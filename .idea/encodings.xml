@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/amqp/AMQPConnectionProperties.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/amqp/AMQPConsumerCallback.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/amqp/AMQPListenContext.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/amqp/AMQPListenProperties.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/amqp/AMQPMessageBundle.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/amqp/AMQPPublishContext.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/amqp/AMQPPublishProperties.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/amqp/AMQPTransport.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/consumer/Consumer.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/publisher/Publisher.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/transport/Transport.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/transport/TransportConnectionProperties.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/transport/TransportListenContext.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/transport/TransportListenProperties.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/transport/TransportMessageBundle.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/transport/TransportPublishContext.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/conduit/transport/TransportPublishProperties.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/test/java/publisher/PublisherTest.java" charset="UTF-8" />
+  </component>
+</project>
+
