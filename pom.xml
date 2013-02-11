@@ -11,6 +11,10 @@
         <powermock.version>1.4.11</powermock.version>
     </properties>
 
+    <scm>
+        <connection>scm:git:git@github.com:RentTheRunway2/conduit.git</connection>
+    </scm>
+
     <distributionManagement>
         <repository>
             <id>rtr-nexus</id>
