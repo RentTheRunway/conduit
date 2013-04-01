@@ -1,5 +1,7 @@
 package conduit.amqp;
 
+import com.rabbitmq.client.ShutdownSignalException;
+
 /**
  * Interface for the callback invoked by the transport consumer on a new message
  * arrival. The _Actions_ enumeration will dictate to the framework what to do. More
@@ -25,4 +27,5 @@ public interface AMQPConsumerCallback {
 
     Action handle(AMQPMessageBundle messageBundle);
     void notifyOfActionFailure(Exception e);
+    void notifyOfShutdown(String consumerTag, ShutdownSignalException sig);
 }

@@ -67,6 +67,7 @@ public class AMQPTransport extends Transport {
         @Override
         public void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
             log.info("Shutdown handler invoked");
+            callback.notifyOfShutdown(consumerTag, sig);
         }
 
         @Override
