@@ -19,7 +19,7 @@ A simple abstraction over the rabbitmq java client, which hides most of the amqp
 
 == How do I consume?
 
-    Consumer c = new Consumer(AMQPListenContect(
+    Consumer c = new Consumer(AMQPListenContext(
             username
           , password
           , exchange
