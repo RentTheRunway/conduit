@@ -18,7 +18,15 @@ public class AMQPMessageBundle implements TransportMessageBundle {
     private byte[] body;
 
     private static AMQP.BasicProperties initialProperties() {
+        return initialProperties(null);
+    }
+
+    private static AMQP.BasicProperties initialProperties(Map<String, Object> additionalHeaders) {
         Map<String, Object> headers = new HashMap<String, Object>();
+
+        if(additionalHeaders != null) {
+            headers.putAll(additionalHeaders);
+        }
 
         headers.put("conduit-retry-count", 0);
 
@@ -40,6 +48,10 @@ public class AMQPMessageBundle implements TransportMessageBundle {
 
     public AMQPMessageBundle(String message) {
         this(null, null, initialProperties(), message.getBytes());
+    }
+
+    public AMQPMessageBundle(String message, Map<String, Object> headers) {
+        this(null, null, initialProperties(headers), message.getBytes());
     }
 
     public String getConsumerTag() {
