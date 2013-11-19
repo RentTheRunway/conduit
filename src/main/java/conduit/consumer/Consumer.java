@@ -7,9 +7,6 @@ import java.io.IOException;
 /**
  * The consumer operates in terms of a listen context; an encapsulation of a
  * concrete transport and its properties.
- *
- * User: kmandrika
- * Date: 1/8/13
  */
 public class Consumer {
     private TransportListenContext transportContext;

@@ -7,10 +7,6 @@ import conduit.transport.TransportMessageBundle;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * User: kmandrika
- * Date: 1/9/13
- */
 public class AMQPMessageBundle implements TransportMessageBundle {
     private String consumerTag;
     private Envelope envelope;
@@ -24,7 +20,7 @@ public class AMQPMessageBundle implements TransportMessageBundle {
     private static AMQP.BasicProperties initialProperties(Map<String, Object> additionalHeaders) {
         Map<String, Object> headers = new HashMap<String, Object>();
 
-        if(additionalHeaders != null) {
+        if (additionalHeaders != null) {
             headers.putAll(additionalHeaders);
         }
 

@@ -17,9 +17,6 @@ import java.util.concurrent.TimeoutException;
  * );
  *
  * Publisher publisher = new Publisher(context);
- *
- * User: kmandrika
- * Date: 1/8/13
  */
 public class Publisher {
     private TransportPublishContext transportContext;

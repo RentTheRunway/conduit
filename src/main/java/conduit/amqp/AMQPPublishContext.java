@@ -6,10 +6,6 @@ import conduit.transport.TransportConnectionProperties;
 import conduit.transport.TransportPublishContext;
 import conduit.transport.TransportPublishProperties;
 
-/**
- * User: kmandrika
- * Date: 1/9/13
- */
 public class AMQPPublishContext implements TransportPublishContext {
     private AMQPTransport transport;
     private AMQPConnectionProperties connectionProperties;
@@ -39,6 +35,16 @@ public class AMQPPublishContext implements TransportPublishContext {
           , int port
     ) {
         this(username, password, "/", exchange, routingKey, host, port, 100);
+    }
+
+    public AMQPPublishContext(
+            AMQPTransport transport
+          , AMQPConnectionProperties connectionProperties
+          , AMQPPublishProperties publishProperties
+    ) {
+        this.transport = transport;
+        this.connectionProperties = connectionProperties;
+        this.publishProperties = publishProperties;
     }
 
     @Override

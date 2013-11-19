@@ -2,10 +2,6 @@ package conduit.amqp;
 
 import conduit.transport.TransportPublishProperties;
 
-/**
- * User: kmandrika
- * Date: 1/8/13
- */
 public class AMQPPublishProperties implements TransportPublishProperties {
     private String exchange;
     private String routingKey;

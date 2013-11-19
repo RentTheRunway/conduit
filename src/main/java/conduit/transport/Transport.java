@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
-/**
- * User: kmandrika
- * Date: 1/8/13
- */
 public abstract class Transport {
     //! Public interface.
 

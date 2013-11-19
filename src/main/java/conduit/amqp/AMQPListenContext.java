@@ -5,14 +5,10 @@ import conduit.transport.TransportConnectionProperties;
 import conduit.transport.TransportListenContext;
 import conduit.transport.TransportListenProperties;
 
-/**
- * User: kmandrika
- * Date: 1/9/13
- */
 public class AMQPListenContext implements TransportListenContext {
     private AMQPTransport transport;
     private AMQPConnectionProperties connectionProperties;
-    private AMQPListenProperties listenProperties;
+    private TransportListenProperties listenProperties;
 
     //! Consume context.
     public AMQPListenContext(
@@ -40,6 +36,17 @@ public class AMQPListenContext implements TransportListenContext {
           , AMQPConsumerCallback callback
     ) {
         this(username, password, "/", exchange, queue, host, port, callback);
+    }
+
+    //! Consume context.
+    public AMQPListenContext(
+            AMQPTransport transport
+          , AMQPConnectionProperties connectionProperties
+          , TransportListenProperties transportListenProperties
+    ) {
+        this.transport = transport;
+        this.connectionProperties = connectionProperties;
+        this.listenProperties = transportListenProperties;
     }
 
     @Override

@@ -1,28 +1,24 @@
 package conduit.amqp;
 
+
 import conduit.transport.TransportListenProperties;
 
-/**
- * There is a single restriction on the exchange/queue architecture; the consumer
- * queue must have a respective poison counterpart. Given a queue "Q", there must
- * exist a queue "Q.poison".
- */
-public class AMQPListenProperties implements TransportListenProperties {
-    private AMQPConsumerCallback callback;
+public class AMQPAsyncListenProperties implements TransportListenProperties {
+    private AMQPAsyncConsumerCallback callback;
     private String exchange;
     private String queue;
     private int threshold;
 
-    public AMQPListenProperties(
-            AMQPConsumerCallback callback
+    public AMQPAsyncListenProperties(
+            AMQPAsyncConsumerCallback callback
           , String exchange
           , String queue
     ) {
         this(callback, exchange, queue, 10);
     }
 
-    public AMQPListenProperties(
-            AMQPConsumerCallback callback
+    public AMQPAsyncListenProperties(
+            AMQPAsyncConsumerCallback callback
           , String exchange
           , String queue
           , int threshold
@@ -33,7 +29,7 @@ public class AMQPListenProperties implements TransportListenProperties {
         this.threshold = threshold;
     }
 
-    public AMQPConsumerCallback getCallback() {
+    public AMQPAsyncConsumerCallback getCallback() {
         return callback;
     }
 

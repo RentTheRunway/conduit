@@ -2,10 +2,6 @@ package conduit.amqp;
 
 import conduit.transport.TransportConnectionProperties;
 
-/**
- * User: kmandrika
- * Date: 1/8/13
- */
 public class AMQPConnectionProperties implements TransportConnectionProperties {
     private String username;
     private String password;
@@ -23,6 +19,18 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
 
     public AMQPConnectionProperties(String username, String password) {
         this(username, password, "/");
+    }
+
+    public AMQPConnectionProperties(String username
+                                  , String password
+                                  , String virtualHost
+                                  , int connectionTimeout
+                                  , int heartbeatInterval) {
+        this.username = username;
+        this.password = password;
+        this.virtualHost = virtualHost;
+        this.connectionTimeout = connectionTimeout;
+        this.heartbeatInterval = heartbeatInterval;
     }
 
     public String getUsername() {
