@@ -4,7 +4,7 @@
 
     <groupId>com.rtr.conduit</groupId>
     <artifactId>conduit</artifactId>
-    <version>1.8</version>
+    <version>1.9-SNAPSHOT</version>
     <name>Conduit</name>
     <properties>
         <powermock.version>1.4.11</powermock.version>
