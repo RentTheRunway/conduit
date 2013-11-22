@@ -21,6 +21,7 @@ public class AMQPAsyncTransport extends AMQPTransport {
               , listenProperties.getThreshold()
         );
 
+        getChannel().basicQos(0);
         getChannel().basicConsume(listenProperties.getQueue(), noAutoAck, consumer);
     }
 }
