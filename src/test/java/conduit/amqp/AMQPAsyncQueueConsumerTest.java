@@ -350,4 +350,13 @@ public class AMQPAsyncQueueConsumerTest {
         assertEquals(expectedRoutingKeys, routingKeys);
         assertEquals(expectedDeliveryTags, deliveryTags);
     }
+
+    @Test
+    public void testShutdownHandlerInvocation() {
+        AMQPAsyncConsumerCallback callback = mock(AMQPAsyncConsumerCallback.class);
+        Channel channel = mock(Channel.class);
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 1));
+        consumer.handleShutdownSignal("foo", mock(ShutdownSignalException.class));
+        verify(callback, times(1)).notifyOfShutdown(eq("foo"), any(ShutdownSignalException.class));
+    }
 }

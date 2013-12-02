@@ -3,6 +3,7 @@ package conduit.amqp.consumer;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.ShutdownSignalException;
 import conduit.amqp.AMQPAsyncConsumerCallback;
 import conduit.amqp.AMQPMessageBundle;
 import conduit.amqp.Action;
@@ -22,6 +23,12 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
     public AMQPAsyncQueueConsumer(Channel channel, AMQPAsyncConsumerCallback callback, int threshold) {
         super(channel, null, threshold);
         this.callback = callback;
+    }
+
+    @Override
+    public void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
+        log.info("Shutdown handler invoked");
+        callback.notifyOfShutdown(consumerTag, sig);
     }
 
     @Override
