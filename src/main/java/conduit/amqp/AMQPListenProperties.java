@@ -12,6 +12,58 @@ public class AMQPListenProperties implements TransportListenProperties {
     private String exchange;
     private String queue;
     private int threshold;
+    private boolean isDrainOnListen;
+    private String poisonQueueSeperator;
+
+    public static class AMQPListenPropertiesBuilder{
+        private AMQPConsumerCallback callback;
+        private String exchange;
+        private String queue;
+        private int threshold;
+        private boolean isDrainOnListen;
+        private String poisonQueueSeperator;
+
+        public AMQPListenPropertiesBuilder setCallback(AMQPConsumerCallback callback) {
+            this.callback = callback;
+            return this;
+        }
+
+        public AMQPListenPropertiesBuilder setExchange(String exchange) {
+            this.exchange = exchange;
+            return this;
+        }
+
+        public AMQPListenPropertiesBuilder setQueue(String queue) {
+            this.queue = queue;
+            return this;
+        }
+
+        public AMQPListenPropertiesBuilder setThreshold(int threshold) {
+            this.threshold = threshold;
+            return this;
+        }
+
+        public AMQPListenPropertiesBuilder setDrainOnListen(boolean isDrainOnListen) {
+            this.isDrainOnListen = isDrainOnListen;
+            return this;
+        }
+
+        public AMQPListenPropertiesBuilder setPoisonQueueSeperator(String poisonQueueSeperator) {
+            this.poisonQueueSeperator = poisonQueueSeperator;
+            return this;
+        }
+
+        public AMQPListenProperties create(){
+            if(callback == null || exchange == null || queue == null){
+                throw new IllegalArgumentException("callback, exchange, and queue can't be null");
+            }
+            AMQPListenProperties amqpListenProperties = new AMQPListenProperties(callback, exchange, queue);
+            amqpListenProperties.threshold = threshold;
+            amqpListenProperties.poisonQueueSeperator = poisonQueueSeperator;
+            amqpListenProperties.isDrainOnListen = isDrainOnListen;
+            return amqpListenProperties;
+        }
+    }
 
     public AMQPListenProperties(
             AMQPConsumerCallback callback
@@ -47,5 +99,13 @@ public class AMQPListenProperties implements TransportListenProperties {
 
     public int getThreshold() {
         return threshold;
+    }
+
+    public boolean isDrainOnListen() {
+        return isDrainOnListen;
+    }
+
+    public String getPoisonQueueSeperator() {
+        return poisonQueueSeperator;
     }
 }

@@ -69,6 +69,10 @@ public class AMQPTransport extends Transport {
               , listenProperties.getThreshold()
         );
 
+        if(listenProperties.isDrainOnListen()){
+            channel.queuePurge(listenProperties.getQueue());
+        }
+
         channel.basicConsume(listenProperties.getQueue(), noAutoAck, consumer);
     }
 
