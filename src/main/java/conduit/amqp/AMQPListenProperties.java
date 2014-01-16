@@ -21,7 +21,6 @@ public class AMQPListenProperties implements TransportListenProperties {
         private String queue;
         private int threshold;
         private boolean isDrainOnListen;
-        private String poisonQueueSeperator;
 
         public AMQPListenPropertiesBuilder setCallback(AMQPConsumerCallback callback) {
             this.callback = callback;
@@ -48,18 +47,12 @@ public class AMQPListenProperties implements TransportListenProperties {
             return this;
         }
 
-        public AMQPListenPropertiesBuilder setPoisonQueueSeperator(String poisonQueueSeperator) {
-            this.poisonQueueSeperator = poisonQueueSeperator;
-            return this;
-        }
-
         public AMQPListenProperties create(){
             if(callback == null || exchange == null || queue == null){
                 throw new IllegalArgumentException("callback, exchange, and queue can't be null");
             }
             AMQPListenProperties amqpListenProperties = new AMQPListenProperties(callback, exchange, queue);
             amqpListenProperties.threshold = threshold;
-            amqpListenProperties.poisonQueueSeperator = poisonQueueSeperator;
             amqpListenProperties.isDrainOnListen = isDrainOnListen;
             return amqpListenProperties;
         }
