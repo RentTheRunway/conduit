@@ -1,8 +1,6 @@
 package conduit.amqp;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.*;
 import conduit.amqp.consumer.AMQPQueueConsumer;
 import conduit.amqp.consumer.AMQPQueueConsumerFactory;
 import conduit.transport.*;
@@ -13,6 +11,7 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
@@ -35,11 +34,17 @@ public class AMQPTransportPooled extends Transport {
         this.factory.setHost(host);
         this.factory.setPort(port);
         this.genericObjectPoolConfig = genericObjectPoolConfig;
-
+        this.channels = new HashSet<PooledObject<Channel>>();
         poolableObjectFactory = new PooledObjectFactory<Channel>() {
             @Override
             public PooledObject<Channel> makeObject() throws Exception {
                 Connection connection = factory.newConnection();
+                connection.addShutdownListener(new ShutdownListener() {
+                    @Override
+                    public void shutdownCompleted(ShutdownSignalException cause) {
+                        System.out.println("SHutdown " + cause);
+                    }
+                });
                 Channel channel = connection.createChannel();
                 channel.basicQos(1);
                 DefaultPooledObject defaultPooledObject = new DefaultPooledObject(channel);
