@@ -21,19 +21,10 @@ public class AMQPListenProperties implements TransportListenProperties {
         private int threshold;
         private boolean isDrainOnListen;
 
-        public AMQPListenPropertiesBuilder setCallback(AMQPConsumerCallback callback) {
+        public AMQPListenPropertiesBuilder(AMQPConsumerCallback callback, String exchange, String queue){
             this.callback = callback;
-            return this;
-        }
-
-        public AMQPListenPropertiesBuilder setExchange(String exchange) {
             this.exchange = exchange;
-            return this;
-        }
-
-        public AMQPListenPropertiesBuilder setQueue(String queue) {
             this.queue = queue;
-            return this;
         }
 
         public AMQPListenPropertiesBuilder setThreshold(int threshold) {
@@ -47,9 +38,6 @@ public class AMQPListenProperties implements TransportListenProperties {
         }
 
         public AMQPListenProperties create(){
-            if(callback == null || exchange == null || queue == null){
-                throw new IllegalArgumentException("callback, exchange, and queue can't be null");
-            }
             AMQPListenProperties amqpListenProperties = new AMQPListenProperties(callback, exchange, queue);
             amqpListenProperties.threshold = threshold;
             amqpListenProperties.isDrainOnListen = isDrainOnListen;
