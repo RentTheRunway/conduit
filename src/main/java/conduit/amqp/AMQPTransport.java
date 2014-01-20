@@ -70,11 +70,7 @@ public class AMQPTransport extends Transport {
         final boolean noAutoAck = false;
 
         AMQPListenProperties listenProperties = (AMQPListenProperties)properties;
-        AMQPQueueConsumer consumer = new AMQPQueueConsumer(
-                channel
-              , listenProperties.getCallback()
-              , listenProperties.getThreshold()
-        );
+        AMQPQueueConsumer consumer = this.amqpQueueConsumerFactory.build(channel, listenProperties);
 
         if(listenProperties.isDrainOnListen()){
             channel.queuePurge(listenProperties.getQueue());
