@@ -5,6 +5,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import conduit.amqp.consumer.AMQPQueueConsumer;
+import conduit.amqp.consumer.AMQPQueueConsumerFactory;
 import conduit.transport.Transport;
 import conduit.transport.TransportConnectionProperties;
 import conduit.transport.TransportListenProperties;
@@ -22,10 +23,16 @@ public class AMQPTransport extends Transport {
     private ConnectionFactory factory = new ConnectionFactory();
     private Connection connection;
     private Channel channel;
+    private AMQPQueueConsumerFactory amqpQueueConsumerFactory;
 
     public AMQPTransport(String host, int port) {
         factory.setHost(host);
         factory.setPort(port);
+        amqpQueueConsumerFactory = new AMQPQueueConsumerFactory();
+    }
+
+    public void setAmqpQueueConsumerFactory(AMQPQueueConsumerFactory amqpQueueConsumerFactory) {
+        this.amqpQueueConsumerFactory = amqpQueueConsumerFactory;
     }
 
     protected Channel getChannel() {
