@@ -39,12 +39,6 @@ public class AMQPTransportPooled extends Transport {
             @Override
             public PooledObject<Channel> makeObject() throws Exception {
                 Connection connection = factory.newConnection();
-                connection.addShutdownListener(new ShutdownListener() {
-                    @Override
-                    public void shutdownCompleted(ShutdownSignalException cause) {
-                        System.out.println("SHutdown " + cause);
-                    }
-                });
                 Channel channel = connection.createChannel();
                 channel.basicQos(1);
                 DefaultPooledObject defaultPooledObject = new DefaultPooledObject(channel);

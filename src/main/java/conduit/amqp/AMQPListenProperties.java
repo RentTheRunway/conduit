@@ -13,7 +13,6 @@ public class AMQPListenProperties implements TransportListenProperties {
     private String queue;
     private int threshold;
     private boolean isDrainOnListen;
-    private String poisonQueueSeperator;
 
     public static class AMQPListenPropertiesBuilder{
         private AMQPConsumerCallback callback;
@@ -96,9 +95,5 @@ public class AMQPListenProperties implements TransportListenProperties {
 
     public boolean isDrainOnListen() {
         return isDrainOnListen;
-    }
-
-    public String getPoisonQueueSeperator() {
-        return poisonQueueSeperator;
     }
 }
