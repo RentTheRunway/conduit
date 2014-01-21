@@ -43,7 +43,7 @@ public class AMQPQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPQueueConsumer consumer = spy(new AMQPQueueConsumer(channel, callback, 2));
+        AMQPQueueConsumer consumer = spy(new AMQPQueueConsumer(channel, callback, 2, ""));
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
@@ -75,7 +75,7 @@ public class AMQPQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPQueueConsumer consumer = spy(new AMQPQueueConsumer(channel, callback, 2));
+        AMQPQueueConsumer consumer = spy(new AMQPQueueConsumer(channel, callback, 2, ""));
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
@@ -113,7 +113,7 @@ public class AMQPQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPQueueConsumer consumer = spy(new AMQPQueueConsumer(channel, callback, 2));
+        AMQPQueueConsumer consumer = spy(new AMQPQueueConsumer(channel, callback, 2, ""));
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");

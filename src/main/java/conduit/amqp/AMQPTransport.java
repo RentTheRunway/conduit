@@ -64,10 +64,16 @@ public class AMQPTransport extends Transport {
 
         AMQPListenProperties listenProperties = (AMQPListenProperties)properties;
         AMQPQueueConsumer consumer = new AMQPQueueConsumer(
-                channel
-              , listenProperties.getCallback()
-              , listenProperties.getThreshold()
+                channel,
+                listenProperties.getCallback(),
+                listenProperties.getThreshold(),
+                listenProperties.getPoisonPrefix()
         );
+
+
+        if(listenProperties.isPurgeOnConnect()){
+            channel.queuePurge(listenProperties.getQueue());
+        }
 
         channel.basicConsume(listenProperties.getQueue(), noAutoAck, consumer);
     }
