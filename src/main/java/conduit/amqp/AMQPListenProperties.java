@@ -12,14 +12,16 @@ public class AMQPListenProperties implements TransportListenProperties {
     private String exchange;
     private String queue;
     private int threshold;
-    private boolean isDrainOnListen;
+    private boolean purgeOnConnect;
+    private String poisonPrefix;
 
     public static class AMQPListenPropertiesBuilder{
         private AMQPConsumerCallback callback;
         private String exchange;
         private String queue;
         private int threshold;
-        private boolean isDrainOnListen;
+        private boolean purgeOnConnect;
+        private String poisonPrefix;
 
         public AMQPListenPropertiesBuilder(AMQPConsumerCallback callback, String exchange, String queue){
             this.callback = callback;
@@ -27,20 +29,29 @@ public class AMQPListenProperties implements TransportListenProperties {
             this.queue = queue;
         }
 
+        public AMQPListenPropertiesBuilder setPoisonPrefix(String poisonPrefix) {
+            this.poisonPrefix = poisonPrefix;
+            return this;
+        }
+
         public AMQPListenPropertiesBuilder setThreshold(int threshold) {
             this.threshold = threshold;
             return this;
         }
 
-        public AMQPListenPropertiesBuilder setDrainOnListen(boolean isDrainOnListen) {
-            this.isDrainOnListen = isDrainOnListen;
+        public AMQPListenPropertiesBuilder setPurgeOnConnect(boolean purgeOnConnect) {
+            this.purgeOnConnect = purgeOnConnect;
             return this;
         }
 
         public AMQPListenProperties create(){
             AMQPListenProperties amqpListenProperties = new AMQPListenProperties(callback, exchange, queue);
             amqpListenProperties.threshold = threshold;
-            amqpListenProperties.isDrainOnListen = isDrainOnListen;
+            amqpListenProperties.purgeOnConnect = purgeOnConnect;
+            if(poisonPrefix != null){
+                amqpListenProperties.poisonPrefix = poisonPrefix;
+            }
+
             return amqpListenProperties;
         }
     }
@@ -63,6 +74,7 @@ public class AMQPListenProperties implements TransportListenProperties {
         this.exchange = exchange;
         this.queue = queue;
         this.threshold = threshold;
+        this.poisonPrefix = "";
     }
 
     public AMQPConsumerCallback getCallback() {
@@ -81,7 +93,11 @@ public class AMQPListenProperties implements TransportListenProperties {
         return threshold;
     }
 
-    public boolean isDrainOnListen() {
-        return isDrainOnListen;
+    public boolean isPurgeOnConnect() {
+        return purgeOnConnect;
+    }
+
+    public String getPoisonPrefix() {
+        return poisonPrefix;
     }
 }
