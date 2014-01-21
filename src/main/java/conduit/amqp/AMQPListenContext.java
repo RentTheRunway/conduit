@@ -6,7 +6,7 @@ import conduit.transport.TransportListenContext;
 import conduit.transport.TransportListenProperties;
 
 public class AMQPListenContext implements TransportListenContext {
-    private Transport transport;
+    private AMQPTransport transport;
     private AMQPConnectionProperties connectionProperties;
     private TransportListenProperties listenProperties;
 
@@ -40,7 +40,7 @@ public class AMQPListenContext implements TransportListenContext {
 
     //! Consume context.
     public AMQPListenContext(
-            Transport transport
+            AMQPTransport transport
           , AMQPConnectionProperties connectionProperties
           , TransportListenProperties transportListenProperties
     ) {
