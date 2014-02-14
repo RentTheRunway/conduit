@@ -8,6 +8,7 @@ public class AMQPAsyncListenProperties implements TransportListenProperties {
     private String exchange;
     private String queue;
     private int threshold;
+    private int prefetchCount;
 
     public AMQPAsyncListenProperties(
             AMQPAsyncConsumerCallback callback
@@ -23,10 +24,21 @@ public class AMQPAsyncListenProperties implements TransportListenProperties {
           , String queue
           , int threshold
     ) {
+        this(callback, exchange, queue, threshold, 0);
+    }
+
+    public AMQPAsyncListenProperties(
+            AMQPAsyncConsumerCallback callback
+          , String exchange
+          , String queue
+          , int threshold
+          , int prefetchCount
+    ) {
         this.callback = callback;
         this.exchange = exchange;
         this.queue = queue;
         this.threshold = threshold;
+        this.prefetchCount = prefetchCount;
     }
 
     public AMQPAsyncConsumerCallback getCallback() {
@@ -43,5 +55,9 @@ public class AMQPAsyncListenProperties implements TransportListenProperties {
 
     public int getThreshold() {
         return threshold;
+    }
+
+    public int getPrefetchCount() {
+        return prefetchCount;
     }
 }
