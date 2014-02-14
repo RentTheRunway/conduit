@@ -10,6 +10,7 @@ public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTrans
                                                                 , AMQPAsyncListenProperties
                                                                 , AMQPAsyncConsumerBuilder> {
     private AMQPAsyncConsumerCallback callback;
+    private int prefetchCount = 0;
 
     public static AMQPAsyncConsumerBuilder builder() {
         return new AMQPAsyncConsumerBuilder();
@@ -30,7 +31,7 @@ public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTrans
 
     @Override
     protected AMQPAsyncListenProperties buildListenProperties() {
-        return new AMQPAsyncListenProperties(callback, getExchange(), getQueue());
+        return new AMQPAsyncListenProperties(callback, getExchange(), getQueue(), getRetryThreshold(), prefetchCount);
     }
 
     @Override
@@ -38,5 +39,10 @@ public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTrans
                                                  , AMQPConnectionProperties connectionProperties
                                                  , AMQPAsyncListenProperties listenProperties) {
         return new AMQPListenContext(transport, connectionProperties, listenProperties);
+    }
+
+    public AMQPAsyncConsumerBuilder prefetchCount(int prefetchCount) {
+        this.prefetchCount = prefetchCount;
+        return this;
     }
 }

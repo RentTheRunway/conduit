@@ -59,7 +59,7 @@ public class AMQPQueueConsumer extends DefaultConsumer {
         respond(messageBundle, action);
     }
 
-    protected void respond(AMQPMessageBundle messageBundle, Action action) {
+    private void respond(AMQPMessageBundle messageBundle, Action action) {
         //! We can't issue any blocking amqp calls in the context of this method, otherwise
         //  channel's internal thread(s) will deadlock. Both, basicAck and basicReject are
         //  asynchronous.
@@ -98,11 +98,11 @@ public class AMQPQueueConsumer extends DefaultConsumer {
         }
     }
 
-    protected void ack(Long deliveryTag) throws IOException {
+    private void ack(Long deliveryTag) throws IOException {
         channel.basicAck(deliveryTag, false);
     }
 
-    protected void reject(long deliveryTag) throws IOException {
+    private void reject(long deliveryTag) throws IOException {
         channel.basicReject(deliveryTag, false);
     }
 
