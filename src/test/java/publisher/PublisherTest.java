@@ -135,6 +135,7 @@ public class PublisherTest {
 
         AMQPMockedTransportInternals mocked = mock();
 
+        PowerMock.expectPrivate(mocked.channelMock, "confirmSelect").andReturn(null);
         PowerMock.expectPrivate(mocked.channelMock, "waitForConfirms", anyLong()).andReturn(true);
         PowerMock.expectPrivate(
                 mocked.channelMock
@@ -173,6 +174,7 @@ public class PublisherTest {
     public void testAMQPPublishDeepNegative() throws Exception {
         AMQPMockedTransportInternals mocked = mock();
 
+        PowerMock.expectPrivate(mocked.channelMock, "confirmSelect").andReturn(null);
         PowerMock.expectPrivate(mocked.channelMock, "waitForConfirms", anyLong()).andReturn(false);
         PowerMock.expectPrivate(
                 mocked.channelMock
@@ -219,6 +221,7 @@ public class PublisherTest {
         final BooleanWrapper txSelectCalled = new BooleanWrapper();
         final BooleanWrapper txCommitCalled = new BooleanWrapper();
 
+        PowerMock.expectPrivate(mocked.channelMock, "confirmSelect").andReturn(null).anyTimes();
         PowerMock.expectPrivate(mocked.channelMock, "waitForConfirms", anyLong()).andReturn(true).anyTimes();
         PowerMock.expectPrivate(mocked.channelMock, "txSelect").andAnswer(new IAnswer<Object>() {
                 @Override
@@ -283,6 +286,7 @@ public class PublisherTest {
         final BooleanWrapper txSelectCalled = new BooleanWrapper();
         final BooleanWrapper txRollbackCalled = new BooleanWrapper();
 
+        PowerMock.expectPrivate(mocked.channelMock, "confirmSelect").andReturn(null);
         PowerMock.expectPrivate(mocked.channelMock, "waitForConfirms", anyLong()).andReturn(false).anyTimes();
         PowerMock.expectPrivate(mocked.channelMock, "txSelect").andAnswer(new IAnswer<Object>() {
                 @Override

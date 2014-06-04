@@ -95,6 +95,8 @@ public class AMQPTransport extends Transport {
         AMQPPublishProperties publishProperties = (AMQPPublishProperties)properties;
         AMQPMessageBundle messageBundle = (AMQPMessageBundle)bundle;
 
+        channel.confirmSelect();
+
         channel.basicPublish(
                 publishProperties.getExchange()
               , publishProperties.getRoutingKey()
