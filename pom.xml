@@ -15,16 +15,16 @@
     </scm>
 
     <distributionManagement>
-        <repository>
-            <id>rtr-nexus</id>
-            <name>rtr-nexus</name>
-            <url>http://nexus01.renttherunway.it/content/repositories/releases</url>
-        </repository>
         <snapshotRepository>
-            <id>rtr-nexus</id>
-            <name>rtr-nexus</name>
-            <url>http://nexus01.renttherunway.it/content/repositories/snapshots/</url>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
     <dependencies>
