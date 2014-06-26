@@ -6,6 +6,9 @@
     <artifactId>conduit</artifactId>
     <version>1.1-SNAPSHOT</version>
     <name>Conduit</name>
+    <description>
+        A simple abstraction over the rabbitmq java client
+    </description>
     <properties>
         <powermock.version>1.4.11</powermock.version>
     </properties>
