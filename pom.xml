@@ -14,8 +14,45 @@
         <powermock.version>1.4.11</powermock.version>
     </properties>
 
+    <developers>
+        <developer>
+            <name>Camille Fournier</name>
+            <email>camille@apache.org</email>
+            <timezone>America/New_York</timezone>
+            <roles>
+                <role>committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Carlo Barbara</name>
+            <email>carlo.barbara@gmail.com</email>
+            <timezone>America/New_York</timezone>
+            <roles>
+                <role>committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Gene Trog</name>
+            <email>gtrog@renttherunway.com</email>
+            <timezone>America/New_York</timezone>
+            <roles>
+                <role>committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Dave Fillion</name>
+            <email>df@renttherunway.com</email>
+            <timezone>America/New_York</timezone>
+            <roles>
+                <role>committer</role>
+            </roles>
+        </developer>
+    </developers>
+
     <scm>
         <connection>scm:git:git@github.com:RentTheRunway2/conduit.git</connection>
+        <developerConnection>scm:git:git@github.com:RentTheRunway2/conduit.git</developerConnection>
+        <url>https://github.com/RentTheRunway2/conduit</url>
         <tag>HEAD</tag>
     </scm>
 
