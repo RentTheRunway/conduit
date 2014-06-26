@@ -49,6 +49,14 @@
         </developer>
     </developers>
 
+    <licenses>
+        <license>
+            <name>License</name>
+            <url>https://github.com/RentTheRunway2/conduit/blob/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <scm>
         <connection>scm:git:git@github.com:RentTheRunway2/conduit.git</connection>
         <developerConnection>scm:git:git@github.com:RentTheRunway2/conduit.git</developerConnection>
