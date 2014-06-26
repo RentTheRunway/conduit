@@ -9,6 +9,7 @@
     <description>
         A simple abstraction over the rabbitmq java client
     </description>
+    <url>www.rtr.io</url>
     <properties>
         <powermock.version>1.4.11</powermock.version>
     </properties>
