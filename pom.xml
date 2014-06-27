@@ -40,8 +40,16 @@
             </roles>
         </developer>
         <developer>
-            <name>Dave Fillion</name>
+            <name>Dave Filion</name>
             <email>df@renttherunway.com</email>
+            <timezone>America/New_York</timezone>
+            <roles>
+                <role>committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Konstantin Mandrika</name>
+            <email>kmandrika+rtr@gmail.com</email>
             <timezone>America/New_York</timezone>
             <roles>
                 <role>committer</role>
