@@ -21,13 +21,15 @@ public class AMQPQueueConsumer extends DefaultConsumer {
     private int threshold;
     protected final Channel channel;
     private String poisonPrefix;
+    private boolean poisonQueueEnabled;
 
-    public AMQPQueueConsumer(Channel channel, AMQPConsumerCallback callback, int threshold, String poisonPrefix) {
+    public AMQPQueueConsumer(Channel channel, AMQPConsumerCallback callback, int threshold, String poisonPrefix, boolean poisonQueueEnabled) {
         super(channel);
         this.callback = callback;
         this.threshold = threshold;
         this.channel = channel;
         this.poisonPrefix = poisonPrefix;
+        this.poisonQueueEnabled = poisonQueueEnabled;
     }
 
     @Override
@@ -148,6 +150,10 @@ public class AMQPQueueConsumer extends DefaultConsumer {
 
     protected void publishToPoisonQueue(Envelope envelope, AMQP.BasicProperties properties, byte[] body)
             throws IOException {
+    	if (!poisonQueueEnabled) {
+    		return;
+    	}
+    	
         channel.basicPublish(
                 envelope.getExchange()
               , envelope.getRoutingKey() + poisonPrefix + ".poison"

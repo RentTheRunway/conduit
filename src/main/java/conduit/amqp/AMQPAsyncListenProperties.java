@@ -9,6 +9,7 @@ public class AMQPAsyncListenProperties implements TransportListenProperties {
     private String queue;
     private int threshold;
     private int prefetchCount;
+    private boolean poisonQueueEnabled;
 
     public AMQPAsyncListenProperties(
             AMQPAsyncConsumerCallback callback
@@ -26,7 +27,7 @@ public class AMQPAsyncListenProperties implements TransportListenProperties {
     ) {
         this(callback, exchange, queue, threshold, 0);
     }
-
+    
     public AMQPAsyncListenProperties(
             AMQPAsyncConsumerCallback callback
           , String exchange
@@ -34,11 +35,23 @@ public class AMQPAsyncListenProperties implements TransportListenProperties {
           , int threshold
           , int prefetchCount
     ) {
+        this(callback, exchange, queue, threshold, prefetchCount, true);
+    }
+
+    public AMQPAsyncListenProperties(
+            AMQPAsyncConsumerCallback callback
+          , String exchange
+          , String queue
+          , int threshold
+          , int prefetchCount
+          , boolean poisonQueueEnabled
+    ) {
         this.callback = callback;
         this.exchange = exchange;
         this.queue = queue;
         this.threshold = threshold;
         this.prefetchCount = prefetchCount;
+        this.poisonQueueEnabled = poisonQueueEnabled;
     }
 
     public AMQPAsyncConsumerCallback getCallback() {
@@ -59,5 +72,9 @@ public class AMQPAsyncListenProperties implements TransportListenProperties {
 
     public int getPrefetchCount() {
         return prefetchCount;
+    }
+    
+    public boolean isPoisonQueueEnabled() {
+    	return poisonQueueEnabled;
     }
 }

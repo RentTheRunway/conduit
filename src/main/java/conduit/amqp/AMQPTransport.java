@@ -67,7 +67,8 @@ public class AMQPTransport extends Transport {
                 channel,
                 listenProperties.getCallback(),
                 listenProperties.getThreshold(),
-                listenProperties.getPoisonPrefix()
+                listenProperties.getPoisonPrefix(),
+                listenProperties.isPoisonQueueEnabled()
         );
 
 
