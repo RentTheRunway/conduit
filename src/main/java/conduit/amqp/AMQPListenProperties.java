@@ -14,6 +14,7 @@ public class AMQPListenProperties implements TransportListenProperties {
     private int threshold;
     private boolean purgeOnConnect;
     private String poisonPrefix;
+    private boolean poisonQueueEnabled;
 
     public static class AMQPListenPropertiesBuilder{
         private AMQPConsumerCallback callback;
@@ -22,6 +23,7 @@ public class AMQPListenProperties implements TransportListenProperties {
         private int threshold;
         private boolean purgeOnConnect;
         private String poisonPrefix;
+        private boolean poisonQueueEnabled = true;
 
         public AMQPListenPropertiesBuilder(AMQPConsumerCallback callback, String exchange, String queue){
             this.callback = callback;
@@ -32,6 +34,11 @@ public class AMQPListenProperties implements TransportListenProperties {
         public AMQPListenPropertiesBuilder setPoisonPrefix(String poisonPrefix) {
             this.poisonPrefix = poisonPrefix;
             return this;
+        }
+        
+        public AMQPListenPropertiesBuilder setPoisonQueueEnabled(boolean enabled) {
+        	this.poisonQueueEnabled = enabled;
+        	return this;
         }
 
         public AMQPListenPropertiesBuilder setThreshold(int threshold) {
@@ -51,7 +58,7 @@ public class AMQPListenProperties implements TransportListenProperties {
             if(poisonPrefix != null){
                 amqpListenProperties.poisonPrefix = poisonPrefix;
             }
-
+            amqpListenProperties.poisonQueueEnabled = poisonQueueEnabled;
             return amqpListenProperties;
         }
     }
@@ -70,11 +77,22 @@ public class AMQPListenProperties implements TransportListenProperties {
           , String queue
           , int threshold
     ) {
+        this(callback, exchange, queue, threshold, true);
+    }
+    
+    public AMQPListenProperties(
+            AMQPConsumerCallback callback
+          , String exchange
+          , String queue
+          , int threshold
+          , boolean poisonQueueEnabled
+    ) {
         this.callback = callback;
         this.exchange = exchange;
         this.queue = queue;
         this.threshold = threshold;
         this.poisonPrefix = "";
+        this.poisonQueueEnabled = poisonQueueEnabled;
     }
 
     public AMQPConsumerCallback getCallback() {
@@ -99,5 +117,9 @@ public class AMQPListenProperties implements TransportListenProperties {
 
     public String getPoisonPrefix() {
         return poisonPrefix;
+    }
+    
+    public boolean isPoisonQueueEnabled() {
+    	return poisonQueueEnabled;
     }
 }

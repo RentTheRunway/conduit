@@ -30,7 +30,7 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
 
     @Override
     protected AMQPListenProperties buildListenProperties() {
-        return new AMQPListenProperties(callback, getExchange(), getQueue(), getRetryThreshold());
+        return new AMQPListenProperties(callback, getExchange(), getQueue(), getRetryThreshold(), isPoisonQueueEnabled());
     }
 
     @Override

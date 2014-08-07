@@ -23,6 +23,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private int connectionTimeout = 0; //! 0 is infinite.
     private int heartbeatInterval = 60; //! In seconds.
     private int retryThreshold = 10;
+    private boolean poisonQueueEnabled = true;
 
     protected AMQPConsumerBuilder() {
     }
@@ -109,6 +110,15 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return retryThreshold;
     }
 
+    public R poisonQueueEnabled(boolean enabled) {
+    	this.poisonQueueEnabled = enabled;
+    	return builder();
+    }
+    
+    protected boolean isPoisonQueueEnabled() {
+    	return poisonQueueEnabled;
+    }
+    
     @Override
     protected void validate() {
         assertNotNull(exchange, "exchange");

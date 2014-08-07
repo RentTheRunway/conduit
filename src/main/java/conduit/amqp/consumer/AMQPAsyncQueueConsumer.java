@@ -21,8 +21,8 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
     private final AMQPAsyncConsumerCallback callback;
     private final Map<Long, AMQPMessageBundle> unacknowledgedMessages = new LinkedHashMap<Long, AMQPMessageBundle>();
 
-    public AMQPAsyncQueueConsumer(Channel channel, AMQPAsyncConsumerCallback callback, int threshold) {
-        super(channel, null, threshold, "");
+    public AMQPAsyncQueueConsumer(Channel channel, AMQPAsyncConsumerCallback callback, int threshold, boolean poisonQueueEnabled) {
+        super(channel, null, threshold, "", poisonQueueEnabled);
         this.callback = callback;
     }
 
