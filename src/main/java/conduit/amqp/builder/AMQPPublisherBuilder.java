@@ -18,7 +18,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
     protected String virtualHost = "/";
     protected int port = 5672;
     protected int publishTimeout = 100;
-    protected int connectionTimeout = 0; //! 0 is infinite.
+    protected int connectionTimeout = 10000; //! In milliseconds
     protected int heartbeatInterval = 60; //! In seconds
 
     protected AMQPPublisherBuilder() {

@@ -13,7 +13,7 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
         this.username = username;
         this.password = password;
         this.virtualHost = virtualHost;
-        this.connectionTimeout = 0; //! 0 is infinite.
+        this.connectionTimeout = 10000; //! In milliseconds.
         this.heartbeatInterval = 60; //! In seconds.
     }
 
