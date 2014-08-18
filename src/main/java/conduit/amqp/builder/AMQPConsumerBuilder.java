@@ -20,7 +20,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private String host = "localhost";
     private int port = 5672;
     private String virtualHost = "/";
-    private int connectionTimeout = 0; //! 0 is infinite.
+    private int connectionTimeout = 10000; //! In milliseconds.
     private int heartbeatInterval = 60; //! In seconds.
     private int retryThreshold = 10;
     private boolean poisonQueueEnabled = true;
