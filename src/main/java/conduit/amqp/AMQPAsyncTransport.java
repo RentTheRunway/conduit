@@ -1,9 +1,6 @@
 package conduit.amqp;
 
-import conduit.amqp.consumer.AMQPAsyncQueueConsumer;
 import conduit.transport.TransportListenProperties;
-
-import java.io.IOException;
 
 public class AMQPAsyncTransport extends AMQPTransport {
     public AMQPAsyncTransport(String host, int port) {
@@ -11,18 +8,24 @@ public class AMQPAsyncTransport extends AMQPTransport {
     }
 
     @Override
-    protected void listenImpl(TransportListenProperties properties) throws IOException {
-        final boolean noAutoAck = false;
-
-        AMQPAsyncListenProperties listenProperties = (AMQPAsyncListenProperties)properties;
-        AMQPAsyncQueueConsumer consumer = new AMQPAsyncQueueConsumer(
-                getChannel()
-              , listenProperties.getCallback()
-              , listenProperties.getThreshold()
-              , listenProperties.isPoisonQueueEnabled()
+    protected AMQPQueueConsumer getConsumer(Object callback, AMQPCommonListenProperties commonListenProperties, String poisonPrefix){
+        return new AMQPAsyncQueueConsumer(
+                getChannel(),
+                (AMQPAsyncConsumerCallback) callback,
+                commonListenProperties.getThreshold(),
+                poisonPrefix,
+                commonListenProperties.isPoisonQueueEnabled()
         );
+    }
 
-        getChannel().basicQos(listenProperties.getPrefetchCount());
-        getChannel().basicConsume(listenProperties.getQueue(), noAutoAck, consumer);
+    @Override
+    protected AMQPCommonListenProperties getCommonListenProperties(TransportListenProperties properties) {
+        AMQPAsyncListenProperties listenProperties = (AMQPAsyncListenProperties)properties;
+        return listenProperties.getCommonListenProperties();
+    }
+
+    @Override
+    protected Object getConsumerCallback(TransportListenProperties properties) {
+        return ((AMQPAsyncListenProperties)properties).getCallback();
     }
 }

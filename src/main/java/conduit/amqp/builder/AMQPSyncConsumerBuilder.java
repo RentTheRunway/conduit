@@ -1,5 +1,6 @@
 package conduit.amqp.builder;
 
+import conduit.amqp.AMQPCommonListenProperties;
 import conduit.amqp.AMQPConnectionProperties;
 import conduit.amqp.AMQPConsumerCallback;
 import conduit.amqp.AMQPListenContext;
@@ -30,7 +31,13 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
 
     @Override
     protected AMQPListenProperties buildListenProperties() {
-        return new AMQPListenProperties(callback, getExchange(), getQueue(), getRetryThreshold(), isPoisonQueueEnabled());
+        AMQPCommonListenProperties commonListenProperties = new AMQPCommonListenProperties.AMQPCommonListenPropertiesBuilder()
+                .setExchange(getExchange())
+                .setQueue(getQueue())
+                .setPrefetchCount(1)
+                .setThreshold(getRetryThreshold())
+                .setPoisonQueueEnabled(isPoisonQueueEnabled()).createAMQPCommonListenProperties();
+        return new AMQPListenProperties(callback, commonListenProperties);
     }
 
     @Override

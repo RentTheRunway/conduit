@@ -1,4 +1,4 @@
-package conduit.amqp.consumer;
+package conduit.amqp;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -8,6 +8,7 @@ import conduit.amqp.AMQPAsyncConsumerCallback;
 import conduit.amqp.AMQPMessageBundle;
 import conduit.amqp.Action;
 import conduit.amqp.AsyncResponse;
+import conduit.amqp.AMQPQueueConsumer;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -21,8 +22,8 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
     private final AMQPAsyncConsumerCallback callback;
     private final Map<Long, AMQPMessageBundle> unacknowledgedMessages = new LinkedHashMap<Long, AMQPMessageBundle>();
 
-    public AMQPAsyncQueueConsumer(Channel channel, AMQPAsyncConsumerCallback callback, int threshold, boolean poisonQueueEnabled) {
-        super(channel, null, threshold, "", poisonQueueEnabled);
+    AMQPAsyncQueueConsumer(Channel channel, AMQPAsyncConsumerCallback callback, int threshold, String poisonPrefix, boolean poisonQueueEnabled) {
+        super(channel, null, threshold, poisonPrefix, poisonQueueEnabled);
         this.callback = callback;
     }
 

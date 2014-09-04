@@ -19,8 +19,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
 
-import conduit.amqp.consumer.AMQPAsyncQueueConsumer;
-
 public class AMQPAsyncQueueConsumerTest {
 
     @Test
@@ -50,7 +48,7 @@ public class AMQPAsyncQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, true));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
@@ -91,7 +89,7 @@ public class AMQPAsyncQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, true));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
@@ -134,7 +132,7 @@ public class AMQPAsyncQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, true));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -184,7 +182,7 @@ public class AMQPAsyncQueueConsumerTest {
         Channel channel = mock(Channel.class);
         //disable poison queue
         boolean poisonQueueEnabled =  false;
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, poisonQueueEnabled));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", poisonQueueEnabled));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -232,7 +230,7 @@ public class AMQPAsyncQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, true));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -299,7 +297,7 @@ public class AMQPAsyncQueueConsumerTest {
         Channel channel = mock(Channel.class);
         //disable poison queue
         boolean poisonQueueEnabled = false;
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, poisonQueueEnabled));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", poisonQueueEnabled));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -364,7 +362,7 @@ public class AMQPAsyncQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 2, true));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 2, "", true));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -441,7 +439,7 @@ public class AMQPAsyncQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 2, true));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 2, "", true));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -531,7 +529,7 @@ public class AMQPAsyncQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 0, true));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 0, "", true));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -589,7 +587,7 @@ public class AMQPAsyncQueueConsumerTest {
         };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 1, true));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 1, "", true));
         final Map<Long, String> routingKeys = new HashMap<Long, String>();
         final List<Long> deliveryTags = new ArrayList<Long>();
 
@@ -651,7 +649,7 @@ public class AMQPAsyncQueueConsumerTest {
     public void testShutdownHandlerInvocation() {
         AMQPAsyncConsumerCallback callback = mock(AMQPAsyncConsumerCallback.class);
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 1, true));
+        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 1, "", true));
         consumer.handleShutdownSignal("foo", mock(ShutdownSignalException.class));
         verify(callback, times(1)).notifyOfShutdown(eq("foo"), any(ShutdownSignalException.class));
     }

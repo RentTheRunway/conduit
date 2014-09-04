@@ -16,7 +16,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
 
-import conduit.amqp.consumer.AMQPQueueConsumer;
+import conduit.amqp.AMQPQueueConsumer;
 
 public class AMQPQueueConsumerTest {
     @Test

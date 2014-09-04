@@ -4,8 +4,6 @@ import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import conduit.amqp.consumer.AMQPQueueConsumer;
-import conduit.transport.Transport;
 import conduit.transport.TransportConnectionProperties;
 import conduit.transport.TransportListenProperties;
 import conduit.transport.TransportMessageBundle;
@@ -13,15 +11,18 @@ import conduit.transport.TransportPublishProperties;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 /**
  * Currently, programmatic creation of exchanges and queues is disallowed and discouraged.
  */
-public class AMQPTransport extends Transport {
+public class AMQPTransport extends AbstractAMQPTransport{
     private ConnectionFactory factory = new ConnectionFactory();
     private Connection connection;
     private Channel channel;
+    private final static String POISON = ".poison";
 
     public AMQPTransport(String host, int port) {
         factory.setHost(host);
@@ -59,24 +60,65 @@ public class AMQPTransport extends Transport {
     }
 
     @Override
+    protected AMQPQueueConsumer getConsumer(Object callback, AMQPCommonListenProperties commonListenProperties, String poisonPrefix){
+        return new AMQPQueueConsumer(
+                getChannel(),
+                (AMQPConsumerCallback) callback,
+                commonListenProperties.getThreshold(),
+                poisonPrefix,
+                commonListenProperties.isPoisonQueueEnabled()
+        );
+    }
+
+    @Override
+    protected AMQPCommonListenProperties getCommonListenProperties(TransportListenProperties properties) {
+        AMQPListenProperties listenProperties = (AMQPListenProperties)properties;
+        return listenProperties.getCommonListenProperties();
+    }
+
+    @Override
+    protected Object getConsumerCallback(TransportListenProperties properties) {
+        return ((AMQPListenProperties)properties).getCallback();
+    }
+
+    @Override
     protected void listenImpl(TransportListenProperties properties) throws IOException {
         final boolean noAutoAck = false;
+        AMQPCommonListenProperties commonListenProperties = getCommonListenProperties(properties);
+        String queue = commonListenProperties.getQueue();
+        String poisonPrefix = commonListenProperties.getPoisonPrefix();
 
-        AMQPListenProperties listenProperties = (AMQPListenProperties)properties;
-        AMQPQueueConsumer consumer = new AMQPQueueConsumer(
-                channel,
-                listenProperties.getCallback(),
-                listenProperties.getThreshold(),
-                listenProperties.getPoisonPrefix(),
-                listenProperties.isPoisonQueueEnabled()
-        );
-
-
-        if(listenProperties.isPurgeOnConnect()){
-            channel.queuePurge(listenProperties.getQueue());
+        if(commonListenProperties.isDynamicQueueCreation()) {
+            queue = createDynamicQueue(commonListenProperties.getExchange(),
+                    commonListenProperties.getDynamicQueueRoutingKey(),
+                    commonListenProperties.isPoisonQueueEnabled());
+            poisonPrefix = "." + queue;
         }
 
-        channel.basicConsume(listenProperties.getQueue(), noAutoAck, consumer);
+        if(commonListenProperties.isPurgeOnConnect()){
+            channel.queuePurge(queue);
+        }
+
+        AMQPQueueConsumer consumer = getConsumer(
+                getConsumerCallback(properties),
+                commonListenProperties,
+                poisonPrefix);
+        getChannel().basicQos(commonListenProperties.getPrefetchCount());
+        getChannel().basicConsume(queue, noAutoAck, consumer);
+    }
+
+    protected String createDynamicQueue(String exchange,
+                                        String routingKey,
+                                        boolean isPoisionQueueEnabled) throws IOException {
+        String queue = channel.queueDeclare().getQueue();
+        channel.queueBind(queue, exchange, routingKey);
+        if(isPoisionQueueEnabled){
+            String poisonQueue = POISON + "." + queue;
+            Map<String, Object> settings = new HashMap<String, Object>();
+            channel.queueDeclare(poisonQueue, true, true, true, settings);
+            channel.queueBind(poisonQueue, exchange, routingKey + "." + queue + POISON);
+        }
+        return queue;
     }
 
     @Override

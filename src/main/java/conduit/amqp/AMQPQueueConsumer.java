@@ -1,4 +1,4 @@
-package conduit.amqp.consumer;
+package conduit.amqp;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;

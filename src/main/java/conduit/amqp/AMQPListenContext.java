@@ -22,7 +22,9 @@ public class AMQPListenContext implements TransportListenContext {
           , AMQPConsumerCallback callback
     ) {
         connectionProperties = new AMQPConnectionProperties(username, password, virtualHost);
-        listenProperties = new AMQPListenProperties(callback, exchange, queue);
+        AMQPCommonListenProperties commonListenProperties = new AMQPCommonListenProperties.AMQPCommonListenPropertiesBuilder().
+                setExchange(exchange).setQueue(queue).createAMQPCommonListenProperties();
+        listenProperties = new AMQPListenProperties(callback, commonListenProperties);
         transport = new AMQPTransport(host, port);
     }
 
