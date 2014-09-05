@@ -62,8 +62,8 @@ public class AMQPCommonListenProperties {
     public static class AMQPCommonListenPropertiesBuilder {
         private String exchange;
         private String queue;
-        private int threshold;
-        private int prefetchCount;
+        private Integer threshold;
+        private Integer prefetchCount;
         private boolean poisonQueueEnabled;
         private boolean purgeOnConnect;
         private boolean dynamicQueueCreation;
@@ -80,12 +80,12 @@ public class AMQPCommonListenProperties {
             return this;
         }
 
-        public AMQPCommonListenPropertiesBuilder setThreshold(int threshold) {
+        public AMQPCommonListenPropertiesBuilder setThreshold(Integer threshold) {
             this.threshold = threshold;
             return this;
         }
 
-        public AMQPCommonListenPropertiesBuilder setPrefetchCount(int prefetchCount) {
+        public AMQPCommonListenPropertiesBuilder setPrefetchCount(Integer prefetchCount) {
             this.prefetchCount = prefetchCount;
             return this;
         }
@@ -116,12 +116,29 @@ public class AMQPCommonListenProperties {
         }
 
         public AMQPCommonListenProperties createAMQPCommonListenProperties() {
-            if(dynamicQueueCreation && queue != null){
-                throw new IllegalArgumentException("queue must be null when using dynamic queue creation");
+            if(exchange == null){
+                throw new IllegalArgumentException("Exchange may not be null");
             }
 
-            if(prefetchCount == 0){
-                prefetchCount = 1;
+            if(!dynamicQueueCreation && queue == null){
+                throw new IllegalArgumentException("Queue may not be null");
+            }
+
+            if(dynamicQueueCreation && (dynamicQueueRoutingKey == null || queue != null) ){
+                throw new IllegalArgumentException("queue must be null, and dynamicQueueRoutingKey must be non null" +
+                        " when using dynamic queue creation");
+            }
+
+            if(prefetchCount == null){
+                prefetchCount = 0;
+            }
+
+            if(threshold == null){
+                threshold = 10;
+            }
+
+            if(poisonPrefix == null){
+                poisonPrefix = "";
             }
             return new AMQPCommonListenProperties(exchange, queue, threshold, prefetchCount, poisonQueueEnabled, purgeOnConnect, dynamicQueueCreation, poisonPrefix, dynamicQueueRoutingKey);
         }
