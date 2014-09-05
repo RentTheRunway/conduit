@@ -173,4 +173,9 @@ public class AMQPTransport extends AbstractAMQPTransport{
 
         return !rollback;
     }
+
+    //Package private for testing
+    void setChannel(Channel channel) {
+        this.channel = channel;
+    }
 }

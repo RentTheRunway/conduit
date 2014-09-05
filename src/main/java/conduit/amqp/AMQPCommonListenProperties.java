@@ -119,6 +119,10 @@ public class AMQPCommonListenProperties {
             if(dynamicQueueCreation && queue != null){
                 throw new IllegalArgumentException("queue must be null when using dynamic queue creation");
             }
+
+            if(prefetchCount == 0){
+                prefetchCount = 1;
+            }
             return new AMQPCommonListenProperties(exchange, queue, threshold, prefetchCount, poisonQueueEnabled, purgeOnConnect, dynamicQueueCreation, poisonPrefix, dynamicQueueRoutingKey);
         }
     }
