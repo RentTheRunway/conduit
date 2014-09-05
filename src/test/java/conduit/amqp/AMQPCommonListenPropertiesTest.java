@@ -45,6 +45,7 @@ public class AMQPCommonListenPropertiesTest {
         assertEquals("When prefetch isn't set, default to ", 0, commonListenProperties.getPrefetchCount());
         assertEquals("When threshold isn't set, default to ", 10, commonListenProperties.getThreshold());
         assertEquals("When poisonPrefix not set, default to ", "", commonListenProperties.getPoisonPrefix());
+        assertEquals("When poisonQEnabled not set, default to ", true, commonListenProperties.isPoisonQueueEnabled());
     }
 
     @Test
@@ -56,5 +57,6 @@ public class AMQPCommonListenPropertiesTest {
         assertEquals("When prefetch isn't set, default to ", 0, commonListenProperties.getPrefetchCount());
         assertEquals("When threshold isn't set, default to ", 10, commonListenProperties.getThreshold());
         assertEquals("When poisonPrefix not set, default to ", "", commonListenProperties.getPoisonPrefix());
+        assertEquals("When poisonQEnabled not set, default to ", true, commonListenProperties.isPoisonQueueEnabled());
     }
 }

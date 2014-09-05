@@ -64,7 +64,7 @@ public class AMQPCommonListenProperties {
         private String queue;
         private Integer threshold;
         private Integer prefetchCount;
-        private boolean poisonQueueEnabled;
+        private Boolean poisonQueueEnabled;
         private boolean purgeOnConnect;
         private boolean dynamicQueueCreation;
         private String poisonPrefix;
@@ -139,6 +139,10 @@ public class AMQPCommonListenProperties {
 
             if(poisonPrefix == null){
                 poisonPrefix = "";
+            }
+
+            if(poisonQueueEnabled == null){
+                poisonQueueEnabled = Boolean.TRUE;
             }
             return new AMQPCommonListenProperties(exchange, queue, threshold, prefetchCount, poisonQueueEnabled, purgeOnConnect, dynamicQueueCreation, poisonPrefix, dynamicQueueRoutingKey);
         }
