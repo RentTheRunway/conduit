@@ -1,0 +1,47 @@
+package io.rtr.conduit.amqp.impl;
+
+import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
+
+public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTransport
+                                                                , AMQPAsyncListenProperties
+                                                                , AMQPAsyncConsumerBuilder> {
+    private AMQPAsyncConsumerCallback callback;
+
+    public static AMQPAsyncConsumerBuilder builder() {
+        return new AMQPAsyncConsumerBuilder();
+    }
+
+    private AMQPAsyncConsumerBuilder() {
+    }
+
+    public AMQPAsyncConsumerBuilder callback(AMQPAsyncConsumerCallback callback) {
+        this.callback = callback;
+        return this;
+    }
+
+    @Override
+    protected AMQPAsyncTransport buildTransport() {
+        return new AMQPAsyncTransport(getHost(), getPort());
+    }
+
+    @Override
+    protected AMQPAsyncListenProperties buildListenProperties() {
+        return new AMQPAsyncListenProperties(callback,
+                getExchange(),
+                getQueue(),
+                getRetryThreshold(),
+                getPrefetchCount(),
+                isPoisonQueueEnabled(),
+                isPurgeOnConnect(),
+                isDynamicQueueCreation(),
+                getPoisonPrefix(),
+                getDynamicQueueRoutingKey());
+    }
+
+    @Override
+    protected AMQPListenContext buildListenContext(AMQPAsyncTransport transport
+                                                 , AMQPConnectionProperties connectionProperties
+                                                 , AMQPAsyncListenProperties amqpAsyncListenProperties) {
+        return new AMQPListenContext(transport, connectionProperties, amqpAsyncListenProperties);
+    }
+}
