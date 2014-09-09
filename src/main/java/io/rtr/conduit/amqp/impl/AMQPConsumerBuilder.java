@@ -165,7 +165,12 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     @Override
     protected void validate() {
         assertNotNull(exchange, "exchange");
-        assertNotNull(queue, "queue");
+        if(!dynamicQueueCreation){
+            assertNotNull(queue, "queue");
+        }
+        else{
+            assertNotNull(dynamicQueueRoutingKey, "dynamicQueueRoutingKey");
+        }
     }
 
     @Override
