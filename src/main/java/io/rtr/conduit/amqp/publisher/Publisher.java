@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 /**
- * The io.rtr.conduit.amqp.publisher operates in terms of a publish context; an encapsulation of a
+ * The publisher operates in terms of a publish context; an encapsulation of a
  * concrete transport and its properties.
  * Example:
  *
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeoutException;
  *         username, password, virtualHost, exchange, routingKey, host, port
  * );
  *
- * Publisher io.rtr.conduit.amqp.publisher = new Publisher(context);
+ * Publisher publisher = new Publisher(context);
  */
 public class Publisher {
     private TransportPublishContext transportContext;

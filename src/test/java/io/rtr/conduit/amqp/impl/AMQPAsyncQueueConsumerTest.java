@@ -387,7 +387,7 @@ public class AMQPAsyncQueueConsumerTest {
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
         assertEquals("world", new String(messages.get(1).getBody()));
-        assertEquals(1, captor.getValue().getHeaders().get("io.rtr.conduit-retry-count"));
+        assertEquals(1, captor.getValue().getHeaders().get("conduit-retry-count"));
 
         // second time, we will retry
         reset(channel);
@@ -399,7 +399,7 @@ public class AMQPAsyncQueueConsumerTest {
         assertEquals(4, messages.size());
         assertEquals("hello", new String(messages.get(2).getBody()));
         assertEquals("world", new String(messages.get(3).getBody()));
-        assertEquals(2, captor.getValue().getHeaders().get("io.rtr.conduit-retry-count"));
+        assertEquals(2, captor.getValue().getHeaders().get("conduit-retry-count"));
 
         // third time, it goes to the poison queue
         reset(channel);
@@ -411,7 +411,7 @@ public class AMQPAsyncQueueConsumerTest {
         assertEquals(6, messages.size());
         assertEquals("hello", new String(messages.get(4).getBody()));
         assertEquals("world", new String(messages.get(5).getBody()));
-        assertEquals(2, captor.getValue().getHeaders().get("io.rtr.conduit-retry-count"));
+        assertEquals(2, captor.getValue().getHeaders().get("conduit-retry-count"));
     }
 
     @Test
@@ -464,7 +464,7 @@ public class AMQPAsyncQueueConsumerTest {
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
         assertEquals("world", new String(messages.get(1).getBody()));
-        assertEquals(1, captor.getValue().getHeaders().get("io.rtr.conduit-retry-count"));
+        assertEquals(1, captor.getValue().getHeaders().get("conduit-retry-count"));
 
         // second time, we will retry
         reset(channel);
@@ -476,7 +476,7 @@ public class AMQPAsyncQueueConsumerTest {
         assertEquals(4, messages.size());
         assertEquals("hello", new String(messages.get(2).getBody()));
         assertEquals("world", new String(messages.get(3).getBody()));
-        assertEquals(2, captor.getValue().getHeaders().get("io.rtr.conduit-retry-count"));
+        assertEquals(2, captor.getValue().getHeaders().get("conduit-retry-count"));
 
         // third time, it goes to the poison queue
         reset(channel);
@@ -488,7 +488,7 @@ public class AMQPAsyncQueueConsumerTest {
         assertEquals(6, messages.size());
         assertEquals("hello", new String(messages.get(4).getBody()));
         assertEquals("world", new String(messages.get(5).getBody()));
-        assertEquals(2, captor.getValue().getHeaders().get("io.rtr.conduit-retry-count"));
+        assertEquals(2, captor.getValue().getHeaders().get("conduit-retry-count"));
     }
 
     @Test
@@ -613,10 +613,10 @@ public class AMQPAsyncQueueConsumerTest {
             Envelope envelope = new Envelope(i, false, "exchange", "key");
             HashMap<String, Object> headers = new HashMap<String, Object>();
 
-            // io.rtr.conduit-retry-count values:
+            //conduit-retry-count values:
             // - 0 1 2 0 1
             if (i > 0) {
-                headers.put("io.rtr.conduit-retry-count", (i - 1) % 3);
+                headers.put("conduit-retry-count", (i - 1) % 3);
             }
 
             AMQP.BasicProperties properties = new AMQP.BasicProperties()

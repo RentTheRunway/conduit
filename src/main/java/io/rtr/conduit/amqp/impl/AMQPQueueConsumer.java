@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class AMQPQueueConsumer extends DefaultConsumer {
     private static final Logger log = Logger.getLogger(AMQPQueueConsumer.class);
-    private static final String HEADER_RETRY_COUNT = "io.rtr.conduit-retry-count";
+    private static final String HEADER_RETRY_COUNT = "conduit-retry-count";
     private AMQPConsumerCallback callback;
     private int threshold;
     protected final Channel channel;

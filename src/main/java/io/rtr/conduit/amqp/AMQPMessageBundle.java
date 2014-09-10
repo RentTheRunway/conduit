@@ -24,7 +24,7 @@ public class AMQPMessageBundle implements TransportMessageBundle {
             headers.putAll(additionalHeaders);
         }
 
-        headers.put("io.rtr.conduit-retry-count", 0);
+        headers.put("conduit-retry-count", 0);
 
         return new AMQP.BasicProperties()
                 .builder()
