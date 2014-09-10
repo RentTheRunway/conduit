@@ -111,10 +111,10 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     protected String createDynamicQueue(String exchange,
                                         String routingKey,
-                                        boolean isPoisionQueueEnabled) throws IOException {
+                                        boolean isPoisonQueueEnabled) throws IOException {
         String queue = channel.queueDeclare().getQueue();
         channel.queueBind(queue, exchange, routingKey);
-        if(isPoisionQueueEnabled){
+        if(isPoisonQueueEnabled){
             String poisonQueue = POISON + "." + queue;
             Map<String, Object> settings = new HashMap<String, Object>();
             channel.queueDeclare(poisonQueue, true, true, true, settings);
