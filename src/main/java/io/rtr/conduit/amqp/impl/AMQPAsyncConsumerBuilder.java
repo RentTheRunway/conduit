@@ -32,7 +32,7 @@ public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTrans
                 getRetryThreshold(),
                 getPrefetchCount(),
                 isPoisonQueueEnabled(),
-                isPurgeOnConnect(),
+                shouldPurgeOnConnect(),
                 isDynamicQueueCreation(),
                 getPoisonPrefix(),
                 getDynamicQueueRoutingKey());

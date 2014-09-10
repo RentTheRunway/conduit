@@ -97,7 +97,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
             poisonPrefix = "." + queue;
         }
 
-        if(commonListenProperties.isPurgeOnConnect()){
+        if(commonListenProperties.shouldPurgeOnConnect()){
             channel.queuePurge(queue);
         }
 

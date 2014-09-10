@@ -45,7 +45,7 @@ public abstract class AMQPCommonListenProperties implements TransportListenPrope
         return poisonQueueEnabled;
     }
 
-    public boolean isPurgeOnConnect() {
+    public boolean shouldPurgeOnConnect() {
         return purgeOnConnect;
     }
 

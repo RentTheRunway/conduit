@@ -142,7 +142,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return prefetchCount;
     }
 
-    protected boolean isPurgeOnConnect() {
+    protected boolean shouldPurgeOnConnect() {
         return purgeOnConnect;
     }
 
