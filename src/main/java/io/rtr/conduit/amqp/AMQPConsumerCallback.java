@@ -11,7 +11,7 @@ import com.rabbitmq.client.ShutdownSignalException;
  * queue/exchange is manually deleted.
  */
 public interface AMQPConsumerCallback {
-    Action handle(AMQPMessageBundle messageBundle);
+    ActionResponse handle(AMQPMessageBundle messageBundle);
     void notifyOfActionFailure(Exception e);
     void notifyOfShutdown(String consumerTag, ShutdownSignalException sig);
 }

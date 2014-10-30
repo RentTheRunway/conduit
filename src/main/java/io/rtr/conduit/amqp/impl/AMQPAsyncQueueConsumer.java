@@ -6,11 +6,12 @@ import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
 import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
-import io.rtr.conduit.amqp.Action;
+import io.rtr.conduit.amqp.ActionResponse;
 import io.rtr.conduit.amqp.AsyncResponse;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
         }
     }
 
-    protected void respond(AMQPMessageBundle messageBundle, Action action, boolean multiple) {
+    protected void respond(AMQPMessageBundle messageBundle, ActionResponse actionResponse, boolean multiple) {
         //! We can't issue any blocking amqp calls in the context of this method, otherwise
         //  channel's internal thread(s) will deadlock. Both, basicAck and basicReject are
         //  asynchronous.
@@ -61,9 +62,14 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
         Long deliveryTag = envelope.getDeliveryTag();
         byte[] body = messageBundle.getBody();
         AMQP.BasicProperties properties = messageBundle.getBasicProperties();
+        if(actionResponse.getReason()!=null && !actionResponse.getReason().trim().isEmpty()) {
+            Map<String, Object> headers = new HashMap<String, Object>(properties.getHeaders());
+            headers.put(ActionResponse.REASON_KEY, actionResponse.getReason());
+            properties = createCopyWithNewHeaders(properties, headers);
+        }
 
         try {
-            switch (action) {
+            switch (actionResponse.getAction()) {
                 case Acknowledge:
                     ack(deliveryTag, multiple);
                     break;
@@ -190,12 +196,12 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
     }
 
     @Override
-    public void respondMultiple(AMQPMessageBundle messageBundle, Action action) {
-        respond(messageBundle, action, true);
+    public void respondMultiple(AMQPMessageBundle messageBundle, ActionResponse actionResponse) {
+        respond(messageBundle, actionResponse, true);
     }
 
     @Override
-    public void respondSingle(AMQPMessageBundle messageBundle, Action action) {
-        respond(messageBundle, action, false);
+    public void respondSingle(AMQPMessageBundle messageBundle, ActionResponse actionResponse) {
+        respond(messageBundle, actionResponse, false);
     }
 }

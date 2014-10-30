@@ -7,7 +7,7 @@ import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
-import io.rtr.conduit.amqp.Action;
+import io.rtr.conduit.amqp.ActionResponse;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class AMQPQueueConsumer extends DefaultConsumer {
 
     @Override
     public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-        Action action;
+        ActionResponse actionResponse;
         AMQPMessageBundle messageBundle = new AMQPMessageBundle(
                 consumerTag
               , envelope
@@ -49,7 +49,7 @@ public class AMQPQueueConsumer extends DefaultConsumer {
         );
 
         try {
-            action = callback.handle(messageBundle);
+            actionResponse = callback.handle(messageBundle);
         } catch (RuntimeException e) {
             //! Blanket exception handler for notifying, via the log, that the user-supplied
             //  callback let an exception propagate. In such cases, all the listeners are stopped.
@@ -58,10 +58,10 @@ public class AMQPQueueConsumer extends DefaultConsumer {
             throw e;
         }
 
-        respond(messageBundle, action);
+        respond(messageBundle, actionResponse);
     }
 
-    private void respond(AMQPMessageBundle messageBundle, Action action) {
+    private void respond(AMQPMessageBundle messageBundle, ActionResponse actionResponse) {
         //! We can't issue any blocking amqp calls in the context of this method, otherwise
         //  channel's internal thread(s) will deadlock. Both, basicAck and basicReject are
         //  asynchronous.
@@ -69,9 +69,14 @@ public class AMQPQueueConsumer extends DefaultConsumer {
         Long deliveryTag = envelope.getDeliveryTag();
         byte[] body = messageBundle.getBody();
         AMQP.BasicProperties properties = messageBundle.getBasicProperties();
+        if(actionResponse.getReason()!=null && !actionResponse.getReason().trim().isEmpty()) {
+            Map<String, Object> headers = new HashMap<String, Object>(properties.getHeaders());
+            headers.put(ActionResponse.REASON_KEY, actionResponse.getReason());
+            properties = createCopyWithNewHeaders(properties, headers);
+        }
 
         try {
-            switch (action) {
+            switch (actionResponse.getAction()) {
                 case Acknowledge:
                     ack(deliveryTag);
                     break;
@@ -160,5 +165,25 @@ public class AMQPQueueConsumer extends DefaultConsumer {
               , properties
               , body
         );
+    }
+
+    protected AMQP.BasicProperties createCopyWithNewHeaders(AMQP.BasicProperties properties, Map<String, Object> headers) {
+        return new AMQP.BasicProperties()
+                .builder()
+                .contentType(properties.getContentType())
+                .contentEncoding(properties.getContentEncoding())
+                .headers(headers)
+                .deliveryMode(properties.getDeliveryMode())
+                .priority(properties.getPriority())
+                .correlationId(properties.getCorrelationId())
+                .replyTo(properties.getReplyTo())
+                .expiration(properties.getExpiration())
+                .messageId(properties.getMessageId())
+                .timestamp(properties.getTimestamp())
+                .type(properties.getType())
+                .userId(properties.getUserId())
+                .appId(properties.getAppId())
+                .clusterId(properties.getClusterId())
+                .build();
     }
 }
