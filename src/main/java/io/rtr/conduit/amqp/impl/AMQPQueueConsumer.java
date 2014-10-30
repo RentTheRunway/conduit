@@ -17,7 +17,6 @@ import java.util.Map;
 public class AMQPQueueConsumer extends DefaultConsumer {
     private static final Logger log = Logger.getLogger(AMQPQueueConsumer.class);
     private static final String HEADER_RETRY_COUNT = "conduit-retry-count";
-    public static final String ACTION_RESPONSE_REASON_KEY = "ActionResponse.Reason";
     private AMQPConsumerCallback callback;
     private int threshold;
     protected final Channel channel;
@@ -71,7 +70,9 @@ public class AMQPQueueConsumer extends DefaultConsumer {
         byte[] body = messageBundle.getBody();
         AMQP.BasicProperties properties = messageBundle.getBasicProperties();
         if(actionResponse.getReason()!=null && !actionResponse.getReason().trim().isEmpty()) {
-            properties = createCopyWithActionReason(properties, actionResponse.getReason());
+            Map<String, Object> headers = new HashMap<String, Object>(properties.getHeaders());
+            headers.put(ActionResponse.REASON_KEY, actionResponse.getReason());
+            properties = createCopyWithNewHeaders(properties, headers);
         }
 
         try {
@@ -166,9 +167,7 @@ public class AMQPQueueConsumer extends DefaultConsumer {
         );
     }
 
-    protected AMQP.BasicProperties createCopyWithActionReason(AMQP.BasicProperties properties, String actionReason) {
-        Map<String, Object> headers = new HashMap<String, Object>(properties.getHeaders());
-        headers.put(ACTION_RESPONSE_REASON_KEY, actionReason);
+    protected AMQP.BasicProperties createCopyWithNewHeaders(AMQP.BasicProperties properties, Map<String, Object> headers) {
         return new AMQP.BasicProperties()
                 .builder()
                 .contentType(properties.getContentType())

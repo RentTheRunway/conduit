@@ -11,6 +11,7 @@ import io.rtr.conduit.amqp.AsyncResponse;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -62,7 +63,9 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
         byte[] body = messageBundle.getBody();
         AMQP.BasicProperties properties = messageBundle.getBasicProperties();
         if(actionResponse.getReason()!=null && !actionResponse.getReason().trim().isEmpty()) {
-            properties = createCopyWithActionReason(properties, actionResponse.getReason());
+            Map<String, Object> headers = new HashMap<String, Object>(properties.getHeaders());
+            headers.put(ActionResponse.REASON_KEY, actionResponse.getReason());
+            properties = createCopyWithNewHeaders(properties, headers);
         }
 
         try {

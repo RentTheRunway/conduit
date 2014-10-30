@@ -38,7 +38,7 @@ public class AMQPAsyncQueueConsumerTest {
             public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
                 messages.add(messageBundle);
                 if (++count > 1) {
-                    response.respondMultiple(messageBundle, new ActionResponse(ActionResponse.Action.Acknowledge));
+                    response.respondMultiple(messageBundle, ActionResponse.acknowledge());
                 }
             }
 
@@ -79,7 +79,7 @@ public class AMQPAsyncQueueConsumerTest {
             public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
                 messages.add(messageBundle);
                 if (++count > 1) {
-                    response.respondSingle(messageBundle, new ActionResponse(ActionResponse. Action.Acknowledge));
+                    response.respondSingle(messageBundle, ActionResponse.acknowledge());
                 }
             }
 
@@ -122,7 +122,7 @@ public class AMQPAsyncQueueConsumerTest {
                 messages.add(messageBundle);
 
                 if (++count > 1) {
-                    response.respondMultiple(messageBundle, new ActionResponse(ActionResponse.Action.RejectAndDiscard));
+                    response.respondMultiple(messageBundle, ActionResponse.discard());
                 }
             }
 
@@ -170,7 +170,7 @@ public class AMQPAsyncQueueConsumerTest {
                 messages.add(messageBundle);
 
                 if (++count > 1) {
-                    response.respondMultiple(messageBundle, new ActionResponse(ActionResponse.Action.RejectAndDiscard));
+                    response.respondMultiple(messageBundle, ActionResponse.discard());
                 }
             }
 
@@ -220,7 +220,7 @@ public class AMQPAsyncQueueConsumerTest {
                 messages.add(messageBundle);
 
                 if (++count > 1) {
-                    response.respondSingle(messageBundle, new ActionResponse(ActionResponse.Action.RejectAndDiscard));
+                    response.respondSingle(messageBundle, ActionResponse.discard());
                 }
             }
 
@@ -256,7 +256,7 @@ public class AMQPAsyncQueueConsumerTest {
           , envelope1
           , properties
           , "hello".getBytes()
-        ), new ActionResponse(ActionResponse.Action.RejectAndDiscard));
+        ), ActionResponse.discard());
 
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
         verify(channel, times(1)).basicPublish(eq("exchange")
@@ -285,7 +285,7 @@ public class AMQPAsyncQueueConsumerTest {
                 messages.add(messageBundle);
 
                 if (++count > 1) {
-                    response.respondSingle(messageBundle, new ActionResponse(ActionResponse.Action.RejectAndDiscard));
+                    response.respondSingle(messageBundle, ActionResponse.discard());
                 }
             }
 
@@ -323,7 +323,7 @@ public class AMQPAsyncQueueConsumerTest {
           , envelope1
           , properties
           , "hello".getBytes()
-        ), new ActionResponse(ActionResponse.Action.RejectAndDiscard));
+        ), ActionResponse.discard());
 
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
         verify(channel, never()).basicPublish(anyString()
@@ -351,7 +351,7 @@ public class AMQPAsyncQueueConsumerTest {
                 messages.add(messageBundle);
 
                 if (++count > 1) {
-                    response.respondMultiple(messageBundle, new ActionResponse(ActionResponse.Action.RejectAndRequeue));
+                    response.respondMultiple(messageBundle, ActionResponse.retry());
                     count = 0;
                 }
             }
@@ -428,7 +428,7 @@ public class AMQPAsyncQueueConsumerTest {
                 messages.add(messageBundle);
 
                 if (++count > 1) {
-                    response.respondSingle(messageBundle, new ActionResponse(ActionResponse.Action.RejectAndRequeue));
+                    response.respondSingle(messageBundle, ActionResponse.retry());
                     count = 0;
                 }
             }
@@ -501,15 +501,15 @@ public class AMQPAsyncQueueConsumerTest {
             public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
                 switch (count++) {
                     case 0:
-                        response.respondMultiple(messageBundle, new ActionResponse(ActionResponse. Action.Acknowledge));
+                        response.respondMultiple(messageBundle, ActionResponse.acknowledge());
                         break;
 
                     case 1:
-                        response.respondMultiple(messageBundle, new ActionResponse(ActionResponse.Action.RejectAndDiscard));
+                        response.respondMultiple(messageBundle, ActionResponse.discard());
                         break;
 
                     case 2:
-                        response.respondMultiple(messageBundle, new ActionResponse(ActionResponse.Action.RejectAndRequeue));
+                        response.respondMultiple(messageBundle, ActionResponse.retry());
                         break;
 
                     case 3:
@@ -517,7 +517,7 @@ public class AMQPAsyncQueueConsumerTest {
                         break;
 
                     case 4:
-                        response.respondMultiple(messageBundle, new ActionResponse(ActionResponse.Action.RejectAndDiscard));
+                        response.respondMultiple(messageBundle, ActionResponse.discard());
                         break;
 
                 }
@@ -577,7 +577,7 @@ public class AMQPAsyncQueueConsumerTest {
             @Override
             public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
                 if (++count > 5) {
-                    response.respondMultiple(messageBundle, new ActionResponse(ActionResponse.Action.RejectAndRequeue));
+                    response.respondMultiple(messageBundle, ActionResponse.retry());
                 }
             }
 

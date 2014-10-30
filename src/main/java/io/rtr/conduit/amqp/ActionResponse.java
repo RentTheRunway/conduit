@@ -2,20 +2,36 @@ package io.rtr.conduit.amqp;
 
 /**
  * An action which the transport should take after returning from the handle callback.
- * Created by zcheng on 10/29/14.
  */
 public class ActionResponse {
 
     private Action action;
     private String reason;
+    public static final String REASON_KEY = "reason";
 
-    public ActionResponse(Action action) {
-        this.action = action;
-    }
-
-    public ActionResponse(Action action, String reason) {
+    private ActionResponse(Action action, String reason) {
         this.action = action;
         this.reason = reason;
+    }
+
+    public static ActionResponse acknowledge() {
+        return new ActionResponse(Action.Acknowledge, null);
+    }
+
+    public static ActionResponse retry() {
+        return new ActionResponse(Action.RejectAndRequeue, null);
+    }
+
+    public static ActionResponse retry(String reason, Object... args) {
+        return new ActionResponse(Action.RejectAndRequeue, String.format(reason, args));
+    }
+
+    public static ActionResponse discard() {
+        return new ActionResponse(Action.RejectAndDiscard, null);
+    }
+
+    public static ActionResponse discard(String reason, Object... args) {
+        return new ActionResponse(Action.RejectAndDiscard, String.format(reason, args));
     }
 
     public String getReason() {

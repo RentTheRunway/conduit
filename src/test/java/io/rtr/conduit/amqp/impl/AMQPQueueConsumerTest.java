@@ -28,7 +28,7 @@ public class AMQPQueueConsumerTest {
             @Override
             public ActionResponse handle(AMQPMessageBundle messageBundle) {
                 messages.add(messageBundle);
-                return new ActionResponse(ActionResponse.Action.Acknowledge);
+                return ActionResponse.acknowledge();
             }
 
             @Override
@@ -61,7 +61,7 @@ public class AMQPQueueConsumerTest {
             @Override
             public ActionResponse handle(AMQPMessageBundle messageBundle) {
                 messages.add(messageBundle);
-                return new ActionResponse(ActionResponse.Action.RejectAndDiscard, actionReason);
+                return ActionResponse.discard(actionReason);
             }
 
             @Override
@@ -90,7 +90,7 @@ public class AMQPQueueConsumerTest {
 
         assertEquals(1, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
-        assertEquals(actionReason, captor.getValue().getHeaders().get(AMQPQueueConsumer.ACTION_RESPONSE_REASON_KEY).toString());
+        assertEquals(actionReason, captor.getValue().getHeaders().get(ActionResponse.REASON_KEY).toString());
     }
     
     @Test
@@ -101,7 +101,7 @@ public class AMQPQueueConsumerTest {
             @Override
             public ActionResponse handle(AMQPMessageBundle messageBundle) {
                 messages.add(messageBundle);
-                return new ActionResponse(ActionResponse.Action.RejectAndDiscard);
+                return ActionResponse.discard();
             }
 
             @Override
@@ -143,7 +143,7 @@ public class AMQPQueueConsumerTest {
             @Override
             public ActionResponse handle(AMQPMessageBundle messageBundle) {
                 messages.add(messageBundle);
-                return new ActionResponse(ActionResponse.Action.RejectAndRequeue);
+                return ActionResponse.retry();
             }
 
             @Override
