@@ -69,11 +69,6 @@ public class AMQPQueueConsumer extends DefaultConsumer {
         Long deliveryTag = envelope.getDeliveryTag();
         byte[] body = messageBundle.getBody();
         AMQP.BasicProperties properties = messageBundle.getBasicProperties();
-        if(actionResponse.getReason()!=null && !actionResponse.getReason().trim().isEmpty()) {
-            Map<String, Object> headers = new HashMap<String, Object>(properties.getHeaders());
-            headers.put(ActionResponse.REASON_KEY, actionResponse.getReason());
-            properties = createCopyWithNewHeaders(properties, headers);
-        }
 
         try {
             switch (actionResponse.getAction()) {
@@ -86,7 +81,7 @@ public class AMQPQueueConsumer extends DefaultConsumer {
                     //! Let the broker know we rejected this message. Then publish this bad boy onto
                     //  the poison queue. Don't bother confirming for two reasons; we don't care, and
                     //  we can't issue blocking calls here.
-                    publishToPoisonQueue(envelope, properties, body);
+                    publishToPoisonQueue(envelope, properties, actionResponse.getReason(), body);
                     reject(deliveryTag);
                     break;
 
@@ -95,7 +90,7 @@ public class AMQPQueueConsumer extends DefaultConsumer {
                     log.warn("\tAdjusting headers for retry.");
 
                     if (!retry(envelope, properties, body)) {
-                        publishToPoisonQueue(envelope, properties, body);
+                        publishToPoisonQueue(envelope, properties, actionResponse.getReason(), body);
                     }
                     reject(deliveryTag);
                     break;
@@ -153,12 +148,18 @@ public class AMQPQueueConsumer extends DefaultConsumer {
         return true;
     }
 
-    protected void publishToPoisonQueue(Envelope envelope, AMQP.BasicProperties properties, byte[] body)
+    protected void publishToPoisonQueue(Envelope envelope, AMQP.BasicProperties properties, String reason, byte[] body)
             throws IOException {
     	if (!poisonQueueEnabled) {
     		return;
     	}
-    	
+
+        if(reason!=null && !reason.trim().isEmpty()) {
+            Map<String, Object> headers = new HashMap<String, Object>(properties.getHeaders());
+            headers.put(ActionResponse.REASON_KEY, reason);
+            properties = createCopyWithNewHeaders(properties, headers);
+        }
+
         channel.basicPublish(
                 envelope.getExchange()
               , envelope.getRoutingKey() + poisonPrefix + ".poison"

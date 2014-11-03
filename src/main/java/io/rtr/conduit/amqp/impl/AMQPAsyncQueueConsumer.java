@@ -11,7 +11,6 @@ import io.rtr.conduit.amqp.AsyncResponse;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -62,11 +61,6 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
         Long deliveryTag = envelope.getDeliveryTag();
         byte[] body = messageBundle.getBody();
         AMQP.BasicProperties properties = messageBundle.getBasicProperties();
-        if(actionResponse.getReason()!=null && !actionResponse.getReason().trim().isEmpty()) {
-            Map<String, Object> headers = new HashMap<String, Object>(properties.getHeaders());
-            headers.put(ActionResponse.REASON_KEY, actionResponse.getReason());
-            properties = createCopyWithNewHeaders(properties, headers);
-        }
 
         try {
             switch (actionResponse.getAction()) {
@@ -79,7 +73,7 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
                     //! Let the broker know we rejected this message. Then publish this bad boy onto
                     //  the poison queue. Don't bother confirming for two reasons; we don't care, and
                     //  we can't issue blocking calls here.
-                    publishToPoisonQueue(envelope, properties, body, multiple);
+                    publishToPoisonQueue(envelope, properties, actionResponse.getReason(), body, multiple);
                     reject(deliveryTag, multiple);
                     break;
 
@@ -88,7 +82,7 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
                     log.warn("\tAdjusting headers for retry.");
 
                     if (!retry(envelope, properties, body, multiple)) {
-                        publishToPoisonQueue(envelope, properties, body, multiple);
+                        publishToPoisonQueue(envelope, properties, actionResponse.getReason(), body, multiple);
                     }
                     reject(deliveryTag, multiple);
                     break;
@@ -136,10 +130,11 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
      */
     private void publishToPoisonQueue(Envelope envelope
                                     , AMQP.BasicProperties properties
+                                    , String reason
                                     , byte[] body
                                     , boolean multiple) throws IOException {
         if (!multiple) {
-            super.publishToPoisonQueue(envelope, properties, body);
+            super.publishToPoisonQueue(envelope, properties, reason, body);
             return;
         }
 
@@ -153,7 +148,7 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
                 break;
             }
 
-            super.publishToPoisonQueue(next.getEnvelope(), next.getBasicProperties(), next.getBody());
+            super.publishToPoisonQueue(next.getEnvelope(), next.getBasicProperties(), reason, next.getBody());
         }
     }
 
