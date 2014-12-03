@@ -4,23 +4,59 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.impl.AMQImpl;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
+import io.rtr.conduit.amqp.AMQPMessageBundle;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AMQPTransportTest {
+    Channel channel;
+    AMQPTransport amqpTransport;
+    AMQPPublishProperties properties;
+    AMQPMessageBundle messageBundle;
+
+    @Before
+    public void before() {
+        amqpTransport = spy(new AMQPTransport("host", 1234));
+        channel = mock(Channel.class);
+        amqpTransport.setChannel(channel);
+
+        properties = mock(AMQPPublishProperties.class);
+        messageBundle = mock(AMQPMessageBundle.class);
+    }
+
+    @Test
+    public void testConfirmModeDisabled() throws Exception {
+        when(properties.isConfirmEnabled()).thenReturn(false);
+
+        amqpTransport.publishImpl(messageBundle, properties);
+
+        verify(channel, times(0)).confirmSelect();
+        verify(channel, times(0)).waitForConfirms(anyLong());
+    }
+
+    @Test
+    public void testConfirmModeEnabled() throws Exception {
+        long timeout = 9876;
+        when(properties.getTimeout()).thenReturn(timeout);
+        when(properties.isConfirmEnabled()).thenReturn(true);
+        when(channel.waitForConfirms(anyLong())).thenReturn(false);
+
+        boolean result = amqpTransport.publishImpl(messageBundle, properties);
+
+        assertFalse(result);
+        verify(channel).confirmSelect();
+        verify(channel).waitForConfirms(timeout);
+    }
+
     @Test
     public void testListenImplDynamicQueues() throws IOException {
-        AMQPTransport amqpTransport = spy(new AMQPTransport("host", 1234));
-        Channel channel = mock(Channel.class);
-
         String randoq = "randoq";
         String exchange = "exchange";
         String router = "router";
@@ -50,9 +86,6 @@ public class AMQPTransportTest {
 
     @Test
     public void testListenImplDynamicQueuesPurgeOnConnect() throws IOException {
-        AMQPTransport amqpTransport = spy(new AMQPTransport("host", 1234));
-        Channel channel = mock(Channel.class);
-
         String randoq = "randoq";
         String exchange = "exchange";
         String router = "router";
