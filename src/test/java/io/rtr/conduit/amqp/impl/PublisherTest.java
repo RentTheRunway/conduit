@@ -6,13 +6,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 import io.rtr.conduit.amqp.AMQPMessageBundle;
-import io.rtr.conduit.amqp.impl.AMQPConnectionProperties;
-import io.rtr.conduit.amqp.impl.AMQPPublishContext;
-import io.rtr.conduit.amqp.impl.AMQPPublisherBuilder;
-import io.rtr.conduit.amqp.impl.AMQPTransport;
 import io.rtr.conduit.amqp.publisher.Publisher;
-import io.rtr.conduit.amqp.transport.TransportMessageBundle;
-import io.rtr.conduit.amqp.transport.TransportPublishProperties;
 import org.easymock.IAnswer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.mockito.Mockito;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -30,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.easymock.EasyMock.*;
-import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
@@ -161,6 +153,7 @@ public class PublisherTest {
                     .exchange("exchange")
                     .routingKey("routingKey")
                     .port(5672)
+                    .confirmEnabled(true)
                     .build();
     }
 

@@ -16,6 +16,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
     protected int publishTimeout = 100;
     protected int connectionTimeout = 10000; //! In milliseconds
     protected int heartbeatInterval = 60; //! In seconds
+    protected boolean confirmEnabled = false;
 
     protected AMQPPublisherBuilder() {
     }
@@ -74,6 +75,11 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
         return this;
     }
 
+    public AMQPPublisherBuilder confirmEnabled(boolean confirmEnabled) {
+        this.confirmEnabled = confirmEnabled;
+        return this;
+    }
+
     @Override
     protected AMQPTransport buildTransport() {
         return new AMQPTransport(host, port);
@@ -86,7 +92,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
 
     @Override
     protected AMQPPublishProperties buildPublishProperties() {
-        return new AMQPPublishProperties(exchange, routingKey, publishTimeout);
+        return new AMQPPublishProperties(exchange, routingKey, publishTimeout, confirmEnabled);
     }
 
     @Override

@@ -140,7 +140,9 @@ public class AMQPTransport extends AbstractAMQPTransport {
         AMQPPublishProperties publishProperties = (AMQPPublishProperties)properties;
         AMQPMessageBundle messageBundle = (AMQPMessageBundle)bundle;
 
-        channel.confirmSelect();
+        if (publishProperties.isConfirmEnabled()) {
+            channel.confirmSelect();
+        }
 
         channel.basicPublish(
                 publishProperties.getExchange()
@@ -149,7 +151,11 @@ public class AMQPTransport extends AbstractAMQPTransport {
               , messageBundle.getBody()
         );
 
-        return channel.waitForConfirms(publishProperties.getTimeout());
+        if (publishProperties.isConfirmEnabled()) {
+            return channel.waitForConfirms(publishProperties.getTimeout());
+        }
+
+        return true;
     }
 
     @Override
