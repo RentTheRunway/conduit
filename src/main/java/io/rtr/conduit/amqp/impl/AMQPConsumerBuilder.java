@@ -22,7 +22,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private int heartbeatInterval = 60; //! In seconds.
     private int retryThreshold = 10;
     private boolean poisonQueueEnabled = true;
-    protected int prefetchCount;
+    private int prefetchCount = 1;
     private boolean purgeOnConnect;
     private boolean dynamicQueueCreation;
     private String poisonPrefix = "";

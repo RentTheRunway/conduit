@@ -46,7 +46,7 @@ public class AMQPSyncConsumerBuilderTest {
                 .dynamicQueueRoutingKey("myRouter");
         AMQPCommonListenProperties commonListenProperties = amqpSyncConsumerBuilder.buildListenProperties();
 
-        assertEquals("When prefetch isn't set, default to ", 0, commonListenProperties.getPrefetchCount());
+        assertEquals("When prefetch isn't set, default to ", 1, commonListenProperties.getPrefetchCount());
         assertEquals("When threshold isn't set, default to ", 10, commonListenProperties.getThreshold());
         assertEquals("When poisonPrefix not set, default to ", "", commonListenProperties.getPoisonPrefix());
         assertEquals("When poisonQEnabled not set, default to ", true, commonListenProperties.isPoisonQueueEnabled());
@@ -61,7 +61,7 @@ public class AMQPSyncConsumerBuilderTest {
         AMQPCommonListenProperties commonListenProperties = amqpSyncConsumerBuilder
                 .buildListenProperties();
 
-        assertEquals("When prefetch isn't set, default to ", 0, commonListenProperties.getPrefetchCount());
+        assertEquals("When prefetch isn't set, default to ", 1, commonListenProperties.getPrefetchCount());
         assertEquals("When threshold isn't set, default to ", 10, commonListenProperties.getThreshold());
         assertEquals("When poisonPrefix not set, default to ", "", commonListenProperties.getPoisonPrefix());
         assertEquals("When poisonQEnabled not set, default to ", true, commonListenProperties.isPoisonQueueEnabled());

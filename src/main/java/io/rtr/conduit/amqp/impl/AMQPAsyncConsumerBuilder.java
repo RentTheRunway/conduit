@@ -12,7 +12,7 @@ public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTrans
     }
 
     private AMQPAsyncConsumerBuilder() {
-        prefetchCount = 100;
+        super.prefetchCount(100);
     }
 
     public AMQPAsyncConsumerBuilder callback(AMQPAsyncConsumerCallback callback) {
