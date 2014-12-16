@@ -57,7 +57,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
         //  connection is considered success.
         if (connection != null && connection.isOpen()) {
             try {
-                connection.close();
+                connection.close(factory.getConnectionTimeout());
             } catch (AlreadyClosedException ignored) {}
         }
     }
@@ -185,5 +185,15 @@ public class AMQPTransport extends AbstractAMQPTransport {
     //Package private for testing
     void setChannel(Channel channel) {
         this.channel = channel;
+    }
+
+    //Package private for testing
+    void setConnectionFactory(ConnectionFactory factory){
+        this.factory = factory;
+    }
+
+    //Package private for testing
+    void setConnection(Connection connection){
+        this.connection = connection;
     }
 }

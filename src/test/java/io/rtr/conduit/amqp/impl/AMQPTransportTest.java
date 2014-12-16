@@ -1,6 +1,8 @@
 package io.rtr.conduit.amqp.impl;
 
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.impl.AMQImpl;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
@@ -112,5 +114,20 @@ public class AMQPTransportTest {
         verify(amqpTransport).createDynamicQueue(exchange, router, true);
         verify(channel).basicConsume(eq(randoq), eq(false), any(Consumer.class));
         verify(channel).basicQos(1);
+    }
+
+    @Test
+    public void testCloseUsingConnectionFactoryTimeout() throws IOException {
+        ConnectionFactory factory = mock(ConnectionFactory.class);
+        int expectedTimeout = 5;
+        when(factory.getConnectionTimeout()).thenReturn(expectedTimeout);
+        Connection connection = mock(Connection.class);
+        when(connection.isOpen()).thenReturn(true);
+
+        amqpTransport.setConnectionFactory(factory);
+        amqpTransport.setConnection(connection);
+
+        amqpTransport.closeImpl();
+        verify(connection).close(eq(expectedTimeout));
     }
 }
