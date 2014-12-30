@@ -44,4 +44,8 @@ public class Publisher {
             throws IOException, TimeoutException, InterruptedException {
         return transportContext.getTransport().transactionalPublish(messageBundles, transportContext.getPublishProperties());
     }
+
+    public boolean isOpen(){
+        return transportContext.getTransport().isOpen();
+    }
 }

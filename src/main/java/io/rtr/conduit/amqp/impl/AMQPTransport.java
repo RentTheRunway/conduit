@@ -36,6 +36,10 @@ public class AMQPTransport extends AbstractAMQPTransport {
         return channel;
     }
 
+    public boolean isOpen(){
+        return this.connection.isOpen();
+    }
+
     @Override
     protected void connectImpl(TransportConnectionProperties properties) throws IOException {
         AMQPConnectionProperties connectionProperties = (AMQPConnectionProperties)properties;

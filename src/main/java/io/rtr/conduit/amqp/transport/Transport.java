@@ -41,7 +41,7 @@ public abstract class Transport {
     }
 
     //! Implementation
-
+    public abstract boolean isOpen();
     protected abstract void connectImpl(TransportConnectionProperties properties) throws IOException;
     protected abstract void closeImpl() throws IOException;
 
