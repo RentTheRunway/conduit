@@ -14,7 +14,7 @@ public abstract class PublisherBuilder<T extends Transport, C extends TransportC
     protected abstract P buildPublishProperties();
     protected abstract PC buildPublishContext(T transport, C connectionProperties, P publishProperties);
 
-    public final Publisher build() {
+    public Publisher build() {
         validate();
         PC context = buildPublishContext(buildTransport(), buildConnectionProperties(), buildPublishProperties());
         return new Publisher(context);
