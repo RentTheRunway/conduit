@@ -3,6 +3,7 @@ package io.rtr.conduit.amqp.publisher;
 import io.rtr.conduit.amqp.impl.AMQPPublisherBuilder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -10,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 public class PublisherPoolTest {
     @Test
-    public void testBasicBorrowLogic(){
+    public void testBasicBorrowLogic() {
         AMQPPublisherBuilder amqpPublisherBuilder = mock(AMQPPublisherBuilder.class);
         Publisher publisher = mock(Publisher.class);
         when(publisher.isOpen()).thenReturn(true);
@@ -19,7 +20,7 @@ public class PublisherPoolTest {
         GenericObjectPoolConfig defaultPoolConfig = PublisherPool.getDefaultPoolConfig();
         defaultPoolConfig.setMaxTotal(2);
         PublisherPool publisherPool = new PublisherPool(amqpPublisherBuilder, defaultPoolConfig);
-        try{
+        try {
             assertEquals("Should be 0 idle", 0L, publisherPool.getNumIdle());
             Publisher borrowObject = publisherPool.borrowObject();
             assertEquals("Should be 1 borrowed", 1L, publisherPool.getBorrowedCount());
@@ -33,7 +34,7 @@ public class PublisherPoolTest {
     }
 
     @Test
-    public void testExhaustion(){
+    public void testExhaustion() {
         AMQPPublisherBuilder amqpPublisherBuilder = mock(AMQPPublisherBuilder.class);
         Publisher publisher = mock(Publisher.class);
         when(publisher.isOpen()).thenReturn(true);
@@ -42,7 +43,7 @@ public class PublisherPoolTest {
         GenericObjectPoolConfig defaultPoolConfig = PublisherPool.getDefaultPoolConfig();
         defaultPoolConfig.setMaxTotal(2);
         PublisherPool publisherPool = new PublisherPool(amqpPublisherBuilder, defaultPoolConfig);
-        try{
+        try {
             publisherPool.borrowObject();
             publisherPool.borrowObject();
             publisherPool.borrowObject();
@@ -52,7 +53,7 @@ public class PublisherPoolTest {
     }
 
     @Test
-    public void testEvictionOfClosed(){
+    public void testEvictionOfClosed() {
         AMQPPublisherBuilder amqpPublisherBuilder = mock(AMQPPublisherBuilder.class);
         Publisher publisher1 = mock(Publisher.class);
         Publisher publisher2 = mock(Publisher.class);
@@ -64,14 +65,14 @@ public class PublisherPoolTest {
         when(publisher3.isOpen()).thenReturn(true);
 
         when(amqpPublisherBuilder.build())
-                . thenReturn(publisher1)
+                .thenReturn(publisher1)
                 .thenReturn(publisher2)
                 .thenReturn(publisher3);
 
         GenericObjectPoolConfig defaultPoolConfig = PublisherPool.getDefaultPoolConfig();
         defaultPoolConfig.setMaxTotal(2);
         PublisherPool publisherPool = new PublisherPool(amqpPublisherBuilder, defaultPoolConfig);
-        try{
+        try {
             //First is open and fine
             publisherPool.borrowObject();
             //Second is open and fine

@@ -11,22 +11,22 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
  * A pool of Conduit publishers, which when configured with
  * default pool settings test connectivity upon borrowing
  * from the pool
- *
+ * <p/>
  * Usage
  * Publisher publisher = null;
  * try{
- *     publisher = pool.borrowObject();
- *     //do some publishing ...
+ * publisher = pool.borrowObject();
+ * //do some publishing ...
  * }
  * finally{
- *     pool.returnObject(publisher)
+ * pool.returnObject(publisher)
  * }
- *
  */
 public class PublisherPool extends GenericObjectPool<Publisher> {
     private static class PooledPublisherFactory extends BasePooledObjectFactory<Publisher> {
         private AMQPPublisherBuilder builder;
-        public PooledPublisherFactory(AMQPPublisherBuilder builder){
+
+        public PooledPublisherFactory(AMQPPublisherBuilder builder) {
             this.builder = builder;
         }
 
@@ -47,7 +47,7 @@ public class PublisherPool extends GenericObjectPool<Publisher> {
             return p.getObject().isOpen();
         }
 
-        public void destroyObject(PooledObject<Publisher> p) throws Exception{
+        public void destroyObject(PooledObject<Publisher> p) throws Exception {
             p.getObject().close();
         }
     }
@@ -56,7 +56,7 @@ public class PublisherPool extends GenericObjectPool<Publisher> {
         super(new PooledPublisherFactory(builder), config);
     }
 
-    public static GenericObjectPoolConfig getDefaultPoolConfig(){
+    public static GenericObjectPoolConfig getDefaultPoolConfig() {
         GenericObjectPoolConfig defaultPoolConfig = new GenericObjectPoolConfig();
         defaultPoolConfig.setMaxIdle(Integer.MAX_VALUE);
         defaultPoolConfig.setMaxTotal(8);
