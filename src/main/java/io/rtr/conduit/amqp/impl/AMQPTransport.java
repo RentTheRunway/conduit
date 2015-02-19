@@ -16,12 +16,21 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Currently, programmatic creation of exchanges and queues is disallowed and discouraged.
- */
 public class AMQPTransport extends AbstractAMQPTransport {
+    private static final AtomicInteger THREAD_COUNT = new AtomicInteger(0);
+    private static final ThreadFactory DAEMON_THREAD_FACTORY = new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setDaemon(true);
+            thread.setName(String.format("AMQPConnection-%s", THREAD_COUNT.getAndIncrement()));
+            return thread;
+        }
+    };
     private ConnectionFactory factory = new ConnectionFactory();
     private Connection connection;
     private Channel channel;
@@ -39,7 +48,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
     @Override
     protected void connectImpl(TransportConnectionProperties properties) throws IOException {
         AMQPConnectionProperties connectionProperties = (AMQPConnectionProperties)properties;
-
+        factory.setThreadFactory(DAEMON_THREAD_FACTORY);
         factory.setUsername(connectionProperties.getUsername());
         factory.setPassword(connectionProperties.getPassword());
         factory.setVirtualHost(connectionProperties.getVirtualHost());
