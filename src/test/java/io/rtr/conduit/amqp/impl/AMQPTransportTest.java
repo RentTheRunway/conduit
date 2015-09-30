@@ -18,6 +18,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class AMQPTransportTest {
+    protected static final String POISON = ".poison";
     Channel channel;
     AMQPTransport amqpTransport;
     AMQPPublishProperties properties;
@@ -115,6 +116,42 @@ public class AMQPTransportTest {
         verify(channel).basicConsume(eq(randoq), eq(false), any(Consumer.class));
         verify(channel).basicQos(1);
     }
+
+    @Test
+    public void testListenImplBasicConfig() throws IOException {
+        String queue = "randoq";
+        String exchange = "exchange";
+        String routingKey = "routingKey";
+        AMQPConsumerBuilder.ExchangeType exchangeType = AMQPConsumerBuilder.ExchangeType.DIRECT;
+
+        AMQImpl.Queue.DeclareOk ok = mock(AMQImpl.Queue.DeclareOk.class);
+        when(ok.getQueue()).thenReturn(queue);
+        when(channel.queueDeclare(anyString(), anyBoolean(), anyBoolean(), anyBoolean(), anyMap())).thenReturn(ok);
+        amqpTransport.setChannel(channel);
+
+        AMQPConsumerCallback consumerCallback = mock(AMQPConsumerCallback.class);
+
+        AMQPCommonListenProperties commonListenProperties = AMQPSyncConsumerBuilder.builder()
+                .callback(consumerCallback)
+                .ensureBasicConfig(exchange, exchangeType, queue, routingKey)
+                .poisonQueueEnabled(Boolean.TRUE)
+                .prefetchCount(1)
+                .buildListenProperties();
+
+        amqpTransport.listenImpl(commonListenProperties);
+        verify(amqpTransport).getConsumer(consumerCallback, commonListenProperties, "");
+        verify(amqpTransport).ensureBasicConfig(exchange, exchangeType.toString(), queue, routingKey, true);
+
+        verify(channel, times(1)).exchangeDeclare(exchange, exchangeType.toString(), true);
+        verify(channel, times(1)).queueDeclare(queue, true, false, false, null);
+        verify(channel, times(1)).queueBind(queue, exchange, routingKey);
+        verify(channel, times(1)).queueDeclare(queue + POISON, true, false, false, null);
+        verify(channel, times(1)).queueBind(queue + POISON, exchange, routingKey + POISON);
+
+        verify(channel).basicConsume(eq(queue), eq(false), any(Consumer.class));
+        verify(channel).basicQos(1);
+    }
+
 
     @Test
     public void testCloseUsingConnectionFactoryTimeout() throws IOException {

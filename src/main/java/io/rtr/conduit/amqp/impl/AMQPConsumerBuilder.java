@@ -27,6 +27,9 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private boolean dynamicQueueCreation;
     private String poisonPrefix = "";
     private String dynamicQueueRoutingKey = "";
+    private String routingKey = "";
+    private boolean ensureBasicConfig = false;
+    private ExchangeType exchangeType = ExchangeType.DIRECT;
 
     protected AMQPConsumerBuilder() {
     }
@@ -138,6 +141,39 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     	return builder();
     }
 
+    /*
+    Ensures that the exchange and queue both exist and they are binded.
+
+    There are a few assumptions to keep this 'light' and compatible with typical usage:
+     - Queues are durable
+     - Queues are NOT exclusive to this connection
+     - Queues are NOT auto deleted
+     - No custom arguments
+     - No dead letter routing
+     - No custom TTL
+
+     */
+    public R ensureBasicConfig(String exchange, ExchangeType exchangeType, String queue, String routingKey) {
+        this.ensureBasicConfig = true;
+        this.exchange = exchange;
+        this.queue = queue;
+        this.exchangeType = exchangeType;
+        this.routingKey = routingKey;
+        return builder();
+    }
+
+    public boolean isEnsureBasicConfig() {
+        return ensureBasicConfig;
+    }
+
+    public String getRoutingKey() {
+        return routingKey;
+    }
+
+    public String getExchangeType() {
+        return exchangeType.toString();
+    }
+
     protected int getPrefetchCount() {
         return prefetchCount;
     }
@@ -165,11 +201,22 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     @Override
     protected void validate() {
         assertNotNull(exchange, "exchange");
+        if (dynamicQueueCreation && ensureBasicConfig) {
+            throw new IllegalArgumentException("Both dynamicQueueCreation and ensureBasicConfig are enabled.");
+        }
         if(!dynamicQueueCreation){
             assertNotNull(queue, "queue");
         }
         else{
             assertNotNull(dynamicQueueRoutingKey, "dynamicQueueRoutingKey");
+        }
+        if (ensureBasicConfig) {
+            assertNotNull(queue, "queue");
+            assertNotNull(exchangeType, "exchangeType");
+            assertNotNull(routingKey, "routingKey");
+            if (exchangeType == ExchangeType.FANOUT && isPoisonQueueEnabled()) {
+                throw new IllegalArgumentException("Fanout exchanges do not support poison queues");
+            }
         }
     }
 
@@ -177,4 +224,16 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     protected AMQPConnectionProperties buildConnectionProperties() {
         return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout, heartbeatInterval);
     }
+
+    public enum ExchangeType {
+        DIRECT,
+        FANOUT,
+        TOPIC;
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase();
+        }
+    }
+
 }
