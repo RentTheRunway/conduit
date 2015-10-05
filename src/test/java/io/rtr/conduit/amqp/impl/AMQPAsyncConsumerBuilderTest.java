@@ -40,20 +40,23 @@ public class AMQPAsyncConsumerBuilderTest {
     }
 
     @Test
-    public void testValidationBasicConfig(){
+    public void testValidationAutoCreateAndBind(){
         AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder = AMQPAsyncConsumerBuilder.builder()
                 .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, "queue", "routingKey");
         AMQPCommonListenProperties commonListenProperties = amqpAsyncConsumerBuilder.buildListenProperties();
 
-        assertEquals("Can not autoCreateAndBind and be dynamic", false, commonListenProperties.isDynamicQueueCreation());
+        // check that the properties got set correctly
         assertEquals("Queue should be: ", "queue", commonListenProperties.getQueue());
         assertEquals("Exchange should be: ", "exchange", commonListenProperties.getExchange());
         assertEquals("RoutingKey should be: ", "routingKey", commonListenProperties.getRoutingKey());
         assertEquals("ExchangeType should be: ", AMQPConsumerBuilder.ExchangeType.DIRECT.toString(), commonListenProperties.getExchangeType());
+
+        // Now check that the defaults validate.
+        amqpAsyncConsumerBuilder.validate();
     }
 
     @Test
-    public void testValidationBasicConfigWithNullRoutingKey(){
+    public void testValidationAutoCreateAndBindWithNullRoutingKey(){
         AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder = AMQPAsyncConsumerBuilder.builder()
                 .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, "queue", null);
 
@@ -64,14 +67,14 @@ public class AMQPAsyncConsumerBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testValidationBasicConfigWithNullQueue(){
+    public void testValidationAutoCreateAndBindWithNullQueue(){
         AMQPAsyncConsumerBuilder.builder()
                 .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, null, "routingKey")
                 .build();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testValidationBasicConfigWithDynamic(){
+    public void testValidationAutoCreateAndBindWithDynamic(){
         AMQPAsyncConsumerBuilder.builder()
                 .dynamicQueueCreation(true)
                 .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, null, "routingKey")
@@ -79,7 +82,7 @@ public class AMQPAsyncConsumerBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testValidationBasicConfigWithPoisonFanout(){
+    public void testValidationAutoCreateAndBindWithPoisonFanout(){
         AMQPAsyncConsumerBuilder.builder()
                 .poisonQueueEnabled(true)
                 .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.FANOUT, null, "routingKey")
