@@ -158,7 +158,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         this.exchange = exchange;
         this.queue = queue;
         this.exchangeType = exchangeType;
-        this.routingKey = routingKey;
+        this.routingKey = (routingKey == null) ? "" : routingKey;
         return builder();
     }
 

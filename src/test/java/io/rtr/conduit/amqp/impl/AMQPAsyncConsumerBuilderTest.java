@@ -3,6 +3,7 @@ package io.rtr.conduit.amqp.impl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class AMQPAsyncConsumerBuilderTest {
 
@@ -51,11 +52,15 @@ public class AMQPAsyncConsumerBuilderTest {
         assertEquals("ExchangeType should be: ", AMQPConsumerBuilder.ExchangeType.DIRECT.toString(), commonListenProperties.getExchangeType());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testValidationBasicConfigWithNullRoutingKey(){
-        AMQPAsyncConsumerBuilder.builder()
-                .ensureBasicConfig("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, "queue", null)
-                .build();
+        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder = AMQPAsyncConsumerBuilder.builder()
+                .ensureBasicConfig("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, "queue", null);
+
+        AMQPCommonListenProperties commonListenProperties = amqpAsyncConsumerBuilder
+                .buildListenProperties();
+        assertNotNull(commonListenProperties.getRoutingKey());
+        assertEquals("", commonListenProperties.getRoutingKey());
     }
 
     @Test(expected = IllegalArgumentException.class)
