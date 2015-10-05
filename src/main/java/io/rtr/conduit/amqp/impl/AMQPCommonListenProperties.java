@@ -13,11 +13,11 @@ public abstract class AMQPCommonListenProperties implements TransportListenPrope
     private String poisonPrefix;
     private String dynamicQueueRoutingKey;
     private String routingKey;
-    private boolean ensureBasicConfig;
+    private boolean autoCreateAndBind;
     private String exchangeType;
 
 
-    AMQPCommonListenProperties(String exchange, String queue, int threshold, int prefetchCount, boolean poisonQueueEnabled, boolean purgeOnConnect, boolean dynamicQueueCreation, String poisonPrefix, String dynamicQueueRoutingKey, boolean ensureBasicConfig, String exchangeType, String routingKey) {
+    AMQPCommonListenProperties(String exchange, String queue, int threshold, int prefetchCount, boolean poisonQueueEnabled, boolean purgeOnConnect, boolean dynamicQueueCreation, String poisonPrefix, String dynamicQueueRoutingKey, boolean autoCreateAndBind, String exchangeType, String routingKey) {
         this.exchange = exchange;
         this.queue = queue;
         this.threshold = threshold;
@@ -28,7 +28,7 @@ public abstract class AMQPCommonListenProperties implements TransportListenPrope
         this.poisonPrefix = poisonPrefix;
         this.dynamicQueueRoutingKey = dynamicQueueRoutingKey;
         this.routingKey = routingKey;
-        this.ensureBasicConfig = ensureBasicConfig;
+        this.autoCreateAndBind = autoCreateAndBind;
         this.exchangeType = exchangeType;
     }
 
@@ -76,7 +76,7 @@ public abstract class AMQPCommonListenProperties implements TransportListenPrope
         return exchangeType;
     }
 
-    public boolean isEnsureBasicConfig() {
-        return ensureBasicConfig;
+    public boolean isAutoCreateAndBind() {
+        return autoCreateAndBind;
     }
 }

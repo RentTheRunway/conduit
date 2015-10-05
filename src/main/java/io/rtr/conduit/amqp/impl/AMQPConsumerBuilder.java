@@ -28,7 +28,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private String poisonPrefix = "";
     private String dynamicQueueRoutingKey = "";
     private String routingKey = "";
-    private boolean ensureBasicConfig = false;
+    private boolean autoCreateAndBind = false;
     private ExchangeType exchangeType = ExchangeType.DIRECT;
 
     protected AMQPConsumerBuilder() {
@@ -142,7 +142,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     }
 
     /*
-    Ensures that the exchange and queue both exist and they are binded.
+    Auto create the exchange, queue and then bind them together.
 
     There are a few assumptions to keep this 'light' and compatible with typical usage:
      - Queues are durable
@@ -153,8 +153,8 @@ public abstract class AMQPConsumerBuilder<T extends Transport
      - No custom TTL
 
      */
-    public R ensureBasicConfig(String exchange, ExchangeType exchangeType, String queue, String routingKey) {
-        this.ensureBasicConfig = true;
+    public R autoCreateAndBind(String exchange, ExchangeType exchangeType, String queue, String routingKey) {
+        this.autoCreateAndBind = true;
         this.exchange = exchange;
         this.queue = queue;
         this.exchangeType = exchangeType;
@@ -162,8 +162,8 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return builder();
     }
 
-    public boolean isEnsureBasicConfig() {
-        return ensureBasicConfig;
+    public boolean isAutoCreateAndBind() {
+        return autoCreateAndBind;
     }
 
     public String getRoutingKey() {
@@ -201,8 +201,8 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     @Override
     protected void validate() {
         assertNotNull(exchange, "exchange");
-        if (dynamicQueueCreation && ensureBasicConfig) {
-            throw new IllegalArgumentException("Both dynamicQueueCreation and ensureBasicConfig are enabled.");
+        if (dynamicQueueCreation && autoCreateAndBind) {
+            throw new IllegalArgumentException("Both dynamicQueueCreation and autoCreateAndBind are enabled.");
         }
         if(!dynamicQueueCreation){
             assertNotNull(queue, "queue");
@@ -210,7 +210,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         else{
             assertNotNull(dynamicQueueRoutingKey, "dynamicQueueRoutingKey");
         }
-        if (ensureBasicConfig) {
+        if (autoCreateAndBind) {
             assertNotNull(queue, "queue");
             assertNotNull(exchangeType, "exchangeType");
             assertNotNull(routingKey, "routingKey");

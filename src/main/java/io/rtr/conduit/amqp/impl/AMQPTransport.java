@@ -104,8 +104,8 @@ public class AMQPTransport extends AbstractAMQPTransport {
                     commonListenProperties.getDynamicQueueRoutingKey(),
                     commonListenProperties.isPoisonQueueEnabled());
             poisonPrefix = "." + queue;
-        } else if(commonListenProperties.isEnsureBasicConfig()) {
-            ensureBasicConfig(
+        } else if(commonListenProperties.isAutoCreateAndBind()) {
+            autoCreateAndBind(
                     commonListenProperties.getExchange(),
                     commonListenProperties.getExchangeType(),
                     commonListenProperties.getQueue(),
@@ -139,7 +139,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
         return queue;
     }
 
-    void ensureBasicConfig(String exchange, String exchangeType, String queue, String routingKey, boolean isPoisonQueueEnabled) throws IOException {
+    void autoCreateAndBind(String exchange, String exchangeType, String queue, String routingKey, boolean isPoisonQueueEnabled) throws IOException {
         // Creates durable non-autodeleted exchange and queue(s).
         channel.exchangeDeclare(exchange, exchangeType, true);
         channel.queueDeclare(queue, true, false, false, null);

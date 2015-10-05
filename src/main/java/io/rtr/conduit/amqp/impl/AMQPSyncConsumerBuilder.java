@@ -37,7 +37,7 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
                 isDynamicQueueCreation(),
                 getPoisonPrefix(),
                 getDynamicQueueRoutingKey(),
-                isEnsureBasicConfig(),
+                isAutoCreateAndBind(),
                 getExchangeType(),
                 getRoutingKey());
     }

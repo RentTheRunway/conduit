@@ -132,14 +132,14 @@ public class AMQPTransportTest {
 
         AMQPCommonListenProperties commonListenProperties = AMQPSyncConsumerBuilder.builder()
                 .callback(consumerCallback)
-                .ensureBasicConfig(exchange, exchangeType, queue, routingKey)
+                .autoCreateAndBind(exchange, exchangeType, queue, routingKey)
                 .poisonQueueEnabled(Boolean.TRUE)
                 .prefetchCount(1)
                 .buildListenProperties();
 
         amqpTransport.listenImpl(commonListenProperties);
         verify(amqpTransport).getConsumer(consumerCallback, commonListenProperties, "");
-        verify(amqpTransport).ensureBasicConfig(exchange, exchangeType.toString(), queue, routingKey, true);
+        verify(amqpTransport).autoCreateAndBind(exchange, exchangeType.toString(), queue, routingKey, true);
 
         verify(channel, times(1)).exchangeDeclare(exchange, exchangeType.toString(), true);
         verify(channel, times(1)).queueDeclare(queue, true, false, false, null);
