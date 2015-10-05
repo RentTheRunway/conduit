@@ -18,7 +18,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class AMQPTransportTest {
-    protected static final String POISON = ".poison";
     Channel channel;
     AMQPTransport amqpTransport;
     AMQPPublishProperties properties;
@@ -145,8 +144,8 @@ public class AMQPTransportTest {
         verify(channel, times(1)).exchangeDeclare(exchange, exchangeType.toString(), true);
         verify(channel, times(1)).queueDeclare(queue, true, false, false, null);
         verify(channel, times(1)).queueBind(queue, exchange, routingKey);
-        verify(channel, times(1)).queueDeclare(queue + POISON, true, false, false, null);
-        verify(channel, times(1)).queueBind(queue + POISON, exchange, routingKey + POISON);
+        verify(channel, times(1)).queueDeclare(queue + AMQPTransport.POISON, true, false, false, null);
+        verify(channel, times(1)).queueBind(queue + AMQPTransport.POISON, exchange, routingKey + AMQPTransport.POISON);
 
         verify(channel).basicConsume(eq(queue), eq(false), any(Consumer.class));
         verify(channel).basicQos(1);

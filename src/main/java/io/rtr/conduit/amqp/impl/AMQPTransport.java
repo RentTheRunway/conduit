@@ -34,7 +34,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
     private ConnectionFactory factory = new ConnectionFactory();
     private Connection connection;
     private Channel channel;
-    private final static String POISON = ".poison";
+    final static String POISON = ".poison";
 
     AMQPTransport(String host, int port) {
         factory.setHost(host);
@@ -139,7 +139,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
         return queue;
     }
 
-    protected void ensureBasicConfig(String exchange, String exchangeType, String queue, String routingKey, boolean isPoisonQueueEnabled) throws IOException {
+    void ensureBasicConfig(String exchange, String exchangeType, String queue, String routingKey, boolean isPoisonQueueEnabled) throws IOException {
         // Creates durable non-autodeleted exchange and queue(s).
         channel.exchangeDeclare(exchange, exchangeType, true);
         channel.queueDeclare(queue, true, false, false, null);
