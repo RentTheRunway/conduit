@@ -8,14 +8,15 @@ import com.rabbitmq.client.ShutdownSignalException;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.ActionResponse;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class AMQPQueueConsumer extends DefaultConsumer {
-    private static final Logger log = Logger.getLogger(AMQPQueueConsumer.class);
+    private static final Logger log = LoggerFactory.getLogger(AMQPQueueConsumer.class);
     private static final String HEADER_RETRY_COUNT = "conduit-retry-count";
     private AMQPConsumerCallback callback;
     private int threshold;

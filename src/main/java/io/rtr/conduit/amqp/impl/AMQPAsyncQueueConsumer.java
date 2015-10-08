@@ -8,7 +8,8 @@ import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.ActionResponse;
 import io.rtr.conduit.amqp.AsyncResponse;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -17,7 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncResponse {
-    private static final Logger log = Logger.getLogger(AMQPQueueConsumer.class);
+    private static final Logger log = LoggerFactory.getLogger(AMQPAsyncQueueConsumer.class);
     private final AMQPAsyncConsumerCallback callback;
     private final Map<Long, AMQPMessageBundle> unacknowledgedMessages = new LinkedHashMap<Long, AMQPMessageBundle>();
 
