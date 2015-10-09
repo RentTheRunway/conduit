@@ -1,10 +1,10 @@
-= Conduit
+# Conduit
 
-== What this be?
+## What this be?
 
 A simple abstraction over the rabbitmq java client, which hides most of the amqp/rabbitmq specific details.
 
-== How do I publish?
+## How do I publish?
 
     Publisher p = new Publisher(new AMQPPublishContext(
             username
@@ -17,7 +17,7 @@ A simple abstraction over the rabbitmq java client, which hides most of the amqp
     p.connect();
     p.publish(new AMQPMessageBundle("hello-world");
 
-== How do I consume?
+## How do I consume?
 
     Consumer c = new Consumer(AMQPListenContext(
             username
@@ -40,6 +40,6 @@ A simple abstraction over the rabbitmq java client, which hides most of the amqp
             }
     ));
 
-== What's next?
+## What's next?
 
 If we can hit that bullseye, the rest of the dominoes will fall like a house of cards, checkmate!
