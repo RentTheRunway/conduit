@@ -34,7 +34,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
     private ConnectionFactory factory = new ConnectionFactory();
     private Connection connection;
     private Channel channel;
-    private final static String POISON = ".poison";
+    final static String POISON = ".poison";
 
     AMQPTransport(String host, int port) {
         factory.setHost(host);
@@ -104,6 +104,13 @@ public class AMQPTransport extends AbstractAMQPTransport {
                     commonListenProperties.getDynamicQueueRoutingKey(),
                     commonListenProperties.isPoisonQueueEnabled());
             poisonPrefix = "." + queue;
+        } else if(commonListenProperties.isAutoCreateAndBind()) {
+            autoCreateAndBind(
+                    commonListenProperties.getExchange(),
+                    commonListenProperties.getExchangeType(),
+                    commonListenProperties.getQueue(),
+                    commonListenProperties.getRoutingKey(),
+                    commonListenProperties.isPoisonQueueEnabled());
         }
 
         if(commonListenProperties.shouldPurgeOnConnect()){
@@ -130,6 +137,19 @@ public class AMQPTransport extends AbstractAMQPTransport {
             channel.queueBind(poisonQueue, exchange, routingKey + "." + queue + POISON);
         }
         return queue;
+    }
+
+    void autoCreateAndBind(String exchange, String exchangeType, String queue, String routingKey, boolean isPoisonQueueEnabled) throws IOException {
+        // Creates durable non-autodeleted exchange and queue(s).
+        channel.exchangeDeclare(exchange, exchangeType, true);
+        channel.queueDeclare(queue, true, false, false, null);
+        channel.queueBind(queue, exchange, routingKey);
+        if(isPoisonQueueEnabled){
+            String poisonQueue = queue + POISON;
+            channel.queueDeclare(poisonQueue, true, false, false, null);
+            channel.queueBind(poisonQueue, exchange, routingKey + POISON);
+        }
+
     }
 
     @Override

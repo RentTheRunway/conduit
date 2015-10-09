@@ -3,6 +3,7 @@ package io.rtr.conduit.amqp.impl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class AMQPAsyncConsumerBuilderTest {
 
@@ -35,6 +36,56 @@ public class AMQPAsyncConsumerBuilderTest {
     public void testValidationQueueRequiredWhenNotDynamic(){
         AMQPAsyncConsumerBuilder.builder()
                 .exchange("exchange")
+                .build();
+    }
+
+    @Test
+    public void testValidationAutoCreateAndBind(){
+        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder = AMQPAsyncConsumerBuilder.builder()
+                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, "queue", "routingKey");
+        AMQPCommonListenProperties commonListenProperties = amqpAsyncConsumerBuilder.buildListenProperties();
+
+        // check that the properties got set correctly
+        assertEquals("Queue should be: ", "queue", commonListenProperties.getQueue());
+        assertEquals("Exchange should be: ", "exchange", commonListenProperties.getExchange());
+        assertEquals("RoutingKey should be: ", "routingKey", commonListenProperties.getRoutingKey());
+        assertEquals("ExchangeType should be: ", AMQPConsumerBuilder.ExchangeType.DIRECT.toString(), commonListenProperties.getExchangeType());
+
+        // Now check that the defaults validate.
+        amqpAsyncConsumerBuilder.validate();
+    }
+
+    @Test
+    public void testValidationAutoCreateAndBindWithNullRoutingKey(){
+        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder = AMQPAsyncConsumerBuilder.builder()
+                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, "queue", null);
+
+        AMQPCommonListenProperties commonListenProperties = amqpAsyncConsumerBuilder
+                .buildListenProperties();
+        assertNotNull(commonListenProperties.getRoutingKey());
+        assertEquals("", commonListenProperties.getRoutingKey());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidationAutoCreateAndBindWithNullQueue(){
+        AMQPAsyncConsumerBuilder.builder()
+                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, null, "routingKey")
+                .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidationAutoCreateAndBindWithDynamic(){
+        AMQPAsyncConsumerBuilder.builder()
+                .dynamicQueueCreation(true)
+                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, null, "routingKey")
+                .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidationAutoCreateAndBindWithPoisonFanout(){
+        AMQPAsyncConsumerBuilder.builder()
+                .poisonQueueEnabled(true)
+                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.FANOUT, null, "routingKey")
                 .build();
     }
 

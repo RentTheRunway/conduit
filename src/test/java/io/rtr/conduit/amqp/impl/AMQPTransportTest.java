@@ -117,6 +117,42 @@ public class AMQPTransportTest {
     }
 
     @Test
+    public void testListenImplBasicConfig() throws IOException {
+        String queue = "randoq";
+        String exchange = "exchange";
+        String routingKey = "routingKey";
+        AMQPConsumerBuilder.ExchangeType exchangeType = AMQPConsumerBuilder.ExchangeType.DIRECT;
+
+        AMQImpl.Queue.DeclareOk ok = mock(AMQImpl.Queue.DeclareOk.class);
+        when(ok.getQueue()).thenReturn(queue);
+        when(channel.queueDeclare(anyString(), anyBoolean(), anyBoolean(), anyBoolean(), anyMap())).thenReturn(ok);
+        amqpTransport.setChannel(channel);
+
+        AMQPConsumerCallback consumerCallback = mock(AMQPConsumerCallback.class);
+
+        AMQPCommonListenProperties commonListenProperties = AMQPSyncConsumerBuilder.builder()
+                .callback(consumerCallback)
+                .autoCreateAndBind(exchange, exchangeType, queue, routingKey)
+                .poisonQueueEnabled(Boolean.TRUE)
+                .prefetchCount(1)
+                .buildListenProperties();
+
+        amqpTransport.listenImpl(commonListenProperties);
+        verify(amqpTransport).getConsumer(consumerCallback, commonListenProperties, "");
+        verify(amqpTransport).autoCreateAndBind(exchange, exchangeType.toString(), queue, routingKey, true);
+
+        verify(channel, times(1)).exchangeDeclare(exchange, exchangeType.toString(), true);
+        verify(channel, times(1)).queueDeclare(queue, true, false, false, null);
+        verify(channel, times(1)).queueBind(queue, exchange, routingKey);
+        verify(channel, times(1)).queueDeclare(queue + AMQPTransport.POISON, true, false, false, null);
+        verify(channel, times(1)).queueBind(queue + AMQPTransport.POISON, exchange, routingKey + AMQPTransport.POISON);
+
+        verify(channel).basicConsume(eq(queue), eq(false), any(Consumer.class));
+        verify(channel).basicQos(1);
+    }
+
+
+    @Test
     public void testCloseUsingConnectionFactoryTimeout() throws IOException {
         ConnectionFactory factory = mock(ConnectionFactory.class);
         int expectedTimeout = 5;
