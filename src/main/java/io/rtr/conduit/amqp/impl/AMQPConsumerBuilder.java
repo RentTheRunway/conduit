@@ -20,6 +20,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private String virtualHost = "/";
     private int connectionTimeout = 10000; //! In milliseconds.
     private int heartbeatInterval = 60; //! In seconds.
+    private boolean automaticRecoveryEnabled = true;
     private int retryThreshold = 10;
     private boolean poisonQueueEnabled = true;
     private int prefetchCount = 1;
@@ -88,6 +89,11 @@ public abstract class AMQPConsumerBuilder<T extends Transport
 
     public R heartbeatInterval(int heartbeatInterval) {
         this.heartbeatInterval = heartbeatInterval;
+        return builder();
+    }
+
+    public R automaticRecoveryEnabled(boolean automaticRecoveryEnabled) {
+        this.automaticRecoveryEnabled = automaticRecoveryEnabled;
         return builder();
     }
 
@@ -222,7 +228,8 @@ public abstract class AMQPConsumerBuilder<T extends Transport
 
     @Override
     protected AMQPConnectionProperties buildConnectionProperties() {
-        return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout, heartbeatInterval);
+        return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout,
+                heartbeatInterval, automaticRecoveryEnabled);
     }
 
     public enum ExchangeType {
