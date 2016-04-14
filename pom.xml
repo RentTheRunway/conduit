@@ -11,7 +11,7 @@
     </description>
     <url>www.rtr.io</url>
     <properties>
-        <powermock.version>1.4.11</powermock.version>
+        <powermock.version>1.6.4</powermock.version>
     </properties>
 
     <developers>

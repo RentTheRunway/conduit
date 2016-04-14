@@ -16,6 +16,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
     protected int publishTimeout = 100;
     protected int connectionTimeout = 10000; //! In milliseconds
     protected int heartbeatInterval = 60; //! In seconds
+    protected boolean automaticRecoveryEnabled = true;
     protected boolean confirmEnabled = false;
 
     protected AMQPPublisherBuilder() {
@@ -65,6 +66,11 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
         return this;
     }
 
+    public AMQPPublisherBuilder automaticRecoveryEnabled(boolean automaticRecoveryEnabled) {
+        this.automaticRecoveryEnabled = automaticRecoveryEnabled;
+        return this;
+    }
+
     public AMQPPublisherBuilder exchange(String exchange) {
         this.exchange = exchange;
         return this;
@@ -87,7 +93,8 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
 
     @Override
     protected AMQPConnectionProperties buildConnectionProperties() {
-        return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout, heartbeatInterval);
+        return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout,
+                heartbeatInterval, automaticRecoveryEnabled);
     }
 
     @Override

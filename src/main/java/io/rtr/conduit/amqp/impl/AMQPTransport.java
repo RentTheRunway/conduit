@@ -54,6 +54,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
         factory.setVirtualHost(connectionProperties.getVirtualHost());
         factory.setConnectionTimeout(connectionProperties.getConnectionTimeout());
         factory.setRequestedHeartbeat(connectionProperties.getHeartbeatInterval());
+        factory.setAutomaticRecoveryEnabled(connectionProperties.isAutomaticRecoveryEnabled());
 
         connection = factory.newConnection();
         channel = connection.createChannel();
