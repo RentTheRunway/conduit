@@ -8,7 +8,7 @@ import java.io.IOException;
  * The consumer operates in terms of a listen context; an encapsulation of a
  * concrete transport and its properties.
  */
-public class Consumer {
+public class Consumer implements AutoCloseable {
     private TransportListenContext transportContext;
 
     //! Public interface.
@@ -21,6 +21,7 @@ public class Consumer {
         transportContext.getTransport().connect(transportContext.getConnectionProperties());
     }
 
+    @Override
     public void close() throws IOException {
         transportContext.getTransport().close();
     }

@@ -18,7 +18,7 @@ import java.util.concurrent.TimeoutException;
  *
  * Publisher publisher = new Publisher(context);
  */
-public class Publisher {
+public class Publisher implements AutoCloseable {
     private TransportPublishContext transportContext;
 
     //! Public interface.
@@ -31,6 +31,7 @@ public class Publisher {
         transportContext.getTransport().connect(transportContext.getConnectionProperties());
     }
 
+    @Override
     public void close() throws IOException {
         transportContext.getTransport().close();
     }
