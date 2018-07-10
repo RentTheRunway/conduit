@@ -2,6 +2,7 @@ package io.rtr.conduit.amqp.publisher;
 
 import io.rtr.conduit.amqp.transport.TransportMessageBundle;
 import io.rtr.conduit.amqp.transport.TransportPublishContext;
+import io.rtr.conduit.amqp.transport.TransportPublishProperties;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -36,9 +37,33 @@ public class Publisher implements AutoCloseable {
         transportContext.getTransport().close();
     }
 
+    /**
+     * Publish the message using the publish properties defined in the transport context
+     * @param messageBundle Message to send
+     */
     public boolean publish(TransportMessageBundle messageBundle)
             throws IOException, TimeoutException, InterruptedException {
-        return transportContext.getTransport().publish(messageBundle, transportContext.getPublishProperties());
+        return publish(messageBundle, null);
+    }
+
+    /**
+     * Publish the message with the publish properties passed as parameter, instead of the ones defined in the transport
+     * context. Useful when those properties change from one message to another (i.e. send messages using different
+     * routing keys)
+     * @param messageBundle Message to send
+     * @param overridePublishProperties Publish properties to use when sending the message. If null, the ones defined
+     *                                  in the transport context will be used.
+     * @return
+     * @throws IOException
+     * @throws TimeoutException
+     * @throws InterruptedException
+     */
+    public boolean publish(TransportMessageBundle messageBundle, TransportPublishProperties overridePublishProperties)
+            throws IOException, TimeoutException, InterruptedException {
+        if (overridePublishProperties == null) {
+            overridePublishProperties = transportContext.getPublishProperties();
+        }
+        return transportContext.getTransport().publish(messageBundle, overridePublishProperties);
     }
 
     public <E> boolean transactionalPublish(Collection<E> messageBundles)
