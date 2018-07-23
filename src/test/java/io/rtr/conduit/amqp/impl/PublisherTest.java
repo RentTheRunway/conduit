@@ -34,6 +34,9 @@ import static org.easymock.EasyMock.*;
 })
 public class PublisherTest {
 
+    public static final String DEFAULT_ROUTING_KEY = "routingKey";
+    public static final String DEFAULT_EXCHANGE = "exchange";
+
     private class AMQPMockedTransportInternals {
         public ConnectionFactory connectionFactoryMock;
         public Connection connectionMock;
@@ -97,8 +100,8 @@ public class PublisherTest {
         PowerMock.expectPrivate(
                 mocked.channelMock
               , "basicPublish"
-              , anyObject(String.class)
-              , anyObject(String.class)
+              , eq(DEFAULT_EXCHANGE)
+              , eq(DEFAULT_ROUTING_KEY)
               , anyObject(AMQP.BasicProperties.class)
               , anyObject(byte[].class)
         ).andAnswer(new IAnswer<Object>() {
@@ -127,8 +130,8 @@ public class PublisherTest {
         PowerMock.expectPrivate(
                 mocked.channelMock
               , "basicPublish"
-              , anyObject(String.class)
-              , anyObject(String.class)
+              , eq(DEFAULT_EXCHANGE)
+              , eq(DEFAULT_ROUTING_KEY)
               , anyObject(AMQP.BasicProperties.class)
               , anyObject(byte[].class)
         ).andAnswer(new IAnswer<Object>() {
@@ -145,13 +148,48 @@ public class PublisherTest {
         assertFalse(publisher.publish(new AMQPMessageBundle("hello")));
     }
 
+    @Test
+    public void testAMQPPublishDeepOverridePublishProperties() throws Exception {
+        final ArrayList<String> published = new ArrayList<String>();
+
+        AMQPMockedTransportInternals mocked = mock();
+        String overriddenExchange = "overriddenExchange";
+        String overriddenRoutingKey = "overriddenRoutingKey";
+        AMQPPublishProperties publishProperties = new AMQPPublishProperties(overriddenExchange, overriddenRoutingKey);
+
+        PowerMock.expectPrivate(mocked.channelMock, "confirmSelect").andReturn(null);
+        PowerMock.expectPrivate(mocked.channelMock, "waitForConfirms", anyLong()).andReturn(true);
+        PowerMock.expectPrivate(
+            mocked.channelMock
+            , "basicPublish"
+            , eq(overriddenExchange)
+            , eq(overriddenRoutingKey)
+            , anyObject(AMQP.BasicProperties.class)
+            , anyObject(byte[].class)
+        ).andAnswer(new IAnswer<Object>() {
+            @Override
+            public Object answer() throws Throwable {
+                published.add(new String((byte[])getCurrentArguments()[3]));
+                return null;
+            }
+        });
+        PowerMock.replayAll();
+
+        Publisher publisher = getPublisher();
+        publisher.connect();
+
+        assertTrue(publisher.publish(new AMQPMessageBundle("hello"), publishProperties));
+        assertTrue(published.size() == 1);
+        assertEquals(published.get(0), "hello");
+    }
+
     private Publisher getPublisher() {
         return AMQPPublisherBuilder.builder()
                     .host("host")
                     .username("username")
                     .password("password")
-                    .exchange("exchange")
-                    .routingKey("routingKey")
+                    .exchange(DEFAULT_EXCHANGE)
+                    .routingKey(DEFAULT_ROUTING_KEY)
                     .port(5672)
                     .confirmEnabled(true)
                     .build();
