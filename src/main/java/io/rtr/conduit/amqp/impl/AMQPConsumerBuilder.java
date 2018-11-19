@@ -233,13 +233,20 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     }
 
     public enum ExchangeType {
-        DIRECT,
-        FANOUT,
-        TOPIC;
+        DIRECT("direct"),
+        FANOUT("fanout"),
+        TOPIC("topic"),
+        CONSISTENT_HASH("x-consistent-hash"); // This kind of exchange can only be created if plugin "consistent-hash-exchange" is enabled
+
+        private final String name;
+
+        ExchangeType(String name) {
+            this.name = name;
+        }
 
         @Override
         public String toString() {
-            return this.name().toLowerCase();
+            return this.name;
         }
     }
 
