@@ -11,3 +11,7 @@ dist: precise
 jdk:
   - openjdk7
   - oraclejdk7
+
+# turn on TLS 1.2 for maven so the build doesn't fail
+before_script:
+  - echo "MAVEN_OPTS='-Dhttps.protocols=TLSv1.2'" > ~/.mavenrc
