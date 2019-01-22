@@ -4,25 +4,28 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.publisher.Publisher;
 import org.easymock.IAnswer;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyInt;
+import static org.easymock.EasyMock.anyLong;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.getCurrentArguments;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
@@ -37,18 +40,15 @@ public class PublisherTest {
     public static final String DEFAULT_ROUTING_KEY = "routingKey";
     public static final String DEFAULT_EXCHANGE = "exchange";
 
-    private class AMQPMockedTransportInternals {
-        public ConnectionFactory connectionFactoryMock;
-        public Connection connectionMock;
-        public Channel channelMock;
-    }
+    public ConnectionFactory connectionFactoryMock;
+    public Connection connectionMock;
+    public Channel channelMock;
 
-    AMQPMockedTransportInternals mock() throws Exception {
-        AMQPMockedTransportInternals mocked = new AMQPMockedTransportInternals();
-
-        mocked.connectionFactoryMock = PowerMock.createPartialMock(ConnectionFactory.class, "newConnection");
-        mocked.connectionMock = PowerMock.createPartialMock(Connection.class, "createChannel");
-        mocked.channelMock = PowerMock.createPartialMock(
+    @Before
+    public void setUp() throws Exception {
+        connectionFactoryMock = PowerMock.createPartialMock(ConnectionFactory.class, "newConnection");
+        connectionMock = PowerMock.createPartialMock(Connection.class, "createChannel");
+        channelMock = PowerMock.createPartialMock(
                 Channel.class
               , "basicAck"
               , "basicReject"
@@ -72,7 +72,7 @@ public class PublisherTest {
               , "setRequestedHeartbeat"
         ));
         PowerMock.expectPrivate(
-                mocked.channelMock
+                channelMock
               , "basicQos"
               , anyInt()
         ).andAnswer(new IAnswer<Object>() {
@@ -82,23 +82,19 @@ public class PublisherTest {
                 }
         });
 
-        PowerMock.expectNew(ConnectionFactory.class).andReturn(mocked.connectionFactoryMock);
-        PowerMock.expectPrivate(mocked.connectionFactoryMock, "newConnection").andReturn(mocked.connectionMock);
-        PowerMock.expectPrivate(mocked.connectionMock, "createChannel").andReturn(mocked.channelMock);
-
-        return mocked;
+        PowerMock.expectNew(ConnectionFactory.class).andReturn(connectionFactoryMock);
+        PowerMock.expectPrivate(connectionFactoryMock, "newConnection").andReturn(connectionMock);
+        PowerMock.expectPrivate(connectionMock, "createChannel").andReturn(channelMock);
     }
 
     @Test
     public void testAMQPPublishDeep() throws Exception {
         final ArrayList<String> published = new ArrayList<String>();
 
-        AMQPMockedTransportInternals mocked = mock();
-
-        PowerMock.expectPrivate(mocked.channelMock, "confirmSelect").andReturn(null);
-        PowerMock.expectPrivate(mocked.channelMock, "waitForConfirms", anyLong()).andReturn(true);
+        PowerMock.expectPrivate(channelMock, "confirmSelect").andReturn(null);
+        PowerMock.expectPrivate(channelMock, "waitForConfirms", anyLong()).andReturn(true);
         PowerMock.expectPrivate(
-                mocked.channelMock
+                channelMock
               , "basicPublish"
               , eq(DEFAULT_EXCHANGE)
               , eq(DEFAULT_ROUTING_KEY)
@@ -123,12 +119,10 @@ public class PublisherTest {
 
     @Test
     public void testAMQPPublishDeepNegative() throws Exception {
-        AMQPMockedTransportInternals mocked = mock();
-
-        PowerMock.expectPrivate(mocked.channelMock, "confirmSelect").andReturn(null);
-        PowerMock.expectPrivate(mocked.channelMock, "waitForConfirms", anyLong()).andReturn(false);
+        PowerMock.expectPrivate(channelMock, "confirmSelect").andReturn(null);
+        PowerMock.expectPrivate(channelMock, "waitForConfirms", anyLong()).andReturn(false);
         PowerMock.expectPrivate(
-                mocked.channelMock
+                channelMock
               , "basicPublish"
               , eq(DEFAULT_EXCHANGE)
               , eq(DEFAULT_ROUTING_KEY)
@@ -150,17 +144,16 @@ public class PublisherTest {
 
     @Test
     public void testAMQPPublishDeepOverridePublishProperties() throws Exception {
-        final ArrayList<String> published = new ArrayList<String>();
+        final ArrayList<String> published = new ArrayList<>();
 
-        AMQPMockedTransportInternals mocked = mock();
         String overriddenExchange = "overriddenExchange";
         String overriddenRoutingKey = "overriddenRoutingKey";
         AMQPPublishProperties publishProperties = new AMQPPublishProperties(overriddenExchange, overriddenRoutingKey);
 
-        PowerMock.expectPrivate(mocked.channelMock, "confirmSelect").andReturn(null);
-        PowerMock.expectPrivate(mocked.channelMock, "waitForConfirms", anyLong()).andReturn(true);
+        PowerMock.expectPrivate(channelMock, "confirmSelect").andReturn(null);
+        PowerMock.expectPrivate(channelMock, "waitForConfirms", anyLong()).andReturn(true);
         PowerMock.expectPrivate(
-            mocked.channelMock
+            channelMock
             , "basicPublish"
             , eq(overriddenExchange)
             , eq(overriddenRoutingKey)
@@ -195,39 +188,31 @@ public class PublisherTest {
                     .build();
     }
 
-    private class BooleanWrapper {
-        private boolean value = false;
-        public void set() { value = true; }
-        public boolean get() { return value; }
-    }
-
     @Test
     public void testAMQPTransactionalPublishDeep() throws Exception {
         final ArrayList<String> published = new ArrayList<String>();
 
-        AMQPMockedTransportInternals mocked = mock();
+        final AtomicBoolean txSelectCalled = new AtomicBoolean();
+        final AtomicBoolean txCommitCalled = new AtomicBoolean();
 
-        final BooleanWrapper txSelectCalled = new BooleanWrapper();
-        final BooleanWrapper txCommitCalled = new BooleanWrapper();
-
-        PowerMock.expectPrivate(mocked.channelMock, "confirmSelect").andReturn(null).anyTimes();
-        PowerMock.expectPrivate(mocked.channelMock, "waitForConfirms", anyLong()).andReturn(true).anyTimes();
-        PowerMock.expectPrivate(mocked.channelMock, "txSelect").andAnswer(new IAnswer<Object>() {
+        PowerMock.expectPrivate(channelMock, "confirmSelect").andReturn(null).anyTimes();
+        PowerMock.expectPrivate(channelMock, "waitForConfirms", anyLong()).andReturn(true).anyTimes();
+        PowerMock.expectPrivate(channelMock, "txSelect").andAnswer(new IAnswer<Object>() {
                 @Override
                 public Object answer() throws Throwable {
-                    txSelectCalled.set();
+                    txSelectCalled.set(true);
                     return null;
                 }
         });
-        PowerMock.expectPrivate(mocked.channelMock, "txCommit").andAnswer(new IAnswer<Object>() {
+        PowerMock.expectPrivate(channelMock, "txCommit").andAnswer(new IAnswer<Object>() {
                 @Override
                 public Object answer() throws Throwable {
-                    txCommitCalled.set();
+                    txCommitCalled.set(true);
                     return null;
                 }
         });
         PowerMock.expectPrivate(
-                mocked.channelMock
+                channelMock
               , "basicPublish"
               , anyObject(String.class)
               , anyObject(String.class)
@@ -261,29 +246,27 @@ public class PublisherTest {
     public void testAMQPTransactionalPublishDeepNegative() throws Exception {
         final ArrayList<String> published = new ArrayList<String>();
 
-        AMQPMockedTransportInternals mocked = mock();
+        final AtomicBoolean txSelectCalled = new AtomicBoolean();
+        final AtomicBoolean txRollbackCalled = new AtomicBoolean();
 
-        final BooleanWrapper txSelectCalled = new BooleanWrapper();
-        final BooleanWrapper txRollbackCalled = new BooleanWrapper();
-
-        PowerMock.expectPrivate(mocked.channelMock, "confirmSelect").andReturn(null);
-        PowerMock.expectPrivate(mocked.channelMock, "waitForConfirms", anyLong()).andReturn(false).anyTimes();
-        PowerMock.expectPrivate(mocked.channelMock, "txSelect").andAnswer(new IAnswer<Object>() {
+        PowerMock.expectPrivate(channelMock, "confirmSelect").andReturn(null);
+        PowerMock.expectPrivate(channelMock, "waitForConfirms", anyLong()).andReturn(false).anyTimes();
+        PowerMock.expectPrivate(channelMock, "txSelect").andAnswer(new IAnswer<Object>() {
                 @Override
                 public Object answer() throws Throwable {
-                    txSelectCalled.set();
+                    txSelectCalled.set(true);
                     return null;
                 }
         });
-        PowerMock.expectPrivate(mocked.channelMock, "txRollback").andAnswer(new IAnswer<Object>() {
+        PowerMock.expectPrivate(channelMock, "txRollback").andAnswer(new IAnswer<Object>() {
                 @Override
                 public Object answer() throws Throwable {
-                    txRollbackCalled.set();
+                    txRollbackCalled.set(true);
                     return null;
                 }
         });
         PowerMock.expectPrivate(
-                mocked.channelMock
+                channelMock
               , "basicPublish"
               , anyObject(String.class)
               , anyObject(String.class)

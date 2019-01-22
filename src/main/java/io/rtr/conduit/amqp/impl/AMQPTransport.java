@@ -56,7 +56,12 @@ public class AMQPTransport extends AbstractAMQPTransport {
         factory.setRequestedHeartbeat(connectionProperties.getHeartbeatInterval());
         factory.setAutomaticRecoveryEnabled(connectionProperties.isAutomaticRecoveryEnabled());
 
-        connection = factory.newConnection();
+        try {
+            connection = factory.newConnection();
+        } catch (TimeoutException e) {
+            throw new IOException("Timed-out waiting for new connection", e);
+        }
+
         channel = connection.createChannel();
         channel.basicQos(1);
     }
@@ -160,7 +165,10 @@ public class AMQPTransport extends AbstractAMQPTransport {
         if (channel != null && channel.isOpen()) {
             try {
                 channel.close();
-            } catch (AlreadyClosedException ignored) {}
+            } catch (TimeoutException e) {
+                throw new IOException("Timed-out closing connection", e);
+            } catch (AlreadyClosedException ignored) {
+            }
         }
     }
 
