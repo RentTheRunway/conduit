@@ -15,6 +15,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private String password;
     private String exchange;
     private String queue;
+    private boolean ssl;
     private String host = "localhost";
     private int port = 5672;
     private String virtualHost = "/";
@@ -113,6 +114,15 @@ public abstract class AMQPConsumerBuilder<T extends Transport
 
     protected String getQueue() {
         return queue;
+    }
+
+    public R ssl(boolean ssl) {
+        this.ssl = ssl;
+        return builder();
+    }
+
+    protected boolean isSsl() {
+        return ssl;
     }
 
     public R host(String host) {

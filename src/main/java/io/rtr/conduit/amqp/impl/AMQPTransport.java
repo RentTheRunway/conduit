@@ -12,6 +12,7 @@ import io.rtr.conduit.amqp.transport.TransportListenProperties;
 import io.rtr.conduit.amqp.transport.TransportMessageBundle;
 import io.rtr.conduit.amqp.transport.TransportPublishProperties;
 
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,7 +37,11 @@ public class AMQPTransport extends AbstractAMQPTransport {
     private Channel channel;
     final static String POISON = ".poison";
 
-    AMQPTransport(String host, int port) {
+    AMQPTransport(boolean ssl, String host, int port) {
+        if (ssl) {
+            factory.setSocketFactory(SSLSocketFactory.getDefault());
+        }
+
         factory.setHost(host);
         factory.setPort(port);
     }

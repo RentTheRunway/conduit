@@ -10,6 +10,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
     protected String password;
     protected String exchange;
     protected String routingKey;
+    protected boolean ssl;
     protected String host = "localhost";
     protected String virtualHost = "/";
     protected int port = 5672;
@@ -38,6 +39,11 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
 
     public AMQPPublisherBuilder virtualHost(String virtualHost) {
         this.virtualHost = virtualHost;
+        return this;
+    }
+
+    public AMQPPublisherBuilder ssl(boolean ssl) {
+        this.ssl = ssl;
         return this;
     }
 
@@ -88,7 +94,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
 
     @Override
     protected AMQPTransport buildTransport() {
-        return new AMQPTransport(host, port);
+        return new AMQPTransport(ssl, host, port);
     }
 
     @Override

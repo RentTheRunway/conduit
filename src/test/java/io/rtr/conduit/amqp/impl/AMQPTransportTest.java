@@ -15,7 +15,15 @@ import java.io.IOException;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class AMQPTransportTest {
     Channel channel;
@@ -25,7 +33,7 @@ public class AMQPTransportTest {
 
     @Before
     public void before() {
-        amqpTransport = spy(new AMQPTransport("host", 1234));
+        amqpTransport = spy(new AMQPTransport(false, "host", 1234));
         channel = mock(Channel.class);
         amqpTransport.setChannel(channel);
 
