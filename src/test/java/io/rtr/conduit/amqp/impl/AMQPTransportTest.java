@@ -174,4 +174,8 @@ public class AMQPTransportTest {
         amqpTransport.closeImpl();
         verify(connection).close(eq(expectedTimeout));
     }
+
+    @Test
+    public void testSsl() throws Exception {
+    }
 }
