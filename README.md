@@ -46,5 +46,5 @@ If we can hit that bullseye, the rest of the dominoes will fall like a house of 
 
 ## What versions of Java are supported
 
-As of August 2017, Java 7 and Java 8 are supported.
-Support for Java 6 has ended.
+As of July 2019, Java 8 is supported.
+Support for Java 6 and Java 7 has ended.
