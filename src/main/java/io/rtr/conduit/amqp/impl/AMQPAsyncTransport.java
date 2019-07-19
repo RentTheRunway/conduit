@@ -4,8 +4,8 @@ import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
 import io.rtr.conduit.amqp.transport.TransportListenProperties;
 
 public class AMQPAsyncTransport extends AMQPTransport {
-    public AMQPAsyncTransport(String host, int port) {
-        super(host, port);
+    public AMQPAsyncTransport(boolean ssl, String host, int port) {
+        super(ssl, host, port);
     }
 
     @Override
