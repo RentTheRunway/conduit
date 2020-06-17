@@ -19,6 +19,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
     protected int heartbeatInterval = 60; //! In seconds
     protected boolean automaticRecoveryEnabled = true;
     protected boolean confirmEnabled = false;
+    private boolean connectionChannelMultiplexingEnabled = false;
 
     protected AMQPPublisherBuilder() {
     }
@@ -92,6 +93,11 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
         return this;
     }
 
+    public AMQPPublisherBuilder connectionChannelMultiplexingEnabled(boolean connectionChannelMultiplexingEnabled){
+        this.connectionChannelMultiplexingEnabled = connectionChannelMultiplexingEnabled;
+        return this;
+    }
+
     @Override
     protected AMQPTransport buildTransport() {
         return new AMQPTransport(ssl, host, port);
@@ -100,7 +106,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
     @Override
     protected AMQPConnectionProperties buildConnectionProperties() {
         return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout,
-                heartbeatInterval, automaticRecoveryEnabled);
+                heartbeatInterval, automaticRecoveryEnabled, connectionChannelMultiplexingEnabled);
     }
 
     @Override

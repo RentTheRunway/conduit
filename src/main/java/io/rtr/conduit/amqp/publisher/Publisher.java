@@ -1,5 +1,6 @@
 package io.rtr.conduit.amqp.publisher;
 
+import io.rtr.conduit.amqp.transport.Transport;
 import io.rtr.conduit.amqp.transport.TransportMessageBundle;
 import io.rtr.conduit.amqp.transport.TransportPublishContext;
 import io.rtr.conduit.amqp.transport.TransportPublishProperties;
@@ -21,10 +22,14 @@ import java.util.concurrent.TimeoutException;
  */
 public class Publisher implements AutoCloseable {
     private TransportPublishContext transportContext;
+    private Transport transport;
 
     //! Public interface.
     Publisher(TransportPublishContext transportContext) {
         this.transportContext = transportContext;
+        this.transport = transportContext.getTransport();
+
+        // todo create channel
     }
 
     //! Connects to the context-specified host with context-specified credentials.

@@ -239,7 +239,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     @Override
     protected AMQPConnectionProperties buildConnectionProperties() {
         return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout,
-                heartbeatInterval, automaticRecoveryEnabled);
+                heartbeatInterval, automaticRecoveryEnabled, false);
     }
 
     public enum ExchangeType {

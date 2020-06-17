@@ -9,6 +9,7 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
     private int connectionTimeout;
     private int heartbeatInterval;
     private boolean automaticRecoveryEnabled;
+    private boolean connectionChannelMultiplexingEnabled;
 
     AMQPConnectionProperties(String username, String password, String virtualHost) {
         this.username = username;
@@ -40,13 +41,15 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
                                   , String virtualHost
                                   , int connectionTimeout
                                   , int heartbeatInterval
-                                  , boolean automaticRecoveryEnabled) {
+                                  , boolean automaticRecoveryEnabled
+                                  , boolean connectionChannelMultiplexingEnabled) {
         this.username = username;
         this.password = password;
         this.virtualHost = virtualHost;
         this.connectionTimeout = connectionTimeout;
         this.heartbeatInterval = heartbeatInterval;
         this.automaticRecoveryEnabled = automaticRecoveryEnabled;
+        this.connectionChannelMultiplexingEnabled = connectionChannelMultiplexingEnabled;
     }
 
     public String getUsername() {
@@ -71,5 +74,9 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
 
     public boolean isAutomaticRecoveryEnabled() {
         return automaticRecoveryEnabled;
+    }
+
+    public boolean isConnectionChannelMultiplexingEnabled() {
+        return connectionChannelMultiplexingEnabled;
     }
 }

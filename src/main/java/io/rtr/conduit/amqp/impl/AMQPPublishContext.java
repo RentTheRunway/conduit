@@ -8,6 +8,7 @@ import io.rtr.conduit.amqp.transport.TransportPublishProperties;
 
 public class AMQPPublishContext implements TransportPublishContext {
     private AMQPTransport transport;
+    private AMQPChannel channel;
     private AMQPConnectionProperties connectionProperties;
     private AMQPPublishProperties publishProperties;
 
@@ -19,6 +20,7 @@ public class AMQPPublishContext implements TransportPublishContext {
         this.transport = transport;
         this.connectionProperties = connectionProperties;
         this.publishProperties = publishProperties;
+        
     }
 
     @Override

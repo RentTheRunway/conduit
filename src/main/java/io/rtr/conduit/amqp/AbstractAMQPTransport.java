@@ -1,5 +1,6 @@
 package io.rtr.conduit.amqp;
 
+import io.rtr.conduit.amqp.connection.AMQPConnection;
 import io.rtr.conduit.amqp.impl.AMQPCommonListenProperties;
 import io.rtr.conduit.amqp.impl.AMQPQueueConsumer;
 import io.rtr.conduit.amqp.transport.Transport;
@@ -9,4 +10,5 @@ public abstract class AbstractAMQPTransport extends Transport{
     protected abstract AMQPQueueConsumer getConsumer(Object callback, AMQPCommonListenProperties commonListenProperties, String poisonPrefix);
     protected abstract AMQPCommonListenProperties getCommonListenProperties(TransportListenProperties properties);
     protected abstract Object getConsumerCallback(TransportListenProperties properties);
+    protected abstract AMQPConnection getConnection();
 }
