@@ -9,95 +9,22 @@
     <description>
         A simple abstraction over the rabbitmq java client
     </description>
-    <url>www.rtr.io</url>
-    <properties>
-        <powermock.version>1.6.4</powermock.version>
-    </properties>
-
-    <developers>
-        <developer>
-            <name>Camille Fournier</name>
-            <email>camille@apache.org</email>
-            <timezone>America/New_York</timezone>
-            <roles>
-                <role>committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Carlo Barbara</name>
-            <email>carlo.barbara@gmail.com</email>
-            <timezone>America/New_York</timezone>
-            <roles>
-                <role>committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Gene Trog</name>
-            <email>gtrog@renttherunway.com</email>
-            <timezone>America/New_York</timezone>
-            <roles>
-                <role>committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Dave Filion</name>
-            <email>df@renttherunway.com</email>
-            <timezone>America/New_York</timezone>
-            <roles>
-                <role>committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Konstantin Mandrika</name>
-            <email>kmandrika+rtr@gmail.com</email>
-            <timezone>America/New_York</timezone>
-            <roles>
-                <role>committer</role>
-            </roles>
-        </developer>
-    </developers>
+    <url>www.renttherunway.com</url>
 
     <licenses>
         <license>
             <name>License</name>
-            <url>https://github.com/RentTheRunway2/conduit/blob/master/LICENSE</url>
+            <url>https://github.com/RentTheRunway/conduit/blob/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:RentTheRunway2/conduit.git</connection>
-        <developerConnection>scm:git:git@github.com:RentTheRunway2/conduit.git</developerConnection>
-        <url>https://github.com/RentTheRunway2/conduit</url>
+        <connection>scm:git:git@github.com:RentTheRunway/conduit.git</connection>
+        <developerConnection>scm:git:git@github.com:RentTheRunway/conduit.git</developerConnection>
+        <url>https://github.com/RentTheRunway/conduit</url>
         <tag>HEAD</tag>
     </scm>
-
-    <repositories>
-        <repository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <profiles>
         <profile>
@@ -113,7 +40,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -131,64 +57,32 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-easymock</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.0</version>
+            <artifactId>mockito-core</artifactId>
+            <version>3.2.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
-            <version>4.8.0</version>
+            <version>5.9.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.12</version>
-        </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>3.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Required to make PowerMock/Javassist happy -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.6</version>
-            <scope>test</scope>
+            <version>1.7.30</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.qpid</groupId>
             <artifactId>qpid-broker</artifactId>
-            <version>6.1.5</version>
+            <version>6.1.7</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -247,12 +141,36 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.10</version>
-                <configuration>
-                    <argLine>-XX:-UseSplitVerifier</argLine>
-                </configuration>
+                <version>2.19.1</version>
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>
