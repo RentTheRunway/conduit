@@ -1,7 +1,6 @@
 package io.rtr.conduit.amqp.impl;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -22,6 +21,7 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
+
 
 public class AMQPAsyncQueueConsumerTest {
 
@@ -63,7 +63,7 @@ public class AMQPAsyncQueueConsumerTest {
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
         assertEquals("world", new String(messages.get(1).getBody()));
-        verify(channel, times(1)).basicAck(anyInt(), eq(true));
+        verify(channel, times(1)).basicAck(anyLong(), eq(true));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class AMQPAsyncQueueConsumerTest {
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
         assertEquals("world", new String(messages.get(1).getBody()));
-        verify(channel, times(1)).basicAck(anyInt(), eq(false));
+        verify(channel, times(1)).basicAck(anyLong(), eq(false));
     }
 
 
@@ -543,7 +543,7 @@ public class AMQPAsyncQueueConsumerTest {
         Envelope envelope5 = new Envelope(4, false, "exchange", "key");
         AMQP.BasicProperties properties = new AMQP.BasicProperties()
                                                     .builder()
-                                                    .headers(new HashMap<String, Object>())
+                                                    .headers(new HashMap<>())
                                                     .build();
 
         byte[] ack = "ack".getBytes();
@@ -559,12 +559,17 @@ public class AMQPAsyncQueueConsumerTest {
         // first message
         verify(channel, times(1)).basicAck(eq(0L), eq(true));
         // last four messages we use 3 nacks: discard, requeue, discardx2
-        verify(channel, times(3)).basicNack(anyInt(), eq(true), eq(false));
+        verify(channel, times(3)).basicNack(anyLong(), eq(true), eq(false));
 
         // 1 message rejected and sent to poison
         // 1 message over retry count of 0 and sent to poison
         // 2 rejected and sent to poison
-        verify(channel, times(4)).basicPublish(eq("exchange"), eq("key.poison"), any(AMQP.BasicProperties.class), any(byte[].class));
+        verify(channel, times(4)).basicPublish(
+                eq("exchange"),
+                eq("key.poison"),
+                any(AMQP.BasicProperties.class),
+                any(byte[].class)
+        );
     }
 
     @Test
