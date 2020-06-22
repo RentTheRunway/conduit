@@ -39,7 +39,7 @@ public class AMQPIntegrationIT {
     private static int PORT;
     private static final Broker BROKER;
 
-    private final AMQPConsumerCallback callback = mock(AMQPConsumerCallback.class);
+    private AMQPConsumerCallback callback;
 
     static {
         BROKER = new Broker();
@@ -79,7 +79,7 @@ public class AMQPIntegrationIT {
         }
     }
 
-    private Consumer buildConsumer() {
+    private static Consumer buildConsumer(AMQPConsumerCallback callback) {
         return AMQPConsumerBuilder.synchronous()
                 .ssl(true)
                 .host("localhost")
@@ -98,7 +98,7 @@ public class AMQPIntegrationIT {
                 .build();
     }
 
-    private Publisher buildPublisher() {
+    private static Publisher buildPublisher() {
         return AMQPPublisherBuilder.builder()
                 .ssl(true)
                 .host("localhost")
@@ -113,9 +113,10 @@ public class AMQPIntegrationIT {
 
     @Test
     public void testSslAmqpTransport() {
+        callback = mock(AMQPConsumerCallback.class);
         AMQPMessageBundle message = new AMQPMessageBundle("a message");
         withSystemProperty("javax.net.ssl.trustStore", TRUST_STORE, () -> {
-            connectAndPublish(buildPublisher(), buildConsumer(), message);
+            connectAndPublish(buildPublisher(), buildConsumer(callback), message);
 
             Mockito.verify(callback, times(1)).handle(any());
         });
