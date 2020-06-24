@@ -7,3 +7,4 @@ target/*
 /target/
 .idea/
 derby.log
+work/

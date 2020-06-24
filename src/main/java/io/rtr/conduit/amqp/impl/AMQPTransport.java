@@ -23,19 +23,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class AMQPTransport extends AbstractAMQPTransport {
     private static final AtomicInteger THREAD_COUNT = new AtomicInteger(0);
-    private static final ThreadFactory DAEMON_THREAD_FACTORY = new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(r);
-            thread.setDaemon(true);
-            thread.setName(String.format("AMQPConnection-%s", THREAD_COUNT.getAndIncrement()));
-            return thread;
-        }
+    private static final ThreadFactory DAEMON_THREAD_FACTORY = run -> {
+        Thread thread = new Thread(run);
+        thread.setDaemon(true);
+        thread.setName(String.format("AMQPConnection-%s", THREAD_COUNT.getAndIncrement()));
+        return thread;
     };
     private ConnectionFactory factory = new ConnectionFactory();
     private Connection connection;
     private Channel channel;
-    final static String POISON = ".poison";
+    static final String POISON = ".poison";
 
     AMQPTransport(boolean ssl, String host, int port) {
         if (ssl) {
@@ -48,6 +45,11 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     protected Channel getChannel() {
         return channel;
+    }
+
+    @Override
+    protected boolean isConnectedImpl() {
+        return this.connection != null && this.connection.isOpen();
     }
 
     @Override
