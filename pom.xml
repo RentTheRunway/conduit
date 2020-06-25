@@ -4,7 +4,7 @@
 
     <groupId>io.rtr</groupId>
     <artifactId>conduit</artifactId>
-    <version>1.15-SNAPSHOT</version>
+    <version>1.15</version>
     <name>Conduit</name>
     <description>
         A simple abstraction over the rabbitmq java client
@@ -34,7 +34,7 @@
         <connection>scm:git:git@github.com:RentTheRunway/conduit.git</connection>
         <developerConnection>scm:git:git@github.com:RentTheRunway/conduit.git</developerConnection>
         <url>https://github.com/RentTheRunway/conduit</url>
-        <tag>HEAD</tag>
+        <tag>v1.15</tag>
     </scm>
 
     <profiles>
