@@ -14,6 +14,10 @@ public abstract class Transport {
         connectImpl(properties);
     }
 
+    public boolean isConnected() {
+        return isConnectedImpl();
+    }
+
     //! Closes the connection.
     public final void close() throws IOException {
         closeImpl();
@@ -42,6 +46,7 @@ public abstract class Transport {
 
     //! Implementation
 
+    protected abstract boolean isConnectedImpl();
     protected abstract void connectImpl(TransportConnectionProperties properties) throws IOException;
     protected abstract void closeImpl() throws IOException;
 

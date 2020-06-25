@@ -32,6 +32,10 @@ public class Publisher implements AutoCloseable {
         transportContext.getTransport().connect(transportContext.getConnectionProperties());
     }
 
+    public boolean isConnected() {
+        return transportContext.getTransport().isConnected();
+    }
+
     @Override
     public void close() throws IOException {
         transportContext.getTransport().close();
