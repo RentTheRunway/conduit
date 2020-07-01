@@ -1,12 +1,14 @@
 name: Release
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
-      - master
+      - 'master'
 
 jobs:
   release:
+    if: github.event.pull_request.merged == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -18,21 +20,41 @@ jobs:
         with:
           java-version: 1.8
 
-      - name: Perform Maven Release
-        uses: qcastel/github-actions-maven-release@master
+      - name: Configure git
+        run: |
+          git config --global user.email "infrastructure+deploy@renttherunway.com"
+          git config --global user.name "rtr-deploy"
+
+      - name: Setup GPG
+        env:
+          GPG_KEY: ${{ secrets.GPG_KEY }}
+        run: |
+          echo "$GPG_KEY" | base64 -d > private.key
+          gpg --import --no-tty --batch --yes ./private.key
+          rm ./private.key
+
+      - name: Setup Nexus authentication
+        uses: s4u/maven-settings-action@v2.1.0
         with:
-          release-branch-name: "master"
+          servers: '[
+          {
+            "id": "sonatype-nexus-staging",
+            "username": "${{ secrets.OSS_NEXUS_USERNAME }}",
+            "password": "${{ secrets.OSS_NEXUS_PASSWORD }}"
+          },
+          {
+            "id": "sonatype-nexus-snapshots",
+            "username": "${{ secrets.OSS_NEXUS_USERNAME }}",
+            "password": "${{ secrets.OSS_NEXUS_PASSWORD }}"
+          }]'
 
-          git-release-bot-name: "rtr-actions"
-          git-release-bot-email: "infrastructure+github@renttherunway.com"
+      - name: Setup Github SSH key
+        uses: webfactory/ssh-agent@v0.4.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
 
-          gpg-enabled: "true"
-          gpg-key-id: ${{ secrets.GPG_KEY_ID }}
-          gpg-key: ${{ secrets.GPG_KEY }}
+      - name: Prepare release
+        run: mvn -B release:prepare
 
-          maven-repo-server-username: ${{ secrets.OSS_NEXUS_USERNAME }}
-          maven-repo-server-password: ${{ secrets.OSS_NEXUS_PASSWORD }}
-
-          maven-args: "--no-transfer-progress"
-
-          access-token: ${{ secrets.GH_ACCESS_TOKEN }}
+      - name: Perform release
+        run: mvn -B release:perform
