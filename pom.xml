@@ -13,8 +13,16 @@
 
     <developers>
         <developer>
-            <name>Gene Trog</name>
+            <name>Gene Heinrich</name>
             <email>gtrog@renttherunway.com</email>
+            <timezone>America/New_York</timezone>
+            <roles>
+                <role>committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Falcon Taylor-Carter</name>
+            <email>fcarter@renttherunway.com</email>
             <timezone>America/New_York</timezone>
             <roles>
                 <role>committer</role>
