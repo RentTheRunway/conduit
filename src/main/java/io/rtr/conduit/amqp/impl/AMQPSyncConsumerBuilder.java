@@ -1,11 +1,13 @@
 package io.rtr.conduit.amqp.impl;
 
+import com.rabbitmq.client.MetricsCollector;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 
 public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
                                                                , AMQPListenProperties
                                                                , AMQPSyncConsumerBuilder> {
     private AMQPConsumerCallback callback;
+    private MetricsCollector metricsCollector;
 
     public static AMQPSyncConsumerBuilder builder() {
         return new AMQPSyncConsumerBuilder();
@@ -20,9 +22,14 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
         return this;
     }
 
+    public AMQPSyncConsumerBuilder callback(MetricsCollector metricsCollector) {
+        this.metricsCollector = metricsCollector;
+        return this;
+    }
+
     @Override
     protected AMQPTransport buildTransport() {
-        return new AMQPTransport(isSsl(), getHost(), getPort());
+        return new AMQPTransport(isSsl(), getHost(), getPort(), metricsCollector);
     }
 
     @Override

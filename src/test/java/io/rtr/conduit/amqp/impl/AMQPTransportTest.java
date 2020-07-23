@@ -33,7 +33,7 @@ public class AMQPTransportTest {
 
     @Before
     public void before() {
-        amqpTransport = spy(new AMQPTransport(false, "host", 1234));
+        amqpTransport = spy(new AMQPTransport(false, "host", 1234, null));
         channel = mock(Channel.class);
         amqpTransport.setChannel(channel);
 

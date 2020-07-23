@@ -4,6 +4,7 @@ import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.MetricsCollector;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.AbstractAMQPTransport;
@@ -34,13 +35,17 @@ public class AMQPTransport extends AbstractAMQPTransport {
     private Channel channel;
     static final String POISON = ".poison";
 
-    AMQPTransport(boolean ssl, String host, int port) {
+    AMQPTransport(boolean ssl, String host, int port, MetricsCollector metricsCollector) {
         if (ssl) {
             factory.setSocketFactory(SSLSocketFactory.getDefault());
         }
 
         factory.setHost(host);
         factory.setPort(port);
+
+        if (metricsCollector != null) {
+            factory.setMetricsCollector(metricsCollector);
+        }
     }
 
     protected Channel getChannel() {
