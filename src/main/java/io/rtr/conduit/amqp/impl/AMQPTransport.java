@@ -8,6 +8,7 @@ import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.AbstractAMQPTransport;
 import io.rtr.conduit.amqp.transport.TransportConnectionProperties;
+import io.rtr.conduit.amqp.transport.TransportExecutor;
 import io.rtr.conduit.amqp.transport.TransportListenProperties;
 import io.rtr.conduit.amqp.transport.TransportMessageBundle;
 import io.rtr.conduit.amqp.transport.TransportPublishProperties;
@@ -17,20 +18,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class AMQPTransport extends AbstractAMQPTransport {
-    private static final AtomicInteger THREAD_COUNT = new AtomicInteger(0);
-    private static final ThreadFactory DAEMON_THREAD_FACTORY = run -> {
-        Thread thread = new Thread(run);
-        thread.setDaemon(true);
-        thread.setName(String.format("AMQPConnection-%s", THREAD_COUNT.getAndIncrement()));
-        return thread;
-    };
     private ConnectionFactory factory = new ConnectionFactory();
     private Connection connection;
+    private TransportExecutor executor;
     private Channel channel;
     static final String POISON = ".poison";
 
@@ -54,23 +48,36 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     @Override
     protected void connectImpl(TransportConnectionProperties properties) throws IOException {
-        AMQPConnectionProperties connectionProperties = (AMQPConnectionProperties)properties;
-        factory.setThreadFactory(DAEMON_THREAD_FACTORY);
-        factory.setUsername(connectionProperties.getUsername());
-        factory.setPassword(connectionProperties.getPassword());
-        factory.setVirtualHost(connectionProperties.getVirtualHost());
-        factory.setConnectionTimeout(connectionProperties.getConnectionTimeout());
-        factory.setRequestedHeartbeat(connectionProperties.getHeartbeatInterval());
-        factory.setAutomaticRecoveryEnabled(connectionProperties.isAutomaticRecoveryEnabled());
+        if (isConnected()) {
+            return;
+        }
 
+        configureConnectionFactory((AMQPConnectionProperties) properties);
         try {
-            connection = factory.newConnection();
+            initializeExecutor();
+            connection = factory.newConnection(executor);
         } catch (TimeoutException e) {
             throw new IOException("Timed-out waiting for new connection", e);
         }
 
         channel = connection.createChannel();
         channel.basicQos(1);
+    }
+
+    private void configureConnectionFactory(AMQPConnectionProperties properties) {
+        factory.setUsername(properties.getUsername());
+        factory.setPassword(properties.getPassword());
+        factory.setVirtualHost(properties.getVirtualHost());
+        factory.setConnectionTimeout(properties.getConnectionTimeout());
+        factory.setRequestedHeartbeat(properties.getHeartbeatInterval());
+        factory.setAutomaticRecoveryEnabled(properties.isAutomaticRecoveryEnabled());
+    }
+
+    private void initializeExecutor() {
+        if (executor != null) {
+            executor.shutdown();
+        }
+        executor = new TransportExecutor();
     }
 
     @Override
@@ -81,6 +88,9 @@ public class AMQPTransport extends AbstractAMQPTransport {
             try {
                 connection.close(factory.getConnectionTimeout());
             } catch (AlreadyClosedException ignored) {}
+        }
+        if (executor != null) {
+            executor.shutdown();
         }
     }
 
@@ -176,6 +186,18 @@ public class AMQPTransport extends AbstractAMQPTransport {
                 throw new IOException("Timed-out closing connection", e);
             } catch (AlreadyClosedException ignored) {
             }
+        }
+        if (executor != null) {
+            executor.shutdown();
+        }
+    }
+
+    @Override
+    protected boolean isStoppedImpl(int waitForMillis) {
+        try {
+            return executor.awaitTermination(waitForMillis, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            return false; // interrupted while waiting for termination
         }
     }
 
