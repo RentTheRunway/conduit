@@ -30,7 +30,7 @@ jobs:
           GPG_KEY: ${{ secrets.GPG_KEY }}
         run: |
           echo "$GPG_KEY" | base64 -d > private.key
-          gpg --import --no-tty --batch --yes ./private.key
+          gpg --import --batch --yes ./private.key
           rm ./private.key
 
       - name: Setup Nexus authentication
