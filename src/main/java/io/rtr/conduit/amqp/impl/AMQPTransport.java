@@ -193,12 +193,8 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
     @Override
-    protected boolean isStoppedImpl(int waitForMillis) {
-        try {
-            return executor.awaitTermination(waitForMillis, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            return false; // interrupted while waiting for termination
-        }
+    protected boolean isStoppedImpl(int waitForMillis) throws InterruptedException {
+        return executor.awaitTermination(waitForMillis, TimeUnit.MILLISECONDS);
     }
 
     @Override

@@ -34,7 +34,7 @@ public abstract class Transport {
     }
 
     // Is the listener thread pool still doing work? (stop is not synchronous)
-    public final boolean isStopped(int maxWaitMilliseconds)  {
+    public final boolean isStopped(int maxWaitMilliseconds) throws InterruptedException {
         return isStoppedImpl(maxWaitMilliseconds);
     }
 
@@ -57,7 +57,7 @@ public abstract class Transport {
 
     protected void listenImpl(TransportListenProperties properties) throws IOException {}
     protected void stopImpl() throws IOException {}
-    protected abstract boolean isStoppedImpl(int waitMillSeconds);
+    protected abstract boolean isStoppedImpl(int waitMillSeconds) throws InterruptedException;
 
     protected boolean publishImpl(TransportMessageBundle messageBundle, TransportPublishProperties properties)
             throws IOException, TimeoutException, InterruptedException { return false; }
