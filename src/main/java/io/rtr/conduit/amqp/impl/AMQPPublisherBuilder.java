@@ -1,5 +1,7 @@
 package io.rtr.conduit.amqp.impl;
 
+import com.rabbitmq.client.MetricsCollector;
+import com.rabbitmq.client.impl.MicrometerMetricsCollector;
 import io.rtr.conduit.amqp.publisher.PublisherBuilder;
 
 public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
@@ -19,6 +21,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
     protected int heartbeatInterval = 60; //! In seconds
     protected boolean automaticRecoveryEnabled = true;
     protected boolean confirmEnabled = false;
+    protected MetricsCollector metricsCollector;
 
     protected AMQPPublisherBuilder() {
     }
@@ -92,9 +95,14 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
         return this;
     }
 
+    public AMQPPublisherBuilder metricsCollector(MetricsCollector metricsCollector) {
+        this.metricsCollector = metricsCollector;
+        return this;
+    }
+
     @Override
     protected AMQPTransport buildTransport() {
-        return new AMQPTransport(ssl, host, port);
+        return new AMQPTransport(ssl, host, port, metricsCollector);
     }
 
     @Override

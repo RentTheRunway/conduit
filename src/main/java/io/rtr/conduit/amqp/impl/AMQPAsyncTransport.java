@@ -1,11 +1,12 @@
 package io.rtr.conduit.amqp.impl;
 
+import com.rabbitmq.client.MetricsCollector;
 import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
 import io.rtr.conduit.amqp.transport.TransportListenProperties;
 
 public class AMQPAsyncTransport extends AMQPTransport {
-    public AMQPAsyncTransport(boolean ssl, String host, int port) {
-        super(ssl, host, port);
+    public AMQPAsyncTransport(boolean ssl, String host, int port, MetricsCollector metricsCollector) {
+        super(ssl, host, port, metricsCollector);
     }
 
     @Override
