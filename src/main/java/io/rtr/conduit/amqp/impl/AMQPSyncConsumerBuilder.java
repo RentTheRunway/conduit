@@ -22,7 +22,7 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
         return this;
     }
 
-    public AMQPSyncConsumerBuilder callback(MetricsCollector metricsCollector) {
+    public AMQPSyncConsumerBuilder metricsCollector(MetricsCollector metricsCollector) {
         this.metricsCollector = metricsCollector;
         return this;
     }
