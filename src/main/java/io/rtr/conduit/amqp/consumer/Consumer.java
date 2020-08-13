@@ -1,5 +1,6 @@
 package io.rtr.conduit.amqp.consumer;
 
+import io.rtr.conduit.amqp.transport.Transport;
 import io.rtr.conduit.amqp.transport.TransportListenContext;
 
 import java.io.IOException;
@@ -18,23 +19,31 @@ public class Consumer implements AutoCloseable {
     }
 
     public void connect() throws IOException {
-        transportContext.getTransport().connect(transportContext.getConnectionProperties());
+        getTransport().connect(transportContext.getConnectionProperties());
     }
 
     public boolean isConnected() {
-        return transportContext.getTransport().isConnected();
+        return getTransport().isConnected();
     }
 
     @Override
     public void close() throws IOException {
-        transportContext.getTransport().close();
+        getTransport().close();
     }
 
     public void listen() throws IOException {
-        transportContext.getTransport().listen(transportContext.getListenProperties());
+        getTransport().listen(transportContext.getListenProperties());
     }
 
     public void stop() throws IOException {
-        transportContext.getTransport().stop();
+        getTransport().stop();
+    }
+
+    public boolean isStopped(int maxWaitMilliseconds) throws InterruptedException {
+        return getTransport().isStopped(maxWaitMilliseconds);
+    }
+
+    private Transport getTransport() {
+        return transportContext.getTransport();
     }
 }
