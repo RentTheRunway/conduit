@@ -36,6 +36,12 @@ jobs:
       - name: Setup Nexus authentication
         uses: s4u/maven-settings-action@v2.1.0
         with:
+          profiles: '[
+          {
+            "id": "gpg",
+            "activation": { "activeByDefault": "true" },
+            "properties": { "gpg.executable": "gpg", "gpg.passphrase": "${{ secrets.GPG_PASSPHRASE }}"}
+          }]'
           servers: '[
           {
             "id": "sonatype-nexus-staging",
