@@ -1,7 +1,6 @@
 package io.rtr.conduit.amqp.impl;
 
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.impl.AMQImpl;
@@ -11,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,6 +20,7 @@ import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -161,17 +162,47 @@ public class AMQPTransportTest {
 
 
     @Test
-    public void testCloseUsingConnectionFactoryTimeout() throws IOException {
+    public void testClose_PrivateConnection_DisconnectsConnection() throws IOException {
         ConnectionFactory factory = mock(ConnectionFactory.class);
         int expectedTimeout = 5;
         when(factory.getConnectionTimeout()).thenReturn(expectedTimeout);
-        Connection connection = mock(Connection.class);
-        when(connection.isOpen()).thenReturn(true);
+        AMQPConnection connection = mock(AMQPConnection.class);
+        when(connection.isConnected()).thenReturn(true);
 
-        amqpTransport.setConnectionFactory(factory);
         amqpTransport.setConnection(connection);
 
         amqpTransport.closeImpl();
-        verify(connection).close(eq(expectedTimeout));
+        verify(connection).disconnect();
     }
+
+
+    @Test
+    public void testClose_SharedConnection_DoesntDisconnectConnectionButClosesOpenChannel() throws IOException, TimeoutException {
+        AMQPConnection connection = mock(AMQPConnection.class);
+        when(connection.isConnected()).thenReturn(true);
+
+        amqpTransport = spy(new AMQPTransport(connection));
+        when(channel.isOpen()).thenReturn(true);
+        amqpTransport.setChannel(channel);
+
+        amqpTransport.closeImpl();
+        verify(connection, never()).disconnect();
+        verify(channel).close();
+    }
+
+
+    @Test
+    public void testClose_SharedConnectionAndClosedChannel_DoesNothing() throws IOException, TimeoutException {
+        AMQPConnection connection = mock(AMQPConnection.class);
+        when(connection.isConnected()).thenReturn(true);
+
+        amqpTransport = spy(new AMQPTransport(connection));
+        when(channel.isOpen()).thenReturn(false);
+        amqpTransport.setChannel(channel);
+
+        amqpTransport.closeImpl();
+        verify(connection, never()).disconnect();
+        verify(channel, never()).close();
+    }
+
 }

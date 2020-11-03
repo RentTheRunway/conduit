@@ -23,24 +23,24 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class AMQPTransport extends AbstractAMQPTransport {
-    private ConnectionFactory factory = new ConnectionFactory();
-    private Connection connection;
-    private TransportExecutor executor;
+    private AMQPConnection conn;
+    private boolean hasPrivateConnection;
     private Channel channel;
     static final String POISON = ".poison";
 
     AMQPTransport(boolean ssl, String host, int port, MetricsCollector metricsCollector) {
-        if (ssl) {
-            factory.setSocketFactory(SSLSocketFactory.getDefault());
-        }
-
-        factory.setHost(host);
-        factory.setPort(port);
-
-        if (metricsCollector != null) {
-            factory.setMetricsCollector(metricsCollector);
-        }
+        this(new AMQPConnection(ssl, host, port, metricsCollector), true);
     }
+
+    public AMQPTransport(AMQPConnection connection) {
+        this(connection, false);
+    }
+
+    private AMQPTransport(AMQPConnection connection, boolean hasPrivateConnection) {
+        conn = connection;
+        this.hasPrivateConnection = hasPrivateConnection;
+    }
+
 
     protected Channel getChannel() {
         return channel;
@@ -48,55 +48,34 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     @Override
     protected boolean isConnectedImpl() {
-        return this.connection != null && this.connection.isOpen();
+        return this.conn.isConnected();
     }
 
     @Override
     protected void connectImpl(TransportConnectionProperties properties) throws IOException {
-        if (isConnected()) {
-            return;
+        if (hasPrivateConnection && !isConnected()) {
+            try {
+                conn.connect((AMQPConnectionProperties) properties);
+            } catch (TimeoutException e) {
+                throw new IOException("Timed-out waiting for new connection", e);
+            }
+
         }
-
-        configureConnectionFactory((AMQPConnectionProperties) properties);
-        try {
-            initializeExecutor();
-            connection = factory.newConnection(executor);
-        } catch (TimeoutException e) {
-            throw new IOException("Timed-out waiting for new connection", e);
+        if (channel == null) {
+            channel = conn.createChannel();
         }
-
-        channel = connection.createChannel();
-        channel.basicQos(1);
-    }
-
-    private void configureConnectionFactory(AMQPConnectionProperties properties) {
-        factory.setUsername(properties.getUsername());
-        factory.setPassword(properties.getPassword());
-        factory.setVirtualHost(properties.getVirtualHost());
-        factory.setConnectionTimeout(properties.getConnectionTimeout());
-        factory.setRequestedHeartbeat(properties.getHeartbeatInterval());
-        factory.setAutomaticRecoveryEnabled(properties.isAutomaticRecoveryEnabled());
-    }
-
-    private void initializeExecutor() {
-        if (executor != null) {
-            executor.shutdown();
-        }
-        executor = new TransportExecutor();
     }
 
     @Override
     protected void closeImpl() throws IOException {
-        //! We are going to assume that closing an already closed
-        //  connection is considered success.
-        if (connection != null && connection.isOpen()) {
-            try {
-                connection.close(factory.getConnectionTimeout());
-            } catch (AlreadyClosedException ignored) {}
+        if (hasPrivateConnection) {
+            if (conn.isConnected()) {
+                conn.disconnect();
+            }
         }
-        if (executor != null) {
-            executor.shutdown();
-        }
+        //If the connection is shared, just try and close the channel
+        else stop();
+
     }
 
     @Override
@@ -192,14 +171,14 @@ public class AMQPTransport extends AbstractAMQPTransport {
             } catch (AlreadyClosedException ignored) {
             }
         }
-        if (executor != null) {
-            executor.shutdown();
+        if (hasPrivateConnection) {
+            conn.stopListening();
         }
     }
 
     @Override
     protected boolean isStoppedImpl(int waitForMillis) throws InterruptedException {
-        return executor.awaitTermination(waitForMillis, TimeUnit.MILLISECONDS);
+        return conn.waitToStopListening(waitForMillis);
     }
 
     @Override
@@ -247,7 +226,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
                 channel.txCommit();
         }
 
-        return !rollback;
+        return true;
     }
 
     //Package private for testing
@@ -256,12 +235,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
     //Package private for testing
-    void setConnectionFactory(ConnectionFactory factory){
-        this.factory = factory;
-    }
-
-    //Package private for testing
-    void setConnection(Connection connection){
-        this.connection = connection;
+    void setConnection(AMQPConnection connection){
+        this.conn = connection;
     }
 }
