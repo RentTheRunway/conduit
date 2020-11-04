@@ -5,12 +5,12 @@ import io.rtr.conduit.amqp.transport.Transport;
 import io.rtr.conduit.amqp.transport.TransportListenProperties;
 
 public abstract class AMQPConsumerBuilder<T extends Transport
-                                        , L extends TransportListenProperties
-                                        , R extends AMQPConsumerBuilder>
-                      extends ConsumerBuilder<T
-                                            , AMQPConnectionProperties
-                                            , L
-                                            , AMQPListenContext> {
+        , L extends TransportListenProperties
+        , R extends AMQPConsumerBuilder>
+        extends ConsumerBuilder<T
+        , AMQPConnectionProperties
+        , L
+        , AMQPListenContext> {
     private String username;
     private String password;
     private String exchange;
@@ -46,7 +46,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     }
 
     private R builder() {
-        return (R)this;
+        return (R) this;
     }
 
     public R username(String username) {
@@ -164,8 +164,8 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     }
 
     public R poisonQueueEnabled(boolean enabled) {
-    	this.poisonQueueEnabled = enabled;
-    	return builder();
+        this.poisonQueueEnabled = enabled;
+        return builder();
     }
 
     /*
@@ -222,7 +222,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     }
 
     protected boolean isPoisonQueueEnabled() {
-    	return poisonQueueEnabled;
+        return poisonQueueEnabled;
     }
 
     @Override
@@ -231,10 +231,9 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         if (dynamicQueueCreation && autoCreateAndBind) {
             throw new IllegalArgumentException("Both dynamicQueueCreation and autoCreateAndBind are enabled.");
         }
-        if(!dynamicQueueCreation){
+        if (!dynamicQueueCreation) {
             assertNotNull(queue, "queue");
-        }
-        else{
+        } else {
             assertNotNull(dynamicQueueRoutingKey, "dynamicQueueRoutingKey");
         }
         if (autoCreateAndBind) {
@@ -245,7 +244,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
                 throw new IllegalArgumentException("Fanout exchanges do not support poison queues");
             }
         }
-        if (sharedConnection!=null && (username!=null || password != null || !virtualHost.equals("/"))) {
+        if (sharedConnection != null && (username != null || password != null || !virtualHost.equals("/"))) {
             throw new IllegalArgumentException(
                     String.format("Username ('%s'), password ('%s') or virtualHost ('%s') should not be specified for a consumer if using a shared connection, it only needs these if using it's own private connection.", username, password, virtualHost)
             );

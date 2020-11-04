@@ -80,7 +80,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
     @Override
-    protected AMQPQueueConsumer getConsumer(Object callback, AMQPCommonListenProperties commonListenProperties, String poisonPrefix){
+    protected AMQPQueueConsumer getConsumer(Object callback, AMQPCommonListenProperties commonListenProperties, String poisonPrefix) {
         return new AMQPQueueConsumer(
                 getChannel(),
                 (AMQPConsumerCallback) callback,
@@ -92,12 +92,12 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     @Override
     protected AMQPCommonListenProperties getCommonListenProperties(TransportListenProperties properties) {
-        return (AMQPListenProperties)properties;
+        return (AMQPListenProperties) properties;
     }
 
     @Override
     protected Object getConsumerCallback(TransportListenProperties properties) {
-        return ((AMQPListenProperties)properties).getCallback();
+        return ((AMQPListenProperties) properties).getCallback();
     }
 
     @Override
@@ -107,12 +107,12 @@ public class AMQPTransport extends AbstractAMQPTransport {
         String queue = commonListenProperties.getQueue();
         String poisonPrefix = commonListenProperties.getPoisonPrefix();
 
-        if(commonListenProperties.isDynamicQueueCreation()) {
+        if (commonListenProperties.isDynamicQueueCreation()) {
             queue = createDynamicQueue(commonListenProperties.getExchange(),
                     commonListenProperties.getDynamicQueueRoutingKey(),
                     commonListenProperties.isPoisonQueueEnabled());
             poisonPrefix = "." + queue;
-        } else if(commonListenProperties.isAutoCreateAndBind()) {
+        } else if (commonListenProperties.isAutoCreateAndBind()) {
             autoCreateAndBind(
                     commonListenProperties.getExchange(),
                     commonListenProperties.getExchangeType(),
@@ -121,7 +121,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
                     commonListenProperties.isPoisonQueueEnabled());
         }
 
-        if(commonListenProperties.shouldPurgeOnConnect()){
+        if (commonListenProperties.shouldPurgeOnConnect()) {
             channel.queuePurge(queue);
         }
 
@@ -138,7 +138,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
                                         boolean isPoisonQueueEnabled) throws IOException {
         String queue = channel.queueDeclare().getQueue();
         channel.queueBind(queue, exchange, routingKey);
-        if(isPoisonQueueEnabled){
+        if (isPoisonQueueEnabled) {
             String poisonQueue = POISON + "." + queue;
             Map<String, Object> settings = new HashMap<String, Object>();
             channel.queueDeclare(poisonQueue, true, true, true, settings);
@@ -152,7 +152,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
         channel.exchangeDeclare(exchange, exchangeType, true);
         channel.queueDeclare(queue, true, false, false, null);
         channel.queueBind(queue, exchange, routingKey);
-        if(isPoisonQueueEnabled){
+        if (isPoisonQueueEnabled) {
             String poisonQueue = queue + POISON;
             channel.queueDeclare(poisonQueue, true, false, false, null);
             channel.queueBind(poisonQueue, exchange, routingKey + POISON);
@@ -181,17 +181,16 @@ public class AMQPTransport extends AbstractAMQPTransport {
     protected boolean isStoppedImpl(int waitForMillis) throws InterruptedException {
         if (hasPrivateConnection) {
             return conn.waitToStopListening(Duration.ofMillis(waitForMillis));
-        }
-        else {
-            return (channel==null || !channel.isOpen());
+        } else {
+            return (channel == null || !channel.isOpen());
         }
     }
 
     @Override
     protected boolean publishImpl(TransportMessageBundle bundle, TransportPublishProperties properties)
             throws IOException, TimeoutException, InterruptedException {
-        AMQPPublishProperties publishProperties = (AMQPPublishProperties)properties;
-        AMQPMessageBundle messageBundle = (AMQPMessageBundle)bundle;
+        AMQPPublishProperties publishProperties = (AMQPPublishProperties) properties;
+        AMQPMessageBundle messageBundle = (AMQPMessageBundle) bundle;
 
         if (publishProperties.isConfirmEnabled()) {
             channel.confirmSelect();
@@ -199,9 +198,9 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
         channel.basicPublish(
                 publishProperties.getExchange()
-              , publishProperties.getRoutingKey()
-              , messageBundle.getBasicProperties()
-              , messageBundle.getBody()
+                , publishProperties.getRoutingKey()
+                , messageBundle.getBasicProperties()
+                , messageBundle.getBody()
         );
 
         if (publishProperties.isConfirmEnabled()) {
@@ -220,7 +219,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
         try {
             for (E messageBundle : messageBundles) {
-                if (!publishImpl((AMQPMessageBundle)messageBundle, properties))
+                if (!publishImpl((AMQPMessageBundle) messageBundle, properties))
                     return false;
             }
             rollback = false;
@@ -241,7 +240,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
     //Package private for testing
-    void setConnection(AMQPConnection connection){
+    void setConnection(AMQPConnection connection) {
         this.conn = connection;
     }
 }

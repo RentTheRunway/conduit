@@ -55,9 +55,10 @@ public class AMQPConnection {
     public synchronized void disconnect() throws IOException {
         //! We are going to assume that closing an already closed
         //  connection is considered success.
-        if (connection != null && connection.isOpen()) {
+        if (isConnected()) {
             try {
                 connection.close(connectionFactory.getConnectionTimeout());
+                connection = null;
             } catch (AlreadyClosedException ignored) {}
         }
         stopListening();
