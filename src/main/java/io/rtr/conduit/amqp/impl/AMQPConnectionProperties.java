@@ -2,25 +2,75 @@ package io.rtr.conduit.amqp.impl;
 
 import io.rtr.conduit.amqp.transport.TransportConnectionProperties;
 
-public class AMQPConnectionProperties implements TransportConnectionProperties {
-    private String username;
-    private String password;
-    private String virtualHost;
-    private int connectionTimeout;
-    private int heartbeatInterval;
-    private boolean automaticRecoveryEnabled;
+import java.time.Duration;
+import java.util.function.BiConsumer;
 
-    AMQPConnectionProperties(String username, String password, String virtualHost) {
-        this.username = username;
-        this.password = password;
-        this.virtualHost = virtualHost;
-        this.connectionTimeout = 10000; //! In milliseconds.
-        this.heartbeatInterval = 60; //! In seconds.
-        this.automaticRecoveryEnabled = true;
+public class AMQPConnectionProperties implements TransportConnectionProperties {
+
+    public static class Builder {
+        private String username;
+        private String password;
+        private String virtualHost = "/";
+        private Duration connectionTimeout = Duration.ofSeconds(10);
+        private Duration heartbeatInterval = Duration.ofSeconds(60);
+        private boolean automaticRecoveryEnabled;
+
+        private Builder() {}
+
+        public Builder username(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public Builder password(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public Builder virtualHost(String virtualHost) {
+            this.virtualHost = virtualHost;
+            return this;
+        }
+
+        public Builder connectionTimeout(Duration connectionTimeout) {
+            this.connectionTimeout = connectionTimeout;
+            return this;
+        }
+
+        public Builder heartbeatInterval(Duration heartbeatInterval) {
+            this.heartbeatInterval = heartbeatInterval;
+            return this;
+        }
+
+        public Builder automaticRecoveryEnabled(boolean automaticRecoveryEnabled) {
+            this.automaticRecoveryEnabled = automaticRecoveryEnabled;
+            return this;
+        }
+
+        public AMQPConnectionProperties build() {
+            return new AMQPConnectionProperties(
+                    username, password, virtualHost, (int)connectionTimeout.toMillis(), (int)heartbeatInterval.getSeconds(), automaticRecoveryEnabled
+            );
+        }
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private final String username;
+    private final String password;
+    private final String virtualHost;
+    private final int connectionTimeout;
+    private final int heartbeatInterval;
+    private final boolean automaticRecoveryEnabled;
 
     AMQPConnectionProperties(String username, String password) {
         this(username, password, "/");
+    }
+
+    AMQPConnectionProperties(String username, String password, String virtualHost) {
+        this(username, password, virtualHost, 10000, 60, true);
     }
 
     AMQPConnectionProperties(String username
@@ -28,11 +78,8 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
                                   , String virtualHost
                                   , int connectionTimeout
                                   , int heartbeatInterval) {
-        this.username = username;
-        this.password = password;
-        this.virtualHost = virtualHost;
-        this.connectionTimeout = connectionTimeout;
-        this.heartbeatInterval = heartbeatInterval;
+        //Different default automaticRecoveryEnabled for this constructor is weird, but it was preexisting logic retained for compatibility
+        this(username, password, virtualHost, connectionTimeout, heartbeatInterval, false);
     }
 
     AMQPConnectionProperties(String username
@@ -72,4 +119,5 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
     public boolean isAutomaticRecoveryEnabled() {
         return automaticRecoveryEnabled;
     }
+
 }

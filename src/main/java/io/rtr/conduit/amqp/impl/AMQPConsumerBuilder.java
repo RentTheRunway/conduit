@@ -18,6 +18,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private boolean ssl;
     private String host = "localhost";
     private int port = 5672;
+    private AMQPConnection sharedConnection;
     private String virtualHost = "/";
     private int connectionTimeout = 10000; //! In milliseconds.
     private int heartbeatInterval = 60; //! In seconds.
@@ -143,10 +144,20 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return port;
     }
 
+    public R sharedConnection(AMQPConnection connection) {
+        sharedConnection = connection;
+        return builder();
+    }
+
+    public AMQPConnection getSharedConnection() {
+        return sharedConnection;
+    }
+
     public R retryThreshold(int retryThreshold) {
         this.retryThreshold = retryThreshold;
         return builder();
     }
+
 
     protected int getRetryThreshold() {
         return retryThreshold;
@@ -234,6 +245,12 @@ public abstract class AMQPConsumerBuilder<T extends Transport
                 throw new IllegalArgumentException("Fanout exchanges do not support poison queues");
             }
         }
+        if (sharedConnection!=null && (username!=null || password != null || !virtualHost.equals("/"))) {
+            throw new IllegalArgumentException(
+                    String.format("Username ('%s'), password ('%s') or virtualHost ('%s') should not be specified for a consumer if using a shared connection, it only needs these if using it's own private connection.", username, password, virtualHost)
+            );
+        }
+
     }
 
     @Override

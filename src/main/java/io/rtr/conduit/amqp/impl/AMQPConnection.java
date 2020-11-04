@@ -9,6 +9,7 @@ import io.rtr.conduit.amqp.transport.TransportExecutor;
 
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
@@ -78,9 +79,9 @@ public class AMQPConnection {
         }
     }
 
-    public boolean waitToStopListening(int waitForMillis) throws InterruptedException {
+    public boolean waitToStopListening(Duration waitFor) throws InterruptedException {
         if (executor != null) {
-            return executor.awaitTermination(waitForMillis, TimeUnit.MILLISECONDS);
+            return executor.awaitTermination(waitFor.toMillis(), TimeUnit.MILLISECONDS);
         }
         return true;
     }

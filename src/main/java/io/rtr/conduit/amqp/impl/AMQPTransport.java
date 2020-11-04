@@ -16,6 +16,7 @@ import io.rtr.conduit.amqp.transport.TransportPublishProperties;
 
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,8 +33,8 @@ public class AMQPTransport extends AbstractAMQPTransport {
         this(new AMQPConnection(ssl, host, port, metricsCollector), true);
     }
 
-    public AMQPTransport(AMQPConnection connection) {
-        this(connection, false);
+    public AMQPTransport(AMQPConnection sharedConnection) {
+        this(sharedConnection, false);
     }
 
     private AMQPTransport(AMQPConnection connection, boolean hasPrivateConnection) {
@@ -178,7 +179,12 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     @Override
     protected boolean isStoppedImpl(int waitForMillis) throws InterruptedException {
-        return conn.waitToStopListening(waitForMillis);
+        if (hasPrivateConnection) {
+            return conn.waitToStopListening(Duration.ofMillis(waitForMillis));
+        }
+        else {
+            return (channel==null || !channel.isOpen());
+        }
     }
 
     @Override

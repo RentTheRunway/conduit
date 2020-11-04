@@ -6,10 +6,12 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.impl.AMQImpl;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertFalse;
@@ -31,6 +33,14 @@ public class AMQPTransportTest {
     AMQPTransport amqpTransport;
     AMQPPublishProperties properties;
     AMQPMessageBundle messageBundle;
+
+    private static final AMQPConnectionProperties CONNECTION_PROPS = new AMQPConnectionProperties(
+            "BOB",
+            "BOBS PASSWORD",
+            "BOBS VHOST",
+            1337,
+            666,
+            true);
 
     @Before
     public void before() {
@@ -190,6 +200,33 @@ public class AMQPTransportTest {
         verify(channel).close();
     }
 
+    @Test
+    public void testConnect_PrivateConnection_ConnectsAndCreatesChannel() throws IOException, TimeoutException {
+
+        amqpTransport = new AMQPTransport(false, "host", 1234, null);
+        AMQPConnection connection = mock(AMQPConnection.class);
+        amqpTransport.setConnection(connection);
+
+        amqpTransport.connect(CONNECTION_PROPS);
+        verify(connection).connect(CONNECTION_PROPS);
+        verify(connection).createChannel();
+    }
+
+
+    @Test
+    public void testConnect_SharedConnection_JustCreatesChannel() throws IOException, TimeoutException {
+        AMQPConnection connection = mock(AMQPConnection.class);
+
+
+        amqpTransport = new AMQPTransport(connection);
+        when(connection.isConnected()).thenReturn(true);
+
+        amqpTransport.connect(CONNECTION_PROPS);
+        verify(connection, never()).connect(CONNECTION_PROPS);
+        verify(connection).createChannel();
+    }
+
+
 
     @Test
     public void testClose_SharedConnectionAndClosedChannel_DoesNothing() throws IOException, TimeoutException {
@@ -200,9 +237,96 @@ public class AMQPTransportTest {
         when(channel.isOpen()).thenReturn(false);
         amqpTransport.setChannel(channel);
 
-        amqpTransport.closeImpl();
+        amqpTransport.close();
         verify(connection, never()).disconnect();
         verify(channel, never()).close();
+    }
+    @Test
+    public void testStop_PrivateConnection_ClosesChannelStopsConnectionListening() throws IOException, TimeoutException {
+        AMQPConnection connection = mock(AMQPConnection.class);
+        when(connection.isConnected()).thenReturn(true);
+
+        amqpTransport.setConnection(connection);
+        when(channel.isOpen()).thenReturn(true);
+        amqpTransport.setChannel(channel);
+
+        amqpTransport.stop();
+        verify(channel).close();
+        verify(connection).stopListening();
+    }
+
+    @Test
+    public void testStop_PrivateConnectionClosedChannel_ClosesChannelStopsConnectionListening() throws IOException, TimeoutException {
+        AMQPConnection connection = mock(AMQPConnection.class);
+        when(connection.isConnected()).thenReturn(true);
+
+        amqpTransport.setConnection(connection);
+        when(channel.isOpen()).thenReturn(false);
+        amqpTransport.setChannel(channel);
+
+        amqpTransport.stop();
+        verify(channel, never()).close();
+        verify(connection).stopListening();
+    }
+
+    @Test
+    public void testStop_SharedConnection_JustClosesOpenChannel() throws IOException, TimeoutException {
+        AMQPConnection connection = mock(AMQPConnection.class);
+        when(connection.isConnected()).thenReturn(true);
+
+        amqpTransport = new AMQPTransport(connection);
+        when(channel.isOpen()).thenReturn(true);
+        amqpTransport.setChannel(channel);
+
+        amqpTransport.stop();
+        verify(channel).close();
+        verify(connection, never()).stopListening();
+    }
+
+    @Test
+    public void testStop_SharedConnectionAndClosedChannel_DoesNothing() throws IOException, TimeoutException {
+        AMQPConnection connection = mock(AMQPConnection.class);
+        when(connection.isConnected()).thenReturn(true);
+
+        amqpTransport = new AMQPTransport(connection);
+        when(channel.isOpen()).thenReturn(false);
+        amqpTransport.setChannel(channel);
+
+        amqpTransport.stop();
+        verify(channel, never()).close();
+        verify(connection, never()).stopListening();
+    }
+
+    @Test
+    public void testIsStopped_PrivateConnection_WaitsForConnectionToStopListening() throws InterruptedException {
+        Duration wait=Duration.ofMillis(666);
+        AMQPConnection connection = mock(AMQPConnection.class);
+        when(connection.isConnected()).thenReturn(true);
+        amqpTransport.setConnection(connection);
+        when(connection.waitToStopListening(wait)).thenReturn(true);
+        Assert.assertTrue(amqpTransport.isStopped(666));
+        verify(connection).waitToStopListening(wait);
+
+        when(connection.waitToStopListening(wait)).thenReturn(false);
+        Assert.assertFalse(amqpTransport.isStopped(666));
+    }
+
+    @Test
+    public void testIsStopped_SharedConnection_JustChecksIfChannelIsOpen() throws InterruptedException {
+        AMQPConnection connection = mock(AMQPConnection.class);
+        when(connection.isConnected()).thenReturn(true);
+
+        amqpTransport = new AMQPTransport(connection);
+        when(channel.isOpen()).thenReturn(true);
+        amqpTransport.setChannel(channel);
+        Assert.assertFalse(amqpTransport.isStopped(666));
+
+        when(channel.isOpen()).thenReturn(false);
+        amqpTransport.setChannel(channel);
+        Assert.assertTrue(amqpTransport.isStopped(666));
+
+        amqpTransport.setChannel(null);
+        Assert.assertTrue(amqpTransport.isStopped(666));
     }
 
 }

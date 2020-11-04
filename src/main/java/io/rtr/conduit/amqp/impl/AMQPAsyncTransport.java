@@ -9,6 +9,10 @@ public class AMQPAsyncTransport extends AMQPTransport {
         super(ssl, host, port, metricsCollector);
     }
 
+    public AMQPAsyncTransport(AMQPConnection sharedConnection) {
+        super(sharedConnection);
+    }
+
     @Override
     protected AMQPQueueConsumer getConsumer(Object callback, AMQPCommonListenProperties commonListenProperties, String poisonPrefix){
         return new AMQPAsyncQueueConsumer(

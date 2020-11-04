@@ -29,7 +29,11 @@ public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTrans
 
     @Override
     protected AMQPAsyncTransport buildTransport() {
-        return new AMQPAsyncTransport(isSsl(), getHost(), getPort(), metricsCollector);
+        if (getSharedConnection()!=null) {
+            return new AMQPAsyncTransport(getSharedConnection());
+        } else {
+            return new AMQPAsyncTransport(isSsl(), getHost(), getPort(), metricsCollector);
+        }
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -197,19 +198,20 @@ public class AMQPConnectionTest {
 
     @Test
     public void testWaitToStopListening_Connected_CallsAwaitTerminationOnExecutor() throws IOException, TimeoutException, InterruptedException {
+        Duration wait = Duration.ofMillis(1338);
         AMQPConnection conn = defaultTestConnection();
         conn.connect(defaultTestConnectionProps());
         when(mockExecutor.awaitTermination(1338, TimeUnit.MILLISECONDS)).thenReturn(true);
-        Assert.assertTrue(conn.waitToStopListening(1338));
+        Assert.assertTrue(conn.waitToStopListening(wait));
         verify(mockExecutor).awaitTermination(1338, TimeUnit.MILLISECONDS);
         when(mockExecutor.awaitTermination(1338, TimeUnit.MILLISECONDS)).thenReturn(false);
-        Assert.assertFalse(conn.waitToStopListening(1338));
+        Assert.assertFalse(conn.waitToStopListening(wait));
         verify(mockExecutor, times(2)).awaitTermination(1338, TimeUnit.MILLISECONDS);
     }
 
     @Test
     public void testWaitToStopListening_NotConnected_ReturnsTrue() throws IOException, TimeoutException, InterruptedException {
-        Assert.assertTrue(defaultTestConnection().waitToStopListening(1338));
+        Assert.assertTrue(defaultTestConnection().waitToStopListening(Duration.ofMillis(1338)));
         verify(mockExecutor, never()).awaitTermination(1338, TimeUnit.MILLISECONDS);
     }
 }
