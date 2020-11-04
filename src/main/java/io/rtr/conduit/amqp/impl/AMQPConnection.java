@@ -25,7 +25,7 @@ public class AMQPConnection {
     }
 
     public AMQPConnection(ConnectionFactory factory, Supplier<TransportExecutor> executorFactory, boolean ssl, String host, int port, MetricsCollector metricsCollector) {
-        this.connectionFactory =factory;
+        this.connectionFactory = factory;
         this.executorFactory = executorFactory;
         if (ssl) {
             factory.setSocketFactory(SSLSocketFactory.getDefault());
