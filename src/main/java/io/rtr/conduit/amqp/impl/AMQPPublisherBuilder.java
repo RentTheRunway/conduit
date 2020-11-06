@@ -112,7 +112,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
 
     @Override
     protected AMQPTransport buildTransport() {
-        if (getSharedConnection()!=null) {
+        if (getSharedConnection() != null) {
             return new AMQPTransport(getSharedConnection());
         } else {
             return new AMQPTransport(ssl, host, port, metricsCollector);
