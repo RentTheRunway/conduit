@@ -6,7 +6,7 @@ import io.rtr.conduit.amqp.transport.TransportListenProperties;
 
 public abstract class AMQPConsumerBuilder<T extends Transport
         , L extends TransportListenProperties
-        , R extends AMQPConsumerBuilder>
+        , R extends AMQPConsumerBuilder<?,?,?>>
         extends ConsumerBuilder<T
         , AMQPConnectionProperties
         , L

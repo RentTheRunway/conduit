@@ -2,25 +2,19 @@ package io.rtr.conduit.amqp.impl;
 
 import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.MetricsCollector;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.AbstractAMQPTransport;
 import io.rtr.conduit.amqp.transport.TransportConnectionProperties;
-import io.rtr.conduit.amqp.transport.TransportExecutor;
 import io.rtr.conduit.amqp.transport.TransportListenProperties;
 import io.rtr.conduit.amqp.transport.TransportMessageBundle;
 import io.rtr.conduit.amqp.transport.TransportPublishProperties;
-
-import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class AMQPTransport extends AbstractAMQPTransport {
@@ -29,11 +23,11 @@ public class AMQPTransport extends AbstractAMQPTransport {
     private Channel channel;
     static final String POISON = ".poison";
 
-    AMQPTransport(boolean ssl, String host, int port, MetricsCollector metricsCollector) {
+    protected AMQPTransport(boolean ssl, String host, int port, MetricsCollector metricsCollector) {
         this(new AMQPConnection(ssl, host, port, metricsCollector), true);
     }
 
-    public AMQPTransport(AMQPConnection sharedConnection) {
+    protected AMQPTransport(AMQPConnection sharedConnection) {
         this(sharedConnection, false);
     }
 
