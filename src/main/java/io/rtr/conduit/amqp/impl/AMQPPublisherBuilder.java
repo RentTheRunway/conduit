@@ -16,6 +16,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
     protected String host = "localhost";
     protected String virtualHost = "/";
     protected int port = 5672;
+    private AMQPConnection sharedConnection;
     protected int publishTimeout = 100;
     protected int connectionTimeout = 10000; //! In milliseconds
     protected int heartbeatInterval = 60; //! In seconds
@@ -60,6 +61,15 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
         return this;
     }
 
+    public AMQPPublisherBuilder sharedConnection(AMQPConnection connection) {
+        sharedConnection = connection;
+        return builder();
+    }
+
+    public AMQPConnection getSharedConnection() {
+        return sharedConnection;
+    }
+
     public AMQPPublisherBuilder publishTimeout(int timeout) {
         this.publishTimeout = timeout;
         return this;
@@ -102,7 +112,11 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
 
     @Override
     protected AMQPTransport buildTransport() {
-        return new AMQPTransport(ssl, host, port, metricsCollector);
+        if (getSharedConnection() != null) {
+            return new AMQPTransport(getSharedConnection());
+        } else {
+            return new AMQPTransport(ssl, host, port, metricsCollector);
+        }
     }
 
     @Override

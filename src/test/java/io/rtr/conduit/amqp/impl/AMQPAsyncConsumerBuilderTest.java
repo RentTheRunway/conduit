@@ -1,9 +1,11 @@
 package io.rtr.conduit.amqp.impl;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 public class AMQPAsyncConsumerBuilderTest {
 
@@ -117,5 +119,16 @@ public class AMQPAsyncConsumerBuilderTest {
         assertEquals("When poisonPrefix not set, default to ", "", commonListenProperties.getPoisonPrefix());
         assertEquals("When poisonQEnabled not set, default to ", true, commonListenProperties.isPoisonQueueEnabled());
         amqpAsyncConsumerBuilder.build();
+    }
+
+    @Test
+    public void testSettingCredsAndSharedConnectionThrows(){
+        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder = AMQPAsyncConsumerBuilder.builder()
+                .exchange("exchange")
+                .queue("queue")
+                .username("bob")
+                .sharedConnection(mock(AMQPConnection.class));
+
+        Assert.assertThrows(IllegalArgumentException.class, amqpAsyncConsumerBuilder::build);
     }
 }

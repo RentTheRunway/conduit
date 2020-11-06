@@ -4,8 +4,8 @@ import com.rabbitmq.client.MetricsCollector;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 
 public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
-                                                               , AMQPListenProperties
-                                                               , AMQPSyncConsumerBuilder> {
+        , AMQPListenProperties
+        , AMQPSyncConsumerBuilder> {
     private AMQPConsumerCallback callback;
     private MetricsCollector metricsCollector;
 
@@ -13,7 +13,7 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
         return new AMQPSyncConsumerBuilder();
     }
 
-    private AMQPSyncConsumerBuilder() {
+    protected AMQPSyncConsumerBuilder() {
         super.prefetchCount(1);
     }
 
@@ -29,7 +29,11 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
 
     @Override
     protected AMQPTransport buildTransport() {
-        return new AMQPTransport(isSsl(), getHost(), getPort(), metricsCollector);
+        if (getSharedConnection() != null) {
+            return new AMQPTransport(getSharedConnection());
+        } else {
+            return new AMQPTransport(isSsl(), getHost(), getPort(), metricsCollector);
+        }
     }
 
     @Override
@@ -51,8 +55,8 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
 
     @Override
     protected AMQPListenContext buildListenContext(AMQPTransport transport
-                                                 , AMQPConnectionProperties connectionProperties
-                                                 , AMQPListenProperties listenProperties) {
+            , AMQPConnectionProperties connectionProperties
+            , AMQPListenProperties listenProperties) {
         return new AMQPListenContext(transport, connectionProperties, listenProperties);
     }
 }
