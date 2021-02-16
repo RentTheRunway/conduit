@@ -4,12 +4,15 @@ import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.SocketUtil;
 import io.rtr.conduit.amqp.consumer.Consumer;
+import io.rtr.conduit.amqp.impl.AMQPConnection;
+import io.rtr.conduit.amqp.impl.AMQPConnectionProperties;
 import io.rtr.conduit.amqp.impl.AMQPConsumerBuilder;
 import io.rtr.conduit.amqp.impl.AMQPPublisherBuilder;
 import io.rtr.conduit.amqp.publisher.Publisher;
 import org.apache.qpid.server.Broker;
 import org.apache.qpid.server.BrokerOptions;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -86,6 +89,18 @@ public class AMQPIntegrationIT {
         }
     }
 
+    private static AMQPConnection buildSslConnection() throws IOException, TimeoutException {
+        AMQPConnection conn = new AMQPConnection(true, "localhost", PORT, null);
+        AMQPConnectionProperties props = AMQPConnectionProperties.builder()
+                .username("guest")
+                .password("guest")
+                .automaticRecoveryEnabled(true)
+                .virtualHost("local")
+                .build();
+        conn.connect(props);
+        return conn;
+    }
+
     private static Consumer buildConsumer(AMQPConsumerCallback callback) {
         return AMQPConsumerBuilder.synchronous()
                 .ssl(true)
@@ -101,6 +116,16 @@ public class AMQPIntegrationIT {
                 .build();
     }
 
+    private static Consumer buildConsumerWithSharedConnection(AMQPConnection connection, AMQPConsumerCallback callback) {
+        return AMQPConsumerBuilder.synchronous()
+                .exchange("foo")
+                .autoCreateAndBind(EXCHANGE, AMQPConsumerBuilder.ExchangeType.DIRECT, QUEUE, ROUTING_KEY)
+                .automaticRecoveryEnabled(true)
+                .callback(callback)
+                .sharedConnection(connection)
+                .build();
+    }
+
     private static Publisher buildPublisher() {
         return AMQPPublisherBuilder.builder()
                 .ssl(true)
@@ -112,6 +137,15 @@ public class AMQPIntegrationIT {
                 .exchange(EXCHANGE)
                 .routingKey(ROUTING_KEY)
                 .automaticRecoveryEnabled(true)
+                .build();
+    }
+
+    private static Publisher buildPublisherWithSharedConnection(AMQPConnection connection) {
+        return AMQPPublisherBuilder.builder()
+                .exchange(EXCHANGE)
+                .routingKey(ROUTING_KEY)
+                .automaticRecoveryEnabled(true)
+                .sharedConnection(connection)
                 .build();
     }
 
@@ -137,6 +171,44 @@ public class AMQPIntegrationIT {
                     }
                 });
     }
+
+    @Test
+    public void testAmqpTransportWithSharedConnection() {
+        AMQPConsumerCallback callback = mock(AMQPConsumerCallback.class);
+        AMQPMessageBundle message = new AMQPMessageBundle("a message");
+        withSystemProperty(
+                "javax.net.ssl.trustStore",
+                TRUST_STORE,
+                () -> {
+
+                    AMQPConnection connection ;
+                    try {
+                        connection = buildSslConnection();
+                    } catch (IOException | TimeoutException e) {
+                        throw new IllegalStateException(e);
+                    }
+                    Consumer consumer = null;
+                    try {
+                        consumer = buildConsumerWithSharedConnection(connection, callback);
+                        Publisher publisher = buildPublisherWithSharedConnection(connection);
+                        connectResources(publisher, consumer);
+                        publishMessage(publisher, message);
+
+                        Mockito.verify(callback, timeout(500).times(1)).handle(any());
+                    }
+                    finally {
+                        try {
+                            if (consumer != null) {
+                                consumer.close();
+                            }
+                            connection.disconnect();
+                        } catch (IOException e) {
+                            Assert.fail(String.format("Error disconnecting consumer channel or broker: %s", e));
+                        }
+                    }
+                });
+    }
+
 
     @Test
     public void testReconnectAfterBrokerShutdown() {

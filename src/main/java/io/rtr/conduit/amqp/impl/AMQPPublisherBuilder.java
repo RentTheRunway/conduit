@@ -63,7 +63,7 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
 
     public AMQPPublisherBuilder sharedConnection(AMQPConnection connection) {
         sharedConnection = connection;
-        return builder();
+        return this;
     }
 
     public AMQPConnection getSharedConnection() {
