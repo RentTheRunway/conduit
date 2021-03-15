@@ -4,7 +4,7 @@
 
     <groupId>io.rtr</groupId>
     <artifactId>conduit</artifactId>
-    <version>1.21-SNAPSHOT</version>
+    <version>1.22-SNAPSHOT</version>
     <name>Conduit</name>
     <description>
         A simple abstraction over the rabbitmq java client
