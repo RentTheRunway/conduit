@@ -66,7 +66,7 @@ public class AMQPConnection {
 
     public Channel createChannel() throws IOException {
         if (!isConnected()) {
-            throw new IllegalStateException("Attempted to create channel whilst disconnected.");
+            throw new ConduitConnectionStateException("Attempted to create channel whilst disconnected.");
         }
         Channel channel = connection.createChannel();
         channel.basicQos(1);

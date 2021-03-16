@@ -3,6 +3,8 @@ package io.rtr.conduit.amqp.impl;
 import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MetricsCollector;
+import com.rabbitmq.client.ShutdownListener;
+import com.rabbitmq.client.ShutdownSignalException;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.AbstractAMQPTransport;
@@ -10,18 +12,59 @@ import io.rtr.conduit.amqp.transport.TransportConnectionProperties;
 import io.rtr.conduit.amqp.transport.TransportListenProperties;
 import io.rtr.conduit.amqp.transport.TransportMessageBundle;
 import io.rtr.conduit.amqp.transport.TransportPublishProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
 public class AMQPTransport extends AbstractAMQPTransport {
+
+    class DynamicQueueCleanupShutdownListener implements ShutdownListener {
+        //@VisibleForTesting
+        CompletableFuture<Void> queueCleanupJob;
+
+        @Override
+        public void shutdownCompleted(ShutdownSignalException e) {
+            // Shutdown handlers run directly in the AMQP Connection's worker loop.
+            // As such, trying to initiate new AMQP commands from within it creates a deadlock.
+            queueCleanupJob = CompletableFuture.runAsync(()-> {
+                if (dynamicQueue != null) {
+                    deleteQueueOnSeparateChannel(dynamicQueue);
+                    LOGGER.debug("Deleted dynamic queue '{}'.", dynamicQueue);
+                }
+                if (dynamicPoisonQueueInUse) {
+                    deleteQueueOnSeparateChannel(POISON + "." + dynamicQueue);
+                    LOGGER.debug("Deleted poison message queue for dynamic queue '{}'.", dynamicQueue);
+                }
+            });
+        }
+
+        private void deleteQueueOnSeparateChannel(String queue) {
+            try (Channel cleanupChannel = conn.createChannel()) {
+                try {
+                    cleanupChannel.queueDelete(queue);
+                } catch (Exception ex) {
+                    LOGGER.error("Failed to delete conduit managed queue '{}', this could cause a queue to leak on the broker! Proceeding with closing channel.", queue, ex);
+                }
+            } catch (TimeoutException | IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AMQPTransport.class);
     private AMQPConnection conn;
     private boolean hasPrivateConnection;
     private Channel channel;
     static final String POISON = ".poison";
+    private String dynamicQueue;
+    private boolean dynamicPoisonQueueInUse = false;
 
     protected AMQPTransport(boolean ssl, String host, int port, MetricsCollector metricsCollector) {
         this(new AMQPConnection(ssl, host, port, metricsCollector), true);
@@ -130,15 +173,29 @@ public class AMQPTransport extends AbstractAMQPTransport {
     protected String createDynamicQueue(String exchange,
                                         String routingKey,
                                         boolean isPoisonQueueEnabled) throws IOException {
-        String queue = channel.queueDeclare().getQueue();
-        channel.queueBind(queue, exchange, routingKey);
-        if (isPoisonQueueEnabled) {
-            String poisonQueue = POISON + "." + queue;
-            Map<String, Object> settings = new HashMap<String, Object>();
-            channel.queueDeclare(poisonQueue, true, true, true, settings);
-            channel.queueBind(poisonQueue, exchange, routingKey + "." + queue + POISON);
+
+        channel.addShutdownListener(new DynamicQueueCleanupShutdownListener());
+
+        if (dynamicQueue == null) {
+            LOGGER.debug("Creating new dynamic queue.");
+            dynamicQueue = channel.queueDeclare().getQueue();
+        } else {
+            channel.queueDeclare(dynamicQueue, false, true, true, null);
         }
-        return queue;
+
+        LOGGER.debug("Declared dynamic queue '{}'.", dynamicQueue);
+        channel.queueBind(dynamicQueue, exchange, routingKey);
+        LOGGER.debug("Bound dynamic queue '{}' to '{}' using routing key '{}'.", dynamicQueue, exchange, routingKey);
+
+        if (isPoisonQueueEnabled) {
+            String poisonQueue = POISON + "." + dynamicQueue;
+            Map<String, Object> settings = new HashMap<>();
+            channel.queueDeclare(poisonQueue, false, true, true, settings);
+            dynamicPoisonQueueInUse = true;
+            channel.queueBind(poisonQueue, exchange, routingKey + "." + dynamicQueue + POISON);
+        }
+
+        return dynamicQueue;
     }
 
     void autoCreateAndBind(String exchange, String exchangeType, String queue, String routingKey, boolean isPoisonQueueEnabled) throws IOException {
@@ -156,9 +213,10 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     @Override
     protected void stopImpl() throws IOException {
-        //! As with closing the connection, closing an already
-        //  closed channel is considered success.
+        // As with closing the connection, closing an already
+        // closed channel is considered success.
         if (channel != null && channel.isOpen()) {
+
             try {
                 channel.close();
             } catch (TimeoutException e) {
