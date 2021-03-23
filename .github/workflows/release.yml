@@ -2,13 +2,11 @@ name: Release
 
 on:
   pull_request:
-    types: [closed]
     branches:
       - master
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
@@ -58,6 +56,9 @@ jobs:
         uses: webfactory/ssh-agent@v0.4.1
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
       - name: Prepare release
         run: mvn -B release:prepare
