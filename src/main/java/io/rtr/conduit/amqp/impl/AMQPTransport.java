@@ -47,13 +47,9 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
         private void deleteQueueOnSeparateChannel(String queue) {
             try (Channel cleanupChannel = conn.createChannel()) {
-                try {
-                    cleanupChannel.queueDelete(queue);
-                } catch (Exception ex) {
-                    LOGGER.error("Failed to delete conduit managed queue '{}', this could cause a queue to leak on the broker! Proceeding with closing channel.", queue, ex);
-                }
-            } catch (TimeoutException | IOException ex) {
-                throw new RuntimeException(ex);
+                cleanupChannel.queueDelete(queue);
+            } catch (TimeoutException | IOException | RuntimeException ex) {
+                LOGGER.error("Failed to delete conduit managed queue '{}', this could cause a queue to leak on the broker! Proceeding with closing channel.", queue, ex);
             }
         }
     }
