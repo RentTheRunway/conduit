@@ -64,7 +64,7 @@ public class AMQPConnectionTest {
     }
 
     @Test
-    public void testConstructor_NoSll_SetsHostPortAndMetrics() throws Exception {
+    public void testConstructor_NoSll_SetsHostPortAndMetrics() {
         new AMQPConnection(mockFactory, ()->mockExecutor, false, "RABBIT HOST", PORT, mockMetrics);
         verify(mockFactory).setHost("RABBIT HOST");
         verify(mockFactory).setPort(PORT);
@@ -74,7 +74,7 @@ public class AMQPConnectionTest {
     }
 
     @Test
-    public void testConstructor_Sll_SetsSocketFactory() throws Exception {
+    public void testConstructor_Sll_SetsSocketFactory() {
         new AMQPConnection(mockFactory, ()->mockExecutor, true, "RABBIT HOST", PORT, mockMetrics);
         verify(mockFactory).setHost("RABBIT HOST");
         verify(mockFactory).setPort(PORT);
@@ -84,7 +84,7 @@ public class AMQPConnectionTest {
     }
 
     @Test
-    public void testConstructor_MetricsNull_SetsNoMetrics() throws Exception {
+    public void testConstructor_MetricsNull_SetsNoMetrics() {
         new AMQPConnection(mockFactory, ()->mockExecutor, false, "RABBIT HOST", PORT, null);
         verify(mockFactory, never()).setMetricsCollector(any());
     }
@@ -123,7 +123,7 @@ public class AMQPConnectionTest {
     }
 
     @Test
-    public void testDisconnect_NotConnected_DoesNothing() throws IOException, TimeoutException {
+    public void testDisconnect_NotConnected_DoesNothing() throws IOException {
         defaultTestConnection().disconnect();
         verify(mockConnection, never()).close(anyInt());
         verify(mockExecutor, never()).shutdown();
@@ -210,7 +210,7 @@ public class AMQPConnectionTest {
     }
 
     @Test
-    public void testWaitToStopListening_NotConnected_ReturnsTrue() throws IOException, TimeoutException, InterruptedException {
+    public void testWaitToStopListening_NotConnected_ReturnsTrue() throws InterruptedException {
         Assert.assertTrue(defaultTestConnection().waitToStopListening(Duration.ofMillis(1338)));
         verify(mockExecutor, never()).awaitTermination(1338, TimeUnit.MILLISECONDS);
     }

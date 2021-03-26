@@ -209,6 +209,42 @@ public class AMQPIntegrationIT {
                 });
     }
 
+    @Test
+    public void testManualReconnectAfterManualClose() {
+        AMQPConsumerCallback callback = mock(AMQPConsumerCallback.class);
+        AMQPMessageBundle message = new AMQPMessageBundle("a message");
+        withSystemProperty(
+                "javax.net.ssl.trustStore",
+                TRUST_STORE,
+                () -> {
+                    Publisher publisher = buildPublisher();
+                    Consumer consumer = buildConsumer(callback);
+                    connectResources(publisher, consumer);
+
+                    try {
+                        publisher.close();
+                        consumer.close();
+                    } catch (IOException e) {
+                        Assert.fail(String.format("Error disconnecting publisher or consumer: %s", e));
+                    }
+
+                    assertFalse(publisher.isConnected());
+                    assertFalse(consumer.isConnected());
+
+                    connectResources(publisher, consumer);
+
+                    publishMessage(publisher, message);
+                    Mockito.verify(callback, timeout(2000).times(1)).handle(any());
+
+                    try {
+                        consumer.close();
+                        publisher.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+    }
 
     @Test
     public void testReconnectAfterBrokerShutdown() {

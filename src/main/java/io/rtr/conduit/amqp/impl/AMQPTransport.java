@@ -56,7 +56,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AMQPTransport.class);
     private AMQPConnection conn;
-    private boolean hasPrivateConnection;
+    private final boolean hasPrivateConnection;
     private Channel channel;
     static final String POISON = ".poison";
     private String dynamicQueue;
@@ -93,9 +93,9 @@ public class AMQPTransport extends AbstractAMQPTransport {
             } catch (TimeoutException e) {
                 throw new IOException("Timed-out waiting for new connection", e);
             }
-
         }
-        if (channel == null) {
+
+        if (channel == null || !channel.isOpen()) {
             channel = conn.createChannel();
         }
     }
