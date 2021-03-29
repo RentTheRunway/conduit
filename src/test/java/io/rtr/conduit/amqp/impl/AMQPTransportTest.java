@@ -123,8 +123,6 @@ public class AMQPTransportTest {
 
     @Test
     public void testListenImplDynamicQueuesPurgeOnConnect() throws IOException {
-        amqpTransport.setChannel(channel);
-
         AMQPCommonListenProperties commonListenProperties = dynamicQueueListenProperties(true, true)
                 .buildListenProperties();
 
@@ -140,7 +138,6 @@ public class AMQPTransportTest {
     @Test
     public void testListenImplDynamicQueues_ThrowsOnBind_StillSetsUpShutdownListener() throws IOException {
         when(channel.queueBind(anyString(), anyString(), anyString(), anyMap())).thenThrow(new RuntimeException());
-        amqpTransport.setChannel(channel);
 
         AMQPCommonListenProperties commonListenProperties = dynamicQueueListenProperties(false, false)
                 .buildListenProperties();
@@ -151,8 +148,6 @@ public class AMQPTransportTest {
 
     @Test
     public void testListenImplDynamicQueues_ThrowsOnDeclare_StillSetsUpShutdownListener() throws IOException {
-        amqpTransport.setChannel(channel);
-
         AMQPConsumerCallback consumerCallback = mock(AMQPConsumerCallback.class);
         AMQPCommonListenProperties commonListenProperties = AMQPSyncConsumerBuilder.builder()
                 .callback(consumerCallback)
@@ -174,7 +169,6 @@ public class AMQPTransportTest {
         AMQImpl.Queue.DeclareOk ok = mock(AMQImpl.Queue.DeclareOk.class);
         when(ok.getQueue()).thenReturn(MOCK_QUEUE);
         when(channel.queueDeclare(anyString(), anyBoolean(), anyBoolean(), anyBoolean(), anyMap())).thenReturn(ok);
-        amqpTransport.setChannel(channel);
 
         AMQPConsumerCallback consumerCallback = mock(AMQPConsumerCallback.class);
 
@@ -241,11 +235,36 @@ public class AMQPTransportTest {
         verify(connection).createChannel();
     }
 
+    @Test
+    public void testConnect_PrivateConnectionAndClosedChannel_ConnectsAndCreatesChannel() throws IOException, TimeoutException {
+        amqpTransport = new AMQPTransport(false, "host", 1234, null);
+        AMQPConnection connection = mock(AMQPConnection.class);
+        amqpTransport.setConnection(connection);
+        when(channel.isOpen()).thenReturn(false);
+        amqpTransport.setChannel(channel);
+
+        amqpTransport.connect(CONNECTION_PROPS);
+        verify(connection).connect(CONNECTION_PROPS);
+        verify(connection).createChannel();
+    }
+
+    @Test
+    public void testConnect_SharedConnectionAndOpenChannel_DoesNothing() throws IOException, TimeoutException {
+        AMQPConnection connection = mock(AMQPConnection.class);
+        when(connection.isConnected()).thenReturn(true);
+
+        amqpTransport = spy(new AMQPTransport(connection));
+        when(channel.isOpen()).thenReturn(true);
+        amqpTransport.setChannel(channel);
+
+        amqpTransport.connect(CONNECTION_PROPS);
+        verify(connection, never()).connect(CONNECTION_PROPS);
+        verify(connection, never()).createChannel();
+    }
 
     @Test
     public void testConnect_SharedConnection_JustCreatesChannel() throws IOException, TimeoutException {
         AMQPConnection connection = mock(AMQPConnection.class);
-
 
         amqpTransport = new AMQPTransport(connection);
         when(connection.isConnected()).thenReturn(true);
@@ -276,7 +295,6 @@ public class AMQPTransportTest {
 
         amqpTransport.setConnection(connection);
         when(channel.isOpen()).thenReturn(true);
-        amqpTransport.setChannel(channel);
 
         amqpTransport.stop();
         verify(channel).close();
@@ -290,7 +308,6 @@ public class AMQPTransportTest {
 
         amqpTransport.setConnection(connection);
         when(channel.isOpen()).thenReturn(false);
-        amqpTransport.setChannel(channel);
 
         amqpTransport.stop();
         verify(channel, never()).close();
