@@ -179,22 +179,31 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return builder();
     }
 
-    /*
-    Auto create the exchange, queue and then bind them together.
-
-    There are a few assumptions to keep this 'light' and compatible with typical usage:
-     - Queues are durable
-     - Queues are NOT exclusive to this connection
-     - Queues are NOT auto deleted
-     - No custom arguments
-     - No dead letter routing
-     - No custom TTL
-
+    /**
+     * Auto create the exchange, queue and then bind them together.
+     *
+     * There are a few assumptions to keep this 'light' and compatible with typical usage:
+     *  - Queues are NOT exclusive to this connection
+     *  - No custom arguments
+     *  - No dead letter routing
+     *  - No custom TTL
+     *
+     * Calls {@link AMQPConsumerBuilder#autoCreateAndBind(String, AMQPConsumerBuilder.ExchangeType, String, String, boolean)}
+     * with isAutoDeleteQueue = false
      */
     public R autoCreateAndBind(String exchange, ExchangeType exchangeType, String queue, String routingKey) {
+        return autoCreateAndBind(exchange, exchangeType, queue, routingKey, false);
+    }
+
+    /**
+     * Auto create the exchange, queue and then bind them together.
+     * Supports auto-delete queues.
+     */
+    public R autoCreateAndBind(String exchange, ExchangeType exchangeType, String queue, String routingKey, boolean isAutoDeleteQueue) {
         this.autoCreateAndBind = true;
         this.exchange = exchange;
         this.queue = queue;
+        this.isAutoDeleteQueue = isAutoDeleteQueue;
         this.exchangeType = exchangeType;
         this.routingKey = (routingKey == null) ? "" : routingKey;
         return builder();

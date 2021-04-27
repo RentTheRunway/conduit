@@ -41,6 +41,7 @@ public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTrans
         return new AMQPAsyncListenProperties(callback,
                 getExchange(),
                 getQueue(),
+                isAutoDeleteQueue(),
                 getRetryThreshold(),
                 getPrefetchCount(),
                 isPoisonQueueEnabled(),

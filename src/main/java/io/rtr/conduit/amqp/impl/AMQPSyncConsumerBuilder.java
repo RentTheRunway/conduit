@@ -43,9 +43,15 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
                 getQueue(),
                 isAutoDeleteQueue(),
                 getRetryThreshold(),
-                isPoisonQueueEnabled(), shouldPurgeOnConnect(), getPrefetchCount(),
-                getPoisonPrefix(), getDynamicQueueRoutingKey(), isDynamicQueueCreation(),
-                getExchangeType(), getRoutingKey(), isAutoCreateAndBind()
+                isPoisonQueueEnabled(),
+                shouldPurgeOnConnect(),
+                getPrefetchCount(),
+                getPoisonPrefix(),
+                getDynamicQueueRoutingKey(),
+                isDynamicQueueCreation(),
+                getExchangeType(),
+                getRoutingKey(),
+                isAutoCreateAndBind()
         );
     }
 
