@@ -11,7 +11,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -20,16 +19,7 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AMQPTransportTest {
     Channel channel;
@@ -181,7 +171,7 @@ public class AMQPTransportTest {
 
         amqpTransport.listenImpl(commonListenProperties);
         verify(amqpTransport).getConsumer(consumerCallback, commonListenProperties, "");
-        verify(amqpTransport).autoCreateAndBind(MOCK_EXCHANGE, exchangeType.toString(), MOCK_QUEUE, TEST_ROUTING_KEY, true);
+        verify(amqpTransport).autoCreateAndBind(MOCK_EXCHANGE, exchangeType.toString(), MOCK_QUEUE, false, true, TEST_ROUTING_KEY);
         verify(channel, never()).addShutdownListener(any(AMQPTransport.DynamicQueueCleanupShutdownListener.class));
 
         verify(channel, times(1)).exchangeDeclare(MOCK_EXCHANGE, exchangeType.toString(), true);
@@ -189,6 +179,39 @@ public class AMQPTransportTest {
         verify(channel, times(1)).queueBind(MOCK_QUEUE, MOCK_EXCHANGE, TEST_ROUTING_KEY);
         verify(channel, times(1)).queueDeclare(MOCK_QUEUE + AMQPTransport.POISON, true, false, false, null);
         verify(channel, times(1)).queueBind(MOCK_QUEUE + AMQPTransport.POISON, MOCK_EXCHANGE, TEST_ROUTING_KEY + AMQPTransport.POISON);
+
+        verify(channel).basicConsume(eq(MOCK_QUEUE), eq(false), any(Consumer.class));
+        verify(channel).basicQos(1);
+    }
+
+    @Test
+    public void testListenAutoDeleteQueue() throws IOException {
+        AMQPConsumerBuilder.ExchangeType exchangeType = AMQPConsumerBuilder.ExchangeType.CONSISTENT_HASH;
+
+        AMQImpl.Queue.DeclareOk ok = mock(AMQImpl.Queue.DeclareOk.class);
+        when(ok.getQueue()).thenReturn(MOCK_QUEUE);
+        when(channel.queueDeclare(anyString(), anyBoolean(), anyBoolean(), anyBoolean(), anyMap())).thenReturn(ok);
+
+        AMQPConsumerCallback consumerCallback = mock(AMQPConsumerCallback.class);
+
+        AMQPCommonListenProperties commonListenProperties = AMQPSyncConsumerBuilder.builder()
+            .callback(consumerCallback)
+            .autoCreateAndBind(MOCK_EXCHANGE, exchangeType, MOCK_QUEUE, TEST_ROUTING_KEY)
+            .isAutoDeleteQueue(true)
+            .poisonQueueEnabled(Boolean.FALSE)
+            .prefetchCount(1)
+            .buildListenProperties();
+
+        amqpTransport.listenImpl(commonListenProperties);
+        verify(amqpTransport).getConsumer(consumerCallback, commonListenProperties, "");
+        verify(amqpTransport).autoCreateAndBind(MOCK_EXCHANGE, exchangeType.toString(), MOCK_QUEUE, true, false, TEST_ROUTING_KEY);
+        verify(channel, never()).addShutdownListener(any(AMQPTransport.DynamicQueueCleanupShutdownListener.class));
+
+        verify(channel).exchangeDeclare(MOCK_EXCHANGE, exchangeType.toString(), true);
+        verify(channel).queueDeclare(MOCK_QUEUE, false, false, true, null);
+        verify(channel).queueBind(MOCK_QUEUE, MOCK_EXCHANGE, TEST_ROUTING_KEY);
+        verify(channel, never()).queueDeclare(MOCK_QUEUE + AMQPTransport.POISON, true, false, false, null);
+        verify(channel, never()).queueBind(MOCK_QUEUE + AMQPTransport.POISON, MOCK_EXCHANGE, TEST_ROUTING_KEY + AMQPTransport.POISON);
 
         verify(channel).basicConsume(eq(MOCK_QUEUE), eq(false), any(Consumer.class));
         verify(channel).basicQos(1);

@@ -11,8 +11,8 @@ import io.rtr.conduit.amqp.transport.TransportListenProperties;
 public class AMQPListenProperties extends AMQPCommonListenProperties implements TransportListenProperties {
     private AMQPConsumerCallback callback;
 
-    AMQPListenProperties(AMQPConsumerCallback callback, String exchange, String queue, int threshold, int prefetchCount, boolean poisonQueueEnabled, boolean purgeOnConnect, boolean dynamicQueueCreation, String poisonPrefix, String dynamicQueueRoutingKey, boolean autoCreateAndBind, String exchangeType, String routingKey) {
-        super(exchange, queue, threshold, prefetchCount, poisonQueueEnabled, purgeOnConnect, dynamicQueueCreation, poisonPrefix, dynamicQueueRoutingKey, autoCreateAndBind, exchangeType, routingKey);
+    AMQPListenProperties(AMQPConsumerCallback callback, String exchange, String queue, boolean isAutoDeleteQueue, int threshold, boolean poisonQueueEnabled, boolean purgeOnConnect, int prefetchCount, String poisonPrefix, String dynamicQueueRoutingKey, boolean dynamicQueueCreation, String exchangeType, String routingKey, boolean autoCreateAndBind) {
+        super(exchange, queue, isAutoDeleteQueue, threshold, prefetchCount, poisonQueueEnabled, purgeOnConnect, dynamicQueueCreation, poisonPrefix, dynamicQueueRoutingKey, autoCreateAndBind, exchangeType, routingKey);
         this.callback = callback;
     }
 

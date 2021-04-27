@@ -5,6 +5,7 @@ import io.rtr.conduit.amqp.transport.TransportListenProperties;
 public abstract class AMQPCommonListenProperties implements TransportListenProperties {
     private String exchange;
     private String queue;
+    private boolean isAutoDeleteQueue;
     private int threshold;
     private int prefetchCount;
     private boolean poisonQueueEnabled;
@@ -17,9 +18,10 @@ public abstract class AMQPCommonListenProperties implements TransportListenPrope
     private String exchangeType;
 
 
-    AMQPCommonListenProperties(String exchange, String queue, int threshold, int prefetchCount, boolean poisonQueueEnabled, boolean purgeOnConnect, boolean dynamicQueueCreation, String poisonPrefix, String dynamicQueueRoutingKey, boolean autoCreateAndBind, String exchangeType, String routingKey) {
+    AMQPCommonListenProperties(String exchange, String queue, boolean isAutoDeleteQueue, int threshold, int prefetchCount, boolean poisonQueueEnabled, boolean purgeOnConnect, boolean dynamicQueueCreation, String poisonPrefix, String dynamicQueueRoutingKey, boolean autoCreateAndBind, String exchangeType, String routingKey) {
         this.exchange = exchange;
         this.queue = queue;
+        this.isAutoDeleteQueue = isAutoDeleteQueue;
         this.threshold = threshold;
         this.prefetchCount = prefetchCount;
         this.poisonQueueEnabled = poisonQueueEnabled;
@@ -78,5 +80,9 @@ public abstract class AMQPCommonListenProperties implements TransportListenPrope
 
     public boolean isAutoCreateAndBind() {
         return autoCreateAndBind;
+    }
+
+    public boolean isAutoDeleteQueue() {
+        return isAutoDeleteQueue;
     }
 }

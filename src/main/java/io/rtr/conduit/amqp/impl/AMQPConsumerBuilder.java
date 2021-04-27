@@ -15,6 +15,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private String password;
     private String exchange;
     private String queue;
+    private boolean isAutoDeleteQueue = false;
     private boolean ssl;
     private String host = "localhost";
     private int port = 5672;
@@ -116,6 +117,16 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     protected String getQueue() {
         return queue;
     }
+
+    public R isAutoDeleteQueue(boolean isAutoDeleteQueue) {
+        this.isAutoDeleteQueue = isAutoDeleteQueue;
+        return builder();
+    }
+
+    protected boolean isAutoDeleteQueue() {
+        return isAutoDeleteQueue;
+    }
+
 
     public R ssl(boolean ssl) {
         this.ssl = ssl;
