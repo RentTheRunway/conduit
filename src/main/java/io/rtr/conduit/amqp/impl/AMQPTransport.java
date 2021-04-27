@@ -197,7 +197,6 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
     void autoCreateAndBind(String exchange, String exchangeType, String queue, boolean isAutoDeleteQueue, boolean isPoisonQueueEnabled, String routingKey) throws IOException {
-        // Creates durable non-autodeleted exchange and queue(s).
         channel.exchangeDeclare(exchange, exchangeType, true);
         channel.queueDeclare(queue, !isAutoDeleteQueue, false, isAutoDeleteQueue, null);
         channel.queueBind(queue, exchange, routingKey);
