@@ -188,22 +188,13 @@ public abstract class AMQPConsumerBuilder<T extends Transport
      *  - No dead letter routing
      *  - No custom TTL
      *
-     * Calls {@link AMQPConsumerBuilder#autoCreateAndBind(String, AMQPConsumerBuilder.ExchangeType, String, String, boolean)}
-     * with isAutoDeleteQueue = false
+     * By default, queue will be durable (NOT auto-delete)
      */
     public R autoCreateAndBind(String exchange, ExchangeType exchangeType, String queue, String routingKey) {
-        return autoCreateAndBind(exchange, exchangeType, queue, routingKey, false);
-    }
-
-    /**
-     * Auto create the exchange, queue and then bind them together.
-     * Supports auto-delete queues.
-     */
-    public R autoCreateAndBind(String exchange, ExchangeType exchangeType, String queue, String routingKey, boolean isAutoDeleteQueue) {
         this.autoCreateAndBind = true;
         this.exchange = exchange;
         this.queue = queue;
-        this.isAutoDeleteQueue = isAutoDeleteQueue;
+        this.isAutoDeleteQueue = isAutoDeleteQueue();
         this.exchangeType = exchangeType;
         this.routingKey = (routingKey == null) ? "" : routingKey;
         return builder();

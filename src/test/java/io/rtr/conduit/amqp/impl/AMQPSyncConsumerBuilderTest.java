@@ -92,12 +92,12 @@ public class AMQPSyncConsumerBuilderTest {
     @Test
     public void testAutoCreateAndBindWithAutoDeleteQueue(){
         AMQPSyncConsumerBuilder amqpSyncConsumerBuilder = AMQPSyncConsumerBuilder.builder()
+            .isAutoDeleteQueue(true)
             .autoCreateAndBind(
                 "exchange",
                 AMQPConsumerBuilder.ExchangeType.CONSISTENT_HASH,
                 "queue",
-                "routingKey",
-                true
+                "routingKey"
             );
         AMQPCommonListenProperties commonListenProperties = amqpSyncConsumerBuilder
             .buildListenProperties();
