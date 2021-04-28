@@ -126,6 +126,21 @@ public class AMQPIntegrationIT {
                 .build();
     }
 
+    private static Consumer buildConsumerWithAutoDeleteQueue(AMQPConsumerCallback callback) {
+        return AMQPConsumerBuilder.synchronous()
+            .ssl(true)
+            .host("localhost")
+            .port(PORT)
+            .virtualHost("local")
+            .username("guest")
+            .password("guest")
+            .isAutoDeleteQueue(true)
+            .autoCreateAndBind(EXCHANGE, AMQPConsumerBuilder.ExchangeType.DIRECT, QUEUE, ROUTING_KEY)
+            .automaticRecoveryEnabled(true)
+            .callback(callback)
+            .build();
+    }
+
     private static Publisher buildPublisher() {
         return AMQPPublisherBuilder.builder()
                 .ssl(true)
@@ -244,6 +259,43 @@ public class AMQPIntegrationIT {
                     }
                 }
         );
+    }
+
+    @Test
+    public void testAmqpTransportWithAutoDeleteQueue() {
+        AMQPConsumerCallback callback = mock(AMQPConsumerCallback.class);
+        AMQPMessageBundle message = new AMQPMessageBundle("a message");
+        withSystemProperty(
+            "javax.net.ssl.trustStore",
+            TRUST_STORE,
+            () -> {
+
+                AMQPConnection connection ;
+                try {
+                    connection = buildSslConnection();
+                } catch (IOException | TimeoutException e) {
+                    throw new IllegalStateException(e);
+                }
+                Consumer consumer = null;
+                try {
+                    consumer = buildConsumerWithAutoDeleteQueue(callback);
+                    Publisher publisher = buildPublisher();
+                    connectResources(publisher, consumer);
+                    publishMessage(publisher, message);
+
+                    Mockito.verify(callback, timeout(500).times(1)).handle(any());
+                }
+                finally {
+                    try {
+                        if (consumer != null) {
+                            consumer.close();
+                        }
+                        connection.disconnect();
+                    } catch (IOException e) {
+                        Assert.fail(String.format("Error disconnecting consumer channel or broker: %s", e));
+                    }
+                }
+            });
     }
 
     @Test
