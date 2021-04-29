@@ -15,6 +15,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private String password;
     private String exchange;
     private String queue;
+    private boolean isAutoDeleteQueue = false;
     private boolean ssl;
     private String host = "localhost";
     private int port = 5672;
@@ -117,6 +118,10 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return queue;
     }
 
+    protected boolean isAutoDeleteQueue() {
+        return isAutoDeleteQueue;
+    }
+
     public R ssl(boolean ssl) {
         this.ssl = ssl;
         return builder();
@@ -168,22 +173,31 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return builder();
     }
 
-    /*
-    Auto create the exchange, queue and then bind them together.
-
-    There are a few assumptions to keep this 'light' and compatible with typical usage:
-     - Queues are durable
-     - Queues are NOT exclusive to this connection
-     - Queues are NOT auto deleted
-     - No custom arguments
-     - No dead letter routing
-     - No custom TTL
-
+    /**
+     * Auto create the exchange, queue and then bind them together.
+     *
+     * There are a few assumptions to keep this 'light' and compatible with typical usage:
+     *  - Queues are NOT exclusive to this connection
+     *  - No custom arguments
+     *  - No dead letter routing
+     *  - No custom TTL
+     *
+     * By default, queue will be durable (NOT auto-delete)
      */
     public R autoCreateAndBind(String exchange, ExchangeType exchangeType, String queue, String routingKey) {
         this.autoCreateAndBind = true;
         this.exchange = exchange;
         this.queue = queue;
+        this.exchangeType = exchangeType;
+        this.routingKey = (routingKey == null) ? "" : routingKey;
+        return builder();
+    }
+
+    public R autoCreateAndBind(String exchange, ExchangeType exchangeType, String queue, boolean isAutoDeleteQueue, String routingKey) {
+        this.autoCreateAndBind = true;
+        this.exchange = exchange;
+        this.queue = queue;
+        this.isAutoDeleteQueue = isAutoDeleteQueue;
         this.exchangeType = exchangeType;
         this.routingKey = (routingKey == null) ? "" : routingKey;
         return builder();

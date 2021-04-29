@@ -52,6 +52,7 @@ public class AMQPSyncConsumerBuilderTest {
         assertEquals("When threshold isn't set, default to ", 10, commonListenProperties.getThreshold());
         assertEquals("When poisonPrefix not set, default to ", "", commonListenProperties.getPoisonPrefix());
         assertEquals("When poisonQEnabled not set, default to ", true, commonListenProperties.isPoisonQueueEnabled());
+        assertEquals("When isAutoDeleteQueue not set, default to ", false, commonListenProperties.isAutoDeleteQueue());
         amqpSyncConsumerBuilder.build();
     }
 
@@ -67,6 +68,42 @@ public class AMQPSyncConsumerBuilderTest {
         assertEquals("When threshold isn't set, default to ", 10, commonListenProperties.getThreshold());
         assertEquals("When poisonPrefix not set, default to ", "", commonListenProperties.getPoisonPrefix());
         assertEquals("When poisonQEnabled not set, default to ", true, commonListenProperties.isPoisonQueueEnabled());
+        assertEquals("When isAutoDeleteQueue not set, default to ", false, commonListenProperties.isAutoDeleteQueue());
+        amqpSyncConsumerBuilder.build();
+    }
+
+    @Test
+    public void testAutoCreateAndBindDefault(){
+        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder = AMQPSyncConsumerBuilder.builder()
+            .autoCreateAndBind(
+                "exchange",
+                AMQPConsumerBuilder.ExchangeType.CONSISTENT_HASH,
+                "queue",
+                "routingKey"
+            );
+        AMQPCommonListenProperties commonListenProperties = amqpSyncConsumerBuilder
+            .buildListenProperties();
+
+        assertEquals("autoCreateAndBind() creates a durable (non-auto-delete) queue by default",
+            false, commonListenProperties.isAutoDeleteQueue());
+        amqpSyncConsumerBuilder.build();
+    }
+
+    @Test
+    public void testAutoCreateAndBindWithAutoDeleteQueue(){
+        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder = AMQPSyncConsumerBuilder.builder()
+            .autoCreateAndBind(
+                "exchange",
+                AMQPConsumerBuilder.ExchangeType.CONSISTENT_HASH,
+                "queue",
+                true,
+                "routingKey"
+            );
+        AMQPCommonListenProperties commonListenProperties = amqpSyncConsumerBuilder
+            .buildListenProperties();
+
+        assertEquals("When isAutoDeleteQueue is set to true, autoCreateAndBind() creates an auto-delete queue",
+            true, commonListenProperties.isAutoDeleteQueue());
         amqpSyncConsumerBuilder.build();
     }
 

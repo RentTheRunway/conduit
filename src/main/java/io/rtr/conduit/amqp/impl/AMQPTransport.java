@@ -147,11 +147,13 @@ public class AMQPTransport extends AbstractAMQPTransport {
             poisonPrefix = "." + queue;
         } else if (commonListenProperties.isAutoCreateAndBind()) {
             autoCreateAndBind(
-                    commonListenProperties.getExchange(),
-                    commonListenProperties.getExchangeType(),
-                    commonListenProperties.getQueue(),
-                    commonListenProperties.getRoutingKey(),
-                    commonListenProperties.isPoisonQueueEnabled());
+                commonListenProperties.getExchange(),
+                commonListenProperties.getExchangeType(),
+                commonListenProperties.getQueue(),
+                commonListenProperties.isAutoDeleteQueue(),
+                commonListenProperties.isPoisonQueueEnabled(),
+                commonListenProperties.getRoutingKey()
+            );
         }
 
         if (commonListenProperties.shouldPurgeOnConnect()) {
@@ -194,17 +196,15 @@ public class AMQPTransport extends AbstractAMQPTransport {
         return dynamicQueue;
     }
 
-    void autoCreateAndBind(String exchange, String exchangeType, String queue, String routingKey, boolean isPoisonQueueEnabled) throws IOException {
-        // Creates durable non-autodeleted exchange and queue(s).
+    void autoCreateAndBind(String exchange, String exchangeType, String queue, boolean isAutoDeleteQueue, boolean isPoisonQueueEnabled, String routingKey) throws IOException {
         channel.exchangeDeclare(exchange, exchangeType, true);
-        channel.queueDeclare(queue, true, false, false, null);
+        channel.queueDeclare(queue, !isAutoDeleteQueue, false, isAutoDeleteQueue, null);
         channel.queueBind(queue, exchange, routingKey);
         if (isPoisonQueueEnabled) {
             String poisonQueue = queue + POISON;
-            channel.queueDeclare(poisonQueue, true, false, false, null);
+            channel.queueDeclare(poisonQueue, !isAutoDeleteQueue, false, isAutoDeleteQueue, null);
             channel.queueBind(poisonQueue, exchange, routingKey + POISON);
         }
-
     }
 
     @Override

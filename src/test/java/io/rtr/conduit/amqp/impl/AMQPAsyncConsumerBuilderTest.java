@@ -3,6 +3,8 @@ package io.rtr.conduit.amqp.impl;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static io.rtr.conduit.amqp.impl.AMQPConsumerBuilder.ExchangeType.CONSISTENT_HASH;
+import static io.rtr.conduit.amqp.impl.AMQPConsumerBuilder.ExchangeType.DIRECT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -44,14 +46,32 @@ public class AMQPAsyncConsumerBuilderTest {
     @Test
     public void testValidationAutoCreateAndBind(){
         AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder = AMQPAsyncConsumerBuilder.builder()
-                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, "queue", "routingKey");
+                .autoCreateAndBind("exchange", DIRECT, "queue", "routingKey");
         AMQPCommonListenProperties commonListenProperties = amqpAsyncConsumerBuilder.buildListenProperties();
 
         // check that the properties got set correctly
         assertEquals("Queue should be: ", "queue", commonListenProperties.getQueue());
+        assertEquals("isAutoDeleteQueue should be: ", false, commonListenProperties.isAutoDeleteQueue());
         assertEquals("Exchange should be: ", "exchange", commonListenProperties.getExchange());
         assertEquals("RoutingKey should be: ", "routingKey", commonListenProperties.getRoutingKey());
-        assertEquals("ExchangeType should be: ", AMQPConsumerBuilder.ExchangeType.DIRECT.toString(), commonListenProperties.getExchangeType());
+        assertEquals("ExchangeType should be: ", DIRECT.toString(), commonListenProperties.getExchangeType());
+
+        // Now check that the defaults validate.
+        amqpAsyncConsumerBuilder.validate();
+    }
+
+    @Test
+    public void testAutoCreateAndBindWithAutoDeleteQueue(){
+        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder = AMQPAsyncConsumerBuilder.builder()
+            .autoCreateAndBind("exchange", CONSISTENT_HASH, "queue", true, "routingKey");
+        AMQPCommonListenProperties commonListenProperties = amqpAsyncConsumerBuilder.buildListenProperties();
+
+        // check that the properties got set correctly
+        assertEquals("Queue should be: ", "queue", commonListenProperties.getQueue());
+        assertEquals("isAutoDeleteQueue should be: ", true, commonListenProperties.isAutoDeleteQueue());
+        assertEquals("Exchange should be: ", "exchange", commonListenProperties.getExchange());
+        assertEquals("RoutingKey should be: ", "routingKey", commonListenProperties.getRoutingKey());
+        assertEquals("ExchangeType should be: ", CONSISTENT_HASH.toString(), commonListenProperties.getExchangeType());
 
         // Now check that the defaults validate.
         amqpAsyncConsumerBuilder.validate();
@@ -60,7 +80,7 @@ public class AMQPAsyncConsumerBuilderTest {
     @Test
     public void testValidationAutoCreateAndBindWithNullRoutingKey(){
         AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder = AMQPAsyncConsumerBuilder.builder()
-                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, "queue", null);
+                .autoCreateAndBind("exchange", DIRECT, "queue", null);
 
         AMQPCommonListenProperties commonListenProperties = amqpAsyncConsumerBuilder
                 .buildListenProperties();
@@ -71,7 +91,7 @@ public class AMQPAsyncConsumerBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void testValidationAutoCreateAndBindWithNullQueue(){
         AMQPAsyncConsumerBuilder.builder()
-                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, null, "routingKey")
+                .autoCreateAndBind("exchange", DIRECT, null, "routingKey")
                 .build();
     }
 
@@ -79,7 +99,7 @@ public class AMQPAsyncConsumerBuilderTest {
     public void testValidationAutoCreateAndBindWithDynamic(){
         AMQPAsyncConsumerBuilder.builder()
                 .dynamicQueueCreation(true)
-                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.DIRECT, null, "routingKey")
+                .autoCreateAndBind("exchange", DIRECT, "queue", "routingKey")
                 .build();
     }
 
@@ -87,7 +107,7 @@ public class AMQPAsyncConsumerBuilderTest {
     public void testValidationAutoCreateAndBindWithPoisonFanout(){
         AMQPAsyncConsumerBuilder.builder()
                 .poisonQueueEnabled(true)
-                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.FANOUT, null, "routingKey")
+                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.FANOUT, "queue", "routingKey")
                 .build();
     }
 
