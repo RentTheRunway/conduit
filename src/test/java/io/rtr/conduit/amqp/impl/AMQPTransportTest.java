@@ -196,8 +196,7 @@ public class AMQPTransportTest {
 
         AMQPCommonListenProperties commonListenProperties = AMQPSyncConsumerBuilder.builder()
             .callback(consumerCallback)
-            .autoCreateAndBind(MOCK_EXCHANGE, exchangeType, MOCK_QUEUE, TEST_ROUTING_KEY)
-            .isAutoDeleteQueue(true)
+            .autoCreateAndBind(MOCK_EXCHANGE, exchangeType, MOCK_QUEUE, true, TEST_ROUTING_KEY)
             .poisonQueueEnabled(Boolean.FALSE)
             .prefetchCount(1)
             .buildListenProperties();

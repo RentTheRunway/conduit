@@ -134,8 +134,7 @@ public class AMQPIntegrationIT {
             .virtualHost("local")
             .username("guest")
             .password("guest")
-            .isAutoDeleteQueue(true)
-            .autoCreateAndBind(EXCHANGE, AMQPConsumerBuilder.ExchangeType.DIRECT, "auto-delete-queue", ROUTING_KEY)
+            .autoCreateAndBind(EXCHANGE, AMQPConsumerBuilder.ExchangeType.DIRECT, "auto-delete-queue", true, ROUTING_KEY)
             .automaticRecoveryEnabled(true)
             .callback(callback)
             .build();

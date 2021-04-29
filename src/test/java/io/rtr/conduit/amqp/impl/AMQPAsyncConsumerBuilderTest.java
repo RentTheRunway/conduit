@@ -63,8 +63,7 @@ public class AMQPAsyncConsumerBuilderTest {
     @Test
     public void testAutoCreateAndBindWithAutoDeleteQueue(){
         AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder = AMQPAsyncConsumerBuilder.builder()
-            .isAutoDeleteQueue(true)
-            .autoCreateAndBind("exchange", CONSISTENT_HASH, "queue", "routingKey");
+            .autoCreateAndBind("exchange", CONSISTENT_HASH, "queue", true, "routingKey");
         AMQPCommonListenProperties commonListenProperties = amqpAsyncConsumerBuilder.buildListenProperties();
 
         // check that the properties got set correctly

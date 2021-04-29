@@ -118,15 +118,9 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return queue;
     }
 
-    public R isAutoDeleteQueue(boolean isAutoDeleteQueue) {
-        this.isAutoDeleteQueue = isAutoDeleteQueue;
-        return builder();
-    }
-
     protected boolean isAutoDeleteQueue() {
         return isAutoDeleteQueue;
     }
-
 
     public R ssl(boolean ssl) {
         this.ssl = ssl;
@@ -194,7 +188,16 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         this.autoCreateAndBind = true;
         this.exchange = exchange;
         this.queue = queue;
-        this.isAutoDeleteQueue = isAutoDeleteQueue();
+        this.exchangeType = exchangeType;
+        this.routingKey = (routingKey == null) ? "" : routingKey;
+        return builder();
+    }
+
+    public R autoCreateAndBind(String exchange, ExchangeType exchangeType, String queue, boolean isAutoDeleteQueue, String routingKey) {
+        this.autoCreateAndBind = true;
+        this.exchange = exchange;
+        this.queue = queue;
+        this.isAutoDeleteQueue = isAutoDeleteQueue;
         this.exchangeType = exchangeType;
         this.routingKey = (routingKey == null) ? "" : routingKey;
         return builder();
