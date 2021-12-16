@@ -1,5 +1,6 @@
 package io.rtr.conduit.adapter;
 
+import io.rtr.conduit.adapter.ampq.AmpqBuilder;
 import io.rtr.conduit.adapter.pubsub.PubSubBuilder;
 
 import java.util.Properties;
@@ -22,6 +23,8 @@ public class PublisherAdapterFactory {
     PublisherBuilder getBuilder(String name){
         if ( name.equalsIgnoreCase("PubSub") ){
             return PubSubBuilder.builder();
+        } else if ( name.equalsIgnoreCase("ampq") ) {
+            return AmpqBuilder.builder();
         }
         return null;
     }
