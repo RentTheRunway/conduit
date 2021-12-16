@@ -33,9 +33,9 @@ public class PublisherAdapterFactory {
         final PublisherAdapterFactory factory = PublisherAdapterFactory.getInstance();
         final PublisherBuilder builder = factory.getBuilder("PubSub");
         final Properties properties = new Properties();
-        properties.setProperty("topicId","killthewabbit");
-        properties.setProperty("projectId","kill-the-wabbit-335017");
-        properties.setProperty("credentialsResource","/Users/since/work/RentTheRunway/KillTheWabbit/kill-the-wabbit.json");
+        properties.setProperty("topicId","pricing-update-topic");
+        properties.setProperty("projectId","hack-335122");
+        properties.setProperty("credentialsResource","/Users/since/work/RentTheRunway/conduit/hack.json");
         builder.withProperties(properties);
         final Publisher publisher = builder.build();
         final MessageFuture future = publisher.publish("Hello World");
