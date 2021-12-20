@@ -40,10 +40,6 @@ A simple abstraction over the rabbitmq java client, which hides most of the amqp
             }
     ));
 
-## What's next?
-
-If we can hit that bullseye, the rest of the dominoes will fall like a house of cards, checkmate!
-
 ## What versions of Java are supported
 
 As of July 2019, Java 8 is supported.
