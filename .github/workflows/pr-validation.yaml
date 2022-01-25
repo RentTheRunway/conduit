@@ -14,7 +14,7 @@ on:  # yamllint disable-line rule:truthy
 jobs:
   pr-validation:
     name: PR Validation
-    runs-on: [self-hosted, default]
+    runs-on: ubuntu-latest
     if: |
       (github.actor != 'dependabot[bot]' && github.event_name != 'pull_request_target') ||
       (github.actor == 'dependabot[bot]' && github.event_name == 'pull_request_target')
