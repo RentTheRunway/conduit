@@ -1,27 +1,34 @@
 package io.rtr.conduit.amqp.impl;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.ShutdownSignalException;
+import io.rtr.conduit.amqp.AMQPConsumerCallback;
+import io.rtr.conduit.amqp.AMQPMessageBundle;
+import io.rtr.conduit.amqp.ActionResponse;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import io.rtr.conduit.amqp.AMQPConsumerCallback;
-import io.rtr.conduit.amqp.AMQPMessageBundle;
-import io.rtr.conduit.amqp.ActionResponse;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Envelope;
-import com.rabbitmq.client.ShutdownSignalException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class AMQPQueueConsumerTest {
     @Test
     public void testHandleDeliveryAcknowledge() {
-        final List<AMQPMessageBundle> messages = new ArrayList<AMQPMessageBundle>();
+        final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         AMQPConsumerCallback callback = new AMQPConsumerCallback() {
             @Override
@@ -53,7 +60,7 @@ public class AMQPQueueConsumerTest {
 
     @Test
     public void testHandleDeliveryRejectAndDiscard() throws Exception {
-        final List<AMQPMessageBundle> messages = new ArrayList<AMQPMessageBundle>();
+        final List<AMQPMessageBundle> messages = new ArrayList<>();
         final String actionReason = "Email was not sent since the user's email address was hard bounced by the Sailthru server";
 
         AMQPConsumerCallback callback = new AMQPConsumerCallback() {
@@ -77,24 +84,22 @@ public class AMQPQueueConsumerTest {
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
-        AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().headers(new HashMap<String, Object>()).build();
+        AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().headers(new HashMap<>())
+            .build();
         ArgumentCaptor<AMQP.BasicProperties> captor = ArgumentCaptor.forClass(AMQP.BasicProperties.class);
 
         consumer.handleDelivery(consumerTag, envelope, properties, "hello".getBytes());
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
-        verify(channel, times(1)).basicPublish(eq("exchange")
-                , eq("key.poison")
-                , captor.capture()
-                , any(byte[].class));
+        verify(channel, times(1)).basicPublish(eq("exchange"), eq("key.poison"), captor.capture(), any(byte[].class));
 
         assertEquals(1, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
         assertEquals(actionReason, captor.getValue().getHeaders().get(ActionResponse.REASON_KEY).toString());
     }
-    
+
     @Test
     public void testHandleDeliveryRejectAndDiscardWithoutPoisonQueue() throws Exception {
-        final List<AMQPMessageBundle> messages = new ArrayList<AMQPMessageBundle>();
+        final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         AMQPConsumerCallback callback = new AMQPConsumerCallback() {
             @Override
@@ -123,12 +128,9 @@ public class AMQPQueueConsumerTest {
 
         consumer.handleDelivery(consumerTag, envelope, properties, "hello".getBytes());
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
-        
+
         //Should not publish to poison queue
-        verify(channel, never()).basicPublish(anyString()
-                                             , anyString()
-                                             , any(AMQP.BasicProperties.class)
-                                             , any(byte[].class));
+        verify(channel, never()).basicPublish(anyString(), anyString(), any(AMQP.BasicProperties.class), any(byte[].class));
 
         assertEquals(1, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
@@ -136,7 +138,7 @@ public class AMQPQueueConsumerTest {
 
     @Test
     public void testHandleDeliveryRejectAndRequeue() throws Exception {
-        final List<AMQPMessageBundle> messages = new ArrayList<AMQPMessageBundle>();
+        final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         AMQPConsumerCallback callback = new AMQPConsumerCallback() {
             @Override
@@ -159,10 +161,9 @@ public class AMQPQueueConsumerTest {
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
-        AMQP.BasicProperties properties = new AMQP.BasicProperties()
-                                                    .builder()
-                                                    .headers(new HashMap<String, Object>())
-                                                    .build();
+        AMQP.BasicProperties properties = new AMQP.BasicProperties().builder()
+            .headers(new HashMap<>())
+            .build();
 
         ArgumentCaptor<AMQP.BasicProperties> captor = ArgumentCaptor.forClass(AMQP.BasicProperties.class);
 

@@ -5,15 +5,17 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.MetricsCollector;
 import io.rtr.conduit.amqp.transport.TransportExecutor;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
@@ -47,7 +49,7 @@ public class AMQPConnectionTest {
                 true);
     }
 
-    @Before
+    @BeforeEach
     public void before() throws IOException, TimeoutException {
         mockFactory = mock(ConnectionFactory.class);
         mockExecutor = mock(TransportExecutor.class);
@@ -181,19 +183,19 @@ public class AMQPConnectionTest {
     public void testCreateChannel_NotConnected_Throws() {
         AMQPConnection conn = defaultTestConnection();
 
-        Assert.assertThrows(IllegalStateException.class, conn::createChannel);
+        assertThrows(IllegalStateException.class, conn::createChannel);
     }
 
     @Test
     public void testIsConnected_Connected_ReturnsTrue() throws IOException, TimeoutException {
         AMQPConnection conn = defaultTestConnection();
-        Assert.assertFalse(conn.isConnected());
+        assertFalse(conn.isConnected());
         conn.connect(defaultTestConnectionProps());
-        Assert.assertTrue(conn.isConnected());
+        assertTrue(conn.isConnected());
         conn.disconnect();
-        Assert.assertFalse(conn.isConnected());
+        assertFalse(conn.isConnected());
 
-        Assert.assertThrows(IllegalStateException.class, conn::createChannel);
+        assertThrows(IllegalStateException.class, conn::createChannel);
     }
 
     @Test
@@ -202,16 +204,16 @@ public class AMQPConnectionTest {
         AMQPConnection conn = defaultTestConnection();
         conn.connect(defaultTestConnectionProps());
         when(mockExecutor.awaitTermination(1338, TimeUnit.MILLISECONDS)).thenReturn(true);
-        Assert.assertTrue(conn.waitToStopListening(wait));
+        assertTrue(conn.waitToStopListening(wait));
         verify(mockExecutor).awaitTermination(1338, TimeUnit.MILLISECONDS);
         when(mockExecutor.awaitTermination(1338, TimeUnit.MILLISECONDS)).thenReturn(false);
-        Assert.assertFalse(conn.waitToStopListening(wait));
+        assertFalse(conn.waitToStopListening(wait));
         verify(mockExecutor, times(2)).awaitTermination(1338, TimeUnit.MILLISECONDS);
     }
 
     @Test
     public void testWaitToStopListening_NotConnected_ReturnsTrue() throws InterruptedException {
-        Assert.assertTrue(defaultTestConnection().waitToStopListening(Duration.ofMillis(1338)));
+        assertTrue(defaultTestConnection().waitToStopListening(Duration.ofMillis(1338)));
         verify(mockExecutor, never()).awaitTermination(1338, TimeUnit.MILLISECONDS);
     }
 }

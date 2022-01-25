@@ -1,9 +1,10 @@
 package io.rtr.conduit.amqp.impl;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AMQPConnectionPropertiesTest {
     @Test
@@ -17,10 +18,10 @@ public class AMQPConnectionPropertiesTest {
                 .virtualHost("Anna's vhost")
                 .build();
 
-        Assert.assertEquals("Anna", properties.getUsername());
-        Assert.assertEquals("Anna's password", properties.getPassword());
-        Assert.assertEquals("Anna's vhost", properties.getVirtualHost());
-        Assert.assertEquals(Duration.ofHours(8).toMillis(), properties.getConnectionTimeout());
-        Assert.assertEquals(2, properties.getHeartbeatInterval());
+        assertEquals("Anna", properties.getUsername());
+        assertEquals("Anna's password", properties.getPassword());
+        assertEquals("Anna's vhost", properties.getVirtualHost());
+        assertEquals(Duration.ofHours(8).toMillis(), properties.getConnectionTimeout());
+        assertEquals(2, properties.getHeartbeatInterval());
     }
 }
