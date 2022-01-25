@@ -1,0 +1,10 @@
+---
+
+version: 2
+updates:
+  - target-branch: "master"
+    package-ecosystem: "maven"
+    registries: "*"
+    directory: "/"
+    schedule:
+      interval: "daily"
