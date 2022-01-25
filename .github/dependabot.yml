@@ -1,10 +1,15 @@
 ---
-
 version: 2
+
 updates:
-  - target-branch: "master"
-    package-ecosystem: "maven"
+  - package-ecosystem: "maven"
+    target-branch: "master"
     registries: "*"
+    directory: "/"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "github-actions"
+    target-branch: "master"
     directory: "/"
     schedule:
       interval: "daily"
