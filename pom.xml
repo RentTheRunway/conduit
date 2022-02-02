@@ -4,7 +4,7 @@
     <groupId>io.rtr</groupId>
     <artifactId>conduit-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.29</version>
+    <version>1.30-SNAPSHOT</version>
     <modules>
         <module>conduit</module>
         <module>conduit-bom</module>
@@ -46,7 +46,7 @@
         <connection>scm:git:git@github.com:RentTheRunway/conduit.git</connection>
         <developerConnection>scm:git:git@github.com:RentTheRunway/conduit.git</developerConnection>
         <url>https://github.com/RentTheRunway/conduit</url>
-        <tag>v1.29</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <profiles>
