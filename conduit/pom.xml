@@ -12,9 +12,6 @@
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-
         <junit-bom.version>5.8.2</junit-bom.version>
         <logback.version>1.2.10</logback.version>
         <slf4j.version>1.7.35</slf4j.version>
@@ -23,6 +20,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.rtr</groupId>
+                <artifactId>conduit-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
@@ -45,12 +49,10 @@
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
-            <version>5.14.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.33</version>
         </dependency>
 
         <!-- Testing dependencies -->

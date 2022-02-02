@@ -7,6 +7,7 @@
     <version>1.29-SNAPSHOT</version>
     <modules>
         <module>conduit</module>
+        <module>conduit-bom</module>
     </modules>
     <name>Conduit</name>
     <description>
