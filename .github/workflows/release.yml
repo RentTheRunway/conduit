@@ -59,11 +59,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
+      # This step will run the tests, so we skip running them again on release:perform
       - name: Prepare release
         run: mvn -B release:prepare
 
       - name: Perform release
-        run: mvn -B release:perform
+        run: mvn -B release:perform -DskipTests
 
       - name: A step failed
         if: ${{ failure() }}
