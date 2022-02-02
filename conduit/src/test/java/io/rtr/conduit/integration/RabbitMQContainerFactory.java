@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 
-import java.util.function.Consumer;
-
 public final class RabbitMQContainerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQContainerFactory.class);
 
