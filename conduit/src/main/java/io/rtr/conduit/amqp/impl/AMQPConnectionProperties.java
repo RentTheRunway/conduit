@@ -3,7 +3,6 @@ package io.rtr.conduit.amqp.impl;
 import io.rtr.conduit.amqp.transport.TransportConnectionProperties;
 
 import java.time.Duration;
-import java.util.function.BiConsumer;
 
 public class AMQPConnectionProperties implements TransportConnectionProperties {
 

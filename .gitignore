@@ -1,10 +1,8 @@
-.idea/*
+.idea/
 *.iml
-target/*
 .classpath
 .project
+**/target/
 .settings/
-/target/
-.idea/
 derby.log
 work/
