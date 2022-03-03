@@ -1,5 +1,7 @@
 package io.rtr.conduit.amqp.transport;
 
+import com.rabbitmq.client.Channel;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.TimeoutException;
@@ -54,6 +56,8 @@ public abstract class Transport {
     protected abstract boolean isConnectedImpl();
     protected abstract void connectImpl(TransportConnectionProperties properties) throws IOException;
     protected abstract void closeImpl() throws IOException;
+
+    public abstract Channel getChannel();
 
     protected void listenImpl(TransportListenProperties properties) throws IOException {}
     protected void stopImpl() throws IOException {}

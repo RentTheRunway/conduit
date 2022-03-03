@@ -5,6 +5,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MetricsCollector;
 import com.rabbitmq.client.ShutdownListener;
 import com.rabbitmq.client.ShutdownSignalException;
+import com.rabbitmq.client.impl.AMQImpl;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.AbstractAMQPTransport;
@@ -76,7 +77,8 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
 
-    protected Channel getChannel() {
+    @Override
+    public Channel getChannel() {
         return channel;
     }
 

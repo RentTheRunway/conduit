@@ -74,4 +74,19 @@ public class Publisher implements AutoCloseable {
             throws IOException, TimeoutException, InterruptedException {
         return transportContext.getTransport().transactionalPublish(messageBundles, transportContext.getPublishProperties());
     }
+
+    public void startTransaction() throws IOException {
+        transportContext.getTransport().getChannel().txSelect();
+    }
+
+    public void commitTransaction() throws IOException {
+        transportContext.getTransport().getChannel().txCommit();
+
+    }
+
+    public void rollbackTransaction() throws IOException {
+        transportContext.getTransport().getChannel().txRollback();
+
+    }
+
 }
