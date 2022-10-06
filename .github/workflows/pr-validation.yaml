@@ -21,12 +21,12 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
         if: github.actor != 'dependabot[bot]'
 
       # See: https://hugo.alliau.me/2021/05/04/migration-to-github-native-dependabot-solutions-for-auto-merge-and-action-secrets/#share-your-secrets-with-dependabot
       - name: Checkout Repository [Dependabot]
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
         if: github.actor == 'dependabot[bot]'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
