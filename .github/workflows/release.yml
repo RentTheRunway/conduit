@@ -34,7 +34,7 @@ jobs:
           rm ./private.key
 
       - name: Setup Nexus authentication and GPG passphrase
-        uses: whelk-io/maven-settings-xml-action@v10
+        uses: whelk-io/maven-settings-xml-action@v21
         with:
           profiles: '[
           {

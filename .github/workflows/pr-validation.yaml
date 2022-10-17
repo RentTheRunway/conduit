@@ -46,7 +46,7 @@ jobs:
       # actions/setup-java does not support multiple servers at this time
       # https://github.com/actions/setup-java/issues/85
       - name: Setup Nexus authentication and GPG passphrase
-        uses: whelk-io/maven-settings-xml-action@v20
+        uses: whelk-io/maven-settings-xml-action@v21
         with:
           servers: |
             [
