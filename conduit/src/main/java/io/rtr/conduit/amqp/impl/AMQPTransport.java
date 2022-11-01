@@ -139,6 +139,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
         AMQPCommonListenProperties commonListenProperties = getCommonListenProperties(properties);
         String queue = commonListenProperties.getQueue();
         String poisonPrefix = commonListenProperties.getPoisonPrefix();
+        boolean exclusive = commonListenProperties.getExclusive();
 
         if (commonListenProperties.isDynamicQueueCreation()) {
             queue = createDynamicQueue(commonListenProperties.getExchange(),
@@ -165,7 +166,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
                 commonListenProperties,
                 poisonPrefix);
         getChannel().basicQos(commonListenProperties.getPrefetchCount());
-        getChannel().basicConsume(queue, noAutoAck, consumer);
+        getChannel().basicConsume(queue, noAutoAck, "", false, exclusive, (Map)null, consumer);
     }
 
     protected String createDynamicQueue(String exchange,

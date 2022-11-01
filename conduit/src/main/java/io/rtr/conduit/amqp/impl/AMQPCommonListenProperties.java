@@ -16,9 +16,10 @@ public abstract class AMQPCommonListenProperties implements TransportListenPrope
     private String routingKey;
     private boolean autoCreateAndBind;
     private String exchangeType;
+    private boolean exclusive;
 
 
-    AMQPCommonListenProperties(String exchange, String queue, boolean isAutoDeleteQueue, int threshold, int prefetchCount, boolean poisonQueueEnabled, boolean purgeOnConnect, boolean dynamicQueueCreation, String poisonPrefix, String dynamicQueueRoutingKey, boolean autoCreateAndBind, String exchangeType, String routingKey) {
+    AMQPCommonListenProperties(String exchange, String queue, boolean isAutoDeleteQueue, int threshold, int prefetchCount, boolean poisonQueueEnabled, boolean purgeOnConnect, boolean dynamicQueueCreation, String poisonPrefix, String dynamicQueueRoutingKey, boolean autoCreateAndBind, String exchangeType, String routingKey, boolean exclusive) {
         this.exchange = exchange;
         this.queue = queue;
         this.isAutoDeleteQueue = isAutoDeleteQueue;
@@ -32,6 +33,7 @@ public abstract class AMQPCommonListenProperties implements TransportListenPrope
         this.routingKey = routingKey;
         this.autoCreateAndBind = autoCreateAndBind;
         this.exchangeType = exchangeType;
+        this.exclusive = exclusive;
     }
 
     public String getExchange() {
@@ -85,4 +87,6 @@ public abstract class AMQPCommonListenProperties implements TransportListenPrope
     public boolean isAutoDeleteQueue() {
         return isAutoDeleteQueue;
     }
+
+    public boolean getExclusive() { return exclusive; }
 }

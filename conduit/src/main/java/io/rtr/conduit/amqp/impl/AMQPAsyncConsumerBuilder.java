@@ -51,7 +51,8 @@ public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTrans
                 getDynamicQueueRoutingKey(),
                 isAutoCreateAndBind(),
                 getExchangeType(),
-                getRoutingKey());
+                getRoutingKey(),
+                getExclusive());
     }
 
     @Override

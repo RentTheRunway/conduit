@@ -34,6 +34,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private String routingKey = "";
     private boolean autoCreateAndBind = false;
     private ExchangeType exchangeType = ExchangeType.DIRECT;
+    private boolean exclusive = false;
 
     protected AMQPConsumerBuilder() {
     }
@@ -157,6 +158,13 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     public AMQPConnection getSharedConnection() {
         return sharedConnection;
     }
+
+    public R exclusive(boolean exclusive) {
+        this.exclusive = exclusive;
+        return builder();
+    }
+
+    protected boolean getExclusive() { return exclusive; }
 
     public R retryThreshold(int retryThreshold) {
         this.retryThreshold = retryThreshold;
