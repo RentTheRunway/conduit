@@ -155,14 +155,16 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return builder();
     }
 
+    public AMQPConnection getSharedConnection() {
+        return sharedConnection;
+    }
+
     public R exclusive(boolean exclusive) {
         this.exclusive = exclusive;
         return builder();
     }
 
-    public AMQPConnection getSharedConnection() {
-        return sharedConnection;
-    }
+    protected boolean getExclusive() { return exclusive; }
 
     public R retryThreshold(int retryThreshold) {
         this.retryThreshold = retryThreshold;
@@ -244,8 +246,6 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     protected boolean isPoisonQueueEnabled() {
         return poisonQueueEnabled;
     }
-
-    protected boolean getExclusive() { return exclusive; }
 
     @Override
     protected void validate() {
