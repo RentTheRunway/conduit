@@ -34,6 +34,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private String routingKey = "";
     private boolean autoCreateAndBind = false;
     private ExchangeType exchangeType = ExchangeType.DIRECT;
+    private boolean exclusive = false;
 
     protected AMQPConsumerBuilder() {
     }
@@ -154,6 +155,11 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return builder();
     }
 
+    public R exclusive(boolean exclusive) {
+        this.exclusive = exclusive;
+        return builder();
+    }
+
     public AMQPConnection getSharedConnection() {
         return sharedConnection;
     }
@@ -238,6 +244,8 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     protected boolean isPoisonQueueEnabled() {
         return poisonQueueEnabled;
     }
+
+    protected boolean getExclusive() { return exclusive; }
 
     @Override
     protected void validate() {
