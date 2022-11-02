@@ -1,7 +1,5 @@
 package io.rtr.conduit.amqp.transport;
 
-import com.rabbitmq.client.Channel;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.TimeoutException;
@@ -50,9 +48,6 @@ public abstract class Transport {
             throws IOException, TimeoutException, InterruptedException {
         return transactionalPublishImpl(messageBundles, properties);
     }
-
-    // Gets the current channel
-    public abstract Channel getChannel();
 
     //! Implementation
 

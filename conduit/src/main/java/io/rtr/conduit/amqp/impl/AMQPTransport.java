@@ -76,7 +76,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
 
-    public Channel getChannel() {
+    protected Channel getChannel() {
         return channel;
     }
 
