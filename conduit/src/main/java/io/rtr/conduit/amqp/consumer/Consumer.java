@@ -1,5 +1,6 @@
 package io.rtr.conduit.amqp.consumer;
 
+import com.rabbitmq.client.Channel;
 import io.rtr.conduit.amqp.transport.Transport;
 import io.rtr.conduit.amqp.transport.TransportListenContext;
 
@@ -46,4 +47,6 @@ public class Consumer implements AutoCloseable {
     private Transport getTransport() {
         return transportContext.getTransport();
     }
+
+    public Channel getChannel() { return getTransport().getChannel(); }
 }
