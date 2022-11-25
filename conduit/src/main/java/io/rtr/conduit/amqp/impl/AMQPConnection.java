@@ -1,11 +1,15 @@
 package io.rtr.conduit.amqp.impl;
 
+import com.rabbitmq.client.impl.recovery.AutorecoveringConnection;
 import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.RecoveryListener;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.MetricsCollector;
 import io.rtr.conduit.amqp.transport.TransportExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
@@ -19,6 +23,7 @@ public class AMQPConnection {
     private Connection connection;
     private TransportExecutor executor;
     private final Supplier<TransportExecutor> executorFactory;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AMQPConnection.class);
 
     public AMQPConnection(boolean ssl, String host, int port, MetricsCollector metricsCollector) {
         this(new ConnectionFactory(), TransportExecutor::new, ssl, host, port, metricsCollector);
@@ -85,6 +90,28 @@ public class AMQPConnection {
             return executor.awaitTermination(waitFor.toMillis(), TimeUnit.MILLISECONDS);
         }
         return true;
+    }
+
+    public synchronized void addRecoveryListener(RecoveryListener recoveryListener) {
+        if (!isConnected()) {
+            throw new ConduitConnectionStateException("Attempted to add recovery listener whilst disconnected.");
+        }
+        if (this.connection instanceof AutorecoveringConnection) {
+            ((AutorecoveringConnection) this.connection).addRecoveryListener(recoveryListener);
+        } else {
+            LOGGER.warn("Cannot add recovery listener to connection as it's not an auto recovering connection");
+        }
+    }
+
+    public synchronized void removeRecoveryListener(RecoveryListener recoveryListener) {
+        if (!isConnected()) {
+            throw new ConduitConnectionStateException("Attempted to remove recovery listener whilst disconnected.");
+        }
+        if (this.connection instanceof AutorecoveringConnection) {
+            ((AutorecoveringConnection) this.connection).removeRecoveryListener(recoveryListener);
+        } else {
+            LOGGER.warn("Cannot remove recovery listener from connection as it's not an auto recovering connection");
+        }
     }
 
     private void initializeExecutor() {
