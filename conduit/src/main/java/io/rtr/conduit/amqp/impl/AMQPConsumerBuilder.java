@@ -26,7 +26,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private boolean automaticRecoveryEnabled = true;
     private int retryThreshold = 10;
     private boolean poisonQueueEnabled = true;
-    private int prefetchCount = 1;
+    private int prefetchCount = 250;
     private boolean purgeOnConnect;
     private boolean dynamicQueueCreation;
     private String poisonPrefix = "";
