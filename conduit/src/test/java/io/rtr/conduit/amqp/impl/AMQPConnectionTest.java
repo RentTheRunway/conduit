@@ -55,7 +55,8 @@ public class AMQPConnectionTest {
                 "BOBS VHOST",
                 CONNECTION_TIMEOUT,
                 666,
-                true);
+                true,
+                5000L);
     }
 
     @BeforeEach
@@ -110,6 +111,7 @@ public class AMQPConnectionTest {
         verify(mockFactory).setConnectionTimeout(CONNECTION_TIMEOUT);
         verify(mockFactory).setRequestedHeartbeat(666);
         verify(mockFactory).setAutomaticRecoveryEnabled(true);
+        verify(mockFactory).setNetworkRecoveryInterval(5000L);
 
         verify(mockFactory).newConnection(mockExecutor);
     }
