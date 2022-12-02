@@ -126,6 +126,7 @@ public class AMQPConnection {
         connectionFactory.setConnectionTimeout(properties.getConnectionTimeout());
         connectionFactory.setRequestedHeartbeat(properties.getHeartbeatInterval());
         connectionFactory.setAutomaticRecoveryEnabled(properties.isAutomaticRecoveryEnabled());
+        connectionFactory.setNetworkRecoveryInterval(properties.getNetworkRecoveryInterval());
     }
 
 }

@@ -13,6 +13,7 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
         private Duration connectionTimeout = Duration.ofSeconds(10);
         private Duration heartbeatInterval = Duration.ofSeconds(60);
         private boolean automaticRecoveryEnabled;
+        private long networkRecoveryInterval = 5000L;
 
         private Builder() {}
 
@@ -46,9 +47,14 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
             return this;
         }
 
+        public Builder networkRecoveryInterval(long networkRecoveryInterval) {
+            this.networkRecoveryInterval = networkRecoveryInterval;
+            return this;
+        }
+
         public AMQPConnectionProperties build() {
             return new AMQPConnectionProperties(
-                    username, password, virtualHost, (int)connectionTimeout.toMillis(), (int)heartbeatInterval.getSeconds(), automaticRecoveryEnabled
+                    username, password, virtualHost, (int)connectionTimeout.toMillis(), (int)heartbeatInterval.getSeconds(), automaticRecoveryEnabled, networkRecoveryInterval
             );
         }
     }
@@ -63,6 +69,7 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
     private final int connectionTimeout;
     private final int heartbeatInterval;
     private final boolean automaticRecoveryEnabled;
+    private long networkRecoveryInterval;
 
     AMQPConnectionProperties(String username, String password) {
         this(username, password, "/");
@@ -95,6 +102,22 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
         this.automaticRecoveryEnabled = automaticRecoveryEnabled;
     }
 
+    AMQPConnectionProperties(String username
+            , String password
+            , String virtualHost
+            , int connectionTimeout
+            , int heartbeatInterval
+            , boolean automaticRecoveryEnabled
+            , long networkRecoveryInterval) {
+        this.username = username;
+        this.password = password;
+        this.virtualHost = virtualHost;
+        this.connectionTimeout = connectionTimeout;
+        this.heartbeatInterval = heartbeatInterval;
+        this.automaticRecoveryEnabled = automaticRecoveryEnabled;
+        this.networkRecoveryInterval = networkRecoveryInterval;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -117,6 +140,10 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
 
     public boolean isAutomaticRecoveryEnabled() {
         return automaticRecoveryEnabled;
+    }
+
+    public long getNetworkRecoveryInterval() {
+        return networkRecoveryInterval;
     }
 
 }
