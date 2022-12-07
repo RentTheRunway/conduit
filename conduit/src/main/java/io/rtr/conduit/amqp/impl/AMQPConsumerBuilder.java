@@ -35,6 +35,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private boolean autoCreateAndBind = false;
     private ExchangeType exchangeType = ExchangeType.DIRECT;
     private boolean exclusive = false;
+    private long networkRecoveryInterval = 5000L;
 
     protected AMQPConsumerBuilder() {
     }
@@ -98,6 +99,11 @@ public abstract class AMQPConsumerBuilder<T extends Transport
 
     public R automaticRecoveryEnabled(boolean automaticRecoveryEnabled) {
         this.automaticRecoveryEnabled = automaticRecoveryEnabled;
+        return builder();
+    }
+
+    public R networkRecoveryInterval(long networkRecoveryInterval) {
+        this.networkRecoveryInterval = networkRecoveryInterval;
         return builder();
     }
 
@@ -247,6 +253,11 @@ public abstract class AMQPConsumerBuilder<T extends Transport
         return poisonQueueEnabled;
     }
 
+    public long getNetworkRecoveryInterval() {
+        return networkRecoveryInterval;
+    }
+
+
     @Override
     protected void validate() {
         assertNotNull(exchange, "exchange");
@@ -277,7 +288,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     @Override
     protected AMQPConnectionProperties buildConnectionProperties() {
         return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout,
-                heartbeatInterval, automaticRecoveryEnabled);
+                heartbeatInterval, automaticRecoveryEnabled, networkRecoveryInterval);
     }
 
     public enum ExchangeType {

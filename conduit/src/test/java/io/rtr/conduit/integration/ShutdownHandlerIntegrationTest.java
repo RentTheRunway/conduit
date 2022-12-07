@@ -32,7 +32,7 @@ public class ShutdownHandlerIntegrationTest {
         .withExposedPorts(5672)
         .withNetwork(COMMON_NETWORK);
     @Container
-    private static final ToxiproxyContainer TOXI_PROXY = new ToxiproxyContainer("shopify/toxiproxy:2.1.0")
+    private static final ToxiproxyContainer TOXI_PROXY = new ToxiproxyContainer("shopify/toxiproxy:2.1.4")
         .withNetwork(COMMON_NETWORK)
         .withNetworkAliases(TOXIPROXY_NETWORK_ALIAS);
 

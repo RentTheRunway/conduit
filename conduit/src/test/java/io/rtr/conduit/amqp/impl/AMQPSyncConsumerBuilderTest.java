@@ -136,4 +136,29 @@ public class AMQPSyncConsumerBuilderTest {
 
         amqpSyncConsumerBuilder.build();
     }
+
+    @Test
+    public void testDefaultConnectionProperties() {
+        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder = AMQPSyncConsumerBuilder.builder()
+                .exchange("exchange")
+                .queue("queue")
+                .username("bob")
+                .password("bob");
+
+        AMQPConnectionProperties connectionProperties = amqpSyncConsumerBuilder.buildConnectionProperties();
+        assertEquals(5000, connectionProperties.getNetworkRecoveryInterval(), "When Network Recovery Interval not set, default to ");
+    }
+
+    @Test
+    public void testOverrideConnectionProperties() {
+        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder = AMQPSyncConsumerBuilder.builder()
+                .exchange("exchange")
+                .queue("queue")
+                .username("bob")
+                .password("bob")
+                .networkRecoveryInterval(10000L);
+
+        AMQPConnectionProperties connectionProperties = amqpSyncConsumerBuilder.buildConnectionProperties();
+        assertEquals(10000, connectionProperties.getNetworkRecoveryInterval(), "When Network Recovery Interval not set, default to ");
+    }
 }
