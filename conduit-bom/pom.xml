@@ -11,7 +11,7 @@
 
     <properties>
         <amqp-client.version>5.14.2</amqp-client.version>
-        <slf4j-api.version>1.7.35</slf4j-api.version>
+        <slf4j-api.version>2.0.6</slf4j-api.version>
     </properties>
 
     <dependencyManagement>
