@@ -1,12 +1,13 @@
 package io.rtr.conduit.amqp.impl;
 
-import com.rabbitmq.client.impl.recovery.AutorecoveringConnection;
 import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.RecoveryListener;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.MetricsCollector;
+import com.rabbitmq.client.RecoveryListener;
+import com.rabbitmq.client.impl.recovery.AutorecoveringConnection;
+import com.rabbitmq.client.impl.recovery.TopologyRecoveryRetryLogic;
 import io.rtr.conduit.amqp.transport.TransportExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,6 +128,14 @@ public class AMQPConnection {
         connectionFactory.setRequestedHeartbeat(properties.getHeartbeatInterval());
         connectionFactory.setAutomaticRecoveryEnabled(properties.isAutomaticRecoveryEnabled());
         connectionFactory.setNetworkRecoveryInterval(properties.getNetworkRecoveryInterval());
+        if (properties.getTopologyRecoveryInterval() != null) {
+            connectionFactory.setTopologyRecoveryRetryHandler(
+                    TopologyRecoveryRetryLogic.RETRY_ON_QUEUE_NOT_FOUND_RETRY_HANDLER
+                            .retryAttempts(properties.getTopologyRecoveryMaxAttempts())
+                            .backoffPolicy(n -> Thread.sleep(properties.getTopologyRecoveryInterval()))
+                            .build()
+            );
+        }
     }
 
 }

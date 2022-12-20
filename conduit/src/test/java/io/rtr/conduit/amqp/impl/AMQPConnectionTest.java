@@ -56,7 +56,10 @@ public class AMQPConnectionTest {
                 CONNECTION_TIMEOUT,
                 666,
                 true,
-                5000L);
+                5000L,
+                null,
+                null
+        );
     }
 
     @BeforeEach

@@ -36,6 +36,8 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     private ExchangeType exchangeType = ExchangeType.DIRECT;
     private boolean exclusive = false;
     private long networkRecoveryInterval = 5000L;
+    private Long topologyRecoveryInterval;
+    private Integer topologyRecoveryMaxAttempts = Integer.MAX_VALUE;
 
     protected AMQPConsumerBuilder() {
     }
@@ -104,6 +106,16 @@ public abstract class AMQPConsumerBuilder<T extends Transport
 
     public R networkRecoveryInterval(long networkRecoveryInterval) {
         this.networkRecoveryInterval = networkRecoveryInterval;
+        return builder();
+    }
+
+    public R topologyRecoveryInterval(Long topologyRecoveryInterval) {
+        this.topologyRecoveryInterval = topologyRecoveryInterval;
+        return builder();
+    }
+
+    public R topologyRecoveryMaxAttempts(Integer topologyRecoveryMaxAttempts) {
+        this.topologyRecoveryMaxAttempts = topologyRecoveryMaxAttempts;
         return builder();
     }
 
@@ -288,7 +300,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport
     @Override
     protected AMQPConnectionProperties buildConnectionProperties() {
         return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout,
-                heartbeatInterval, automaticRecoveryEnabled, networkRecoveryInterval);
+                heartbeatInterval, automaticRecoveryEnabled, networkRecoveryInterval, topologyRecoveryInterval, topologyRecoveryMaxAttempts);
     }
 
     public enum ExchangeType {
