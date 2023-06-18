@@ -1,9 +1,7 @@
 package io.rtr.conduit.amqp.impl;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.MetricsCollector;
+import com.rabbitmq.client.*;
+import com.rabbitmq.client.impl.recovery.AutorecoveringConnection;
 import io.rtr.conduit.amqp.transport.TransportExecutor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +31,17 @@ public class AMQPConnectionTest {
     ConnectionFactory mockFactory;
     TransportExecutor mockExecutor;
     MetricsCollector mockMetrics;
+    RecoveryListener recoveryListener = new RecoveryListener() {
+        @Override
+        public void handleRecovery(Recoverable recoverable) {
+
+        }
+
+        @Override
+        public void handleRecoveryStarted(Recoverable recoverable) {
+
+        }
+    };
 
     private AMQPConnection defaultTestConnection() {
 
@@ -46,7 +55,11 @@ public class AMQPConnectionTest {
                 "BOBS VHOST",
                 CONNECTION_TIMEOUT,
                 666,
-                true);
+                true,
+                5000L,
+                null,
+                null
+        );
     }
 
     @BeforeEach
@@ -55,7 +68,7 @@ public class AMQPConnectionTest {
         mockExecutor = mock(TransportExecutor.class);
         mockMetrics = mock(MetricsCollector.class);
 
-        mockConnection = mock(Connection.class);
+        mockConnection = mock(AutorecoveringConnection.class);
         when(mockConnection.createChannel()).thenReturn(mock(Channel.class));
         when(mockConnection.isOpen()).thenReturn(true);
         doAnswer((i)->when(mockConnection.isOpen())
@@ -101,6 +114,7 @@ public class AMQPConnectionTest {
         verify(mockFactory).setConnectionTimeout(CONNECTION_TIMEOUT);
         verify(mockFactory).setRequestedHeartbeat(666);
         verify(mockFactory).setAutomaticRecoveryEnabled(true);
+        verify(mockFactory).setNetworkRecoveryInterval(5000L);
 
         verify(mockFactory).newConnection(mockExecutor);
     }
@@ -169,6 +183,38 @@ public class AMQPConnectionTest {
 
         verify(mockConnection, never()).close(CONNECTION_TIMEOUT);
         verify(mockExecutor, times(1)).shutdown();
+    }
+
+    @Test
+    public void testAddRecoverListener() throws IOException, TimeoutException {
+        AMQPConnection conn = defaultTestConnection();
+        conn.connect(defaultTestConnectionProps());
+        conn.addRecoveryListener(recoveryListener);
+        verify((AutorecoveringConnection) mockConnection).addRecoveryListener(recoveryListener);
+    }
+
+    @Test
+    public void testRemoveRecoverListener() throws IOException, TimeoutException {
+        AMQPConnection conn = defaultTestConnection();
+        conn.connect(defaultTestConnectionProps());
+        conn.removeRecoveryListener(recoveryListener);
+        verify((AutorecoveringConnection) mockConnection).removeRecoveryListener(recoveryListener);
+    }
+
+    @Test
+    public void testAddRecoverListener_NotConnected_DoesNothing() {
+        AMQPConnection conn = defaultTestConnection();
+        assertThrows(IllegalStateException.class, () -> {
+            conn.addRecoveryListener(recoveryListener);
+        });
+    }
+
+    @Test
+    public void testRemoveRecoverListener_NotConnected_DoesNothing() {
+        AMQPConnection conn = defaultTestConnection();
+        assertThrows(IllegalStateException.class, () -> {
+            conn.removeRecoveryListener(recoveryListener);
+        });
     }
 
     @Test
