@@ -6,9 +6,9 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AMQPConnectionPropertiesTest {
+class AMQPConnectionPropertiesTest {
     @Test
-    public void testValidateBuilder() {
+    void testValidateBuilder() {
         AMQPConnectionProperties properties = AMQPConnectionProperties.builder()
                 .username("Anna")
                 .password("Anna's password")
@@ -28,7 +28,7 @@ public class AMQPConnectionPropertiesTest {
     }
 
     @Test
-    public void testDefaultNetworkRecoveryInterval() {
+    void testDefaultNetworkRecoveryInterval() {
         AMQPConnectionProperties properties = AMQPConnectionProperties.builder()
                 .username("Anna")
                 .password("Anna's password")

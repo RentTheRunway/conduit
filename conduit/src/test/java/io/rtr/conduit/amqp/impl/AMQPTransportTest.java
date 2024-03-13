@@ -8,6 +8,7 @@ import com.rabbitmq.client.impl.AMQImpl;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class AMQPTransportTest {
+class AMQPTransportTest {
     Channel channel;
     AMQPTransport amqpTransport;
     AMQPPublishProperties properties;
@@ -66,7 +67,7 @@ public class AMQPTransportTest {
     }
 
     @BeforeEach
-    public void before() throws IOException {
+    void before() throws IOException {
         amqpTransport = spy(new AMQPTransport(false, "host", 1234, null));
         channel = mock(Channel.class);
 
@@ -83,7 +84,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testConfirmModeDisabled() throws Exception {
+    void testConfirmModeDisabled() throws Exception {
         when(properties.isConfirmEnabled()).thenReturn(false);
 
         amqpTransport.publishImpl(messageBundle, properties);
@@ -93,7 +94,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testConfirmModeEnabled() throws Exception {
+    void testConfirmModeEnabled() throws Exception {
         long timeout = 9876;
         when(properties.getTimeout()).thenReturn(timeout);
         when(properties.isConfirmEnabled()).thenReturn(true);
@@ -107,7 +108,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testListenImplDynamicQueues() throws IOException {
+    void testListenImplDynamicQueues() throws IOException {
 
         amqpTransport.setChannel(channel);
 
@@ -123,7 +124,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testListenImplDynamicQueuesExclusive() throws IOException {
+    void testListenImplDynamicQueuesExclusive() throws IOException {
 
         amqpTransport.setChannel(channel);
 
@@ -139,7 +140,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testListenImplDynamicQueuesPurgeOnConnect() throws IOException {
+    void testListenImplDynamicQueuesPurgeOnConnect() throws IOException {
         AMQPCommonListenProperties commonListenProperties = dynamicQueueListenProperties(true, true, false)
             .buildListenProperties();
 
@@ -153,7 +154,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testListenImplDynamicQueues_ThrowsOnBind_StillSetsUpShutdownListener() throws IOException {
+    void testListenImplDynamicQueues_ThrowsOnBind_StillSetsUpShutdownListener() throws IOException {
         when(channel.queueBind(anyString(), anyString(), anyString(), anyMap())).thenThrow(new RuntimeException());
 
         AMQPCommonListenProperties commonListenProperties = dynamicQueueListenProperties(false, false, false)
@@ -164,7 +165,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testListenImplDynamicQueues_ThrowsOnDeclare_StillSetsUpShutdownListener() throws IOException {
+    void testListenImplDynamicQueues_ThrowsOnDeclare_StillSetsUpShutdownListener() throws IOException {
         AMQPConsumerCallback consumerCallback = mock(AMQPConsumerCallback.class);
         AMQPCommonListenProperties commonListenProperties = AMQPSyncConsumerBuilder.builder()
             .callback(consumerCallback)
@@ -180,7 +181,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testListenImplBasicConfig() throws IOException {
+    void testListenImplBasicConfig() throws IOException {
         AMQPConsumerBuilder.ExchangeType exchangeType = AMQPConsumerBuilder.ExchangeType.DIRECT;
 
         AMQImpl.Queue.DeclareOk ok = mock(AMQImpl.Queue.DeclareOk.class);
@@ -213,7 +214,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testListenAutoDeleteQueue() throws IOException {
+    void testListenAutoDeleteQueue() throws IOException {
         AMQPConsumerBuilder.ExchangeType exchangeType = AMQPConsumerBuilder.ExchangeType.CONSISTENT_HASH;
 
         AMQImpl.Queue.DeclareOk ok = mock(AMQImpl.Queue.DeclareOk.class);
@@ -246,7 +247,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testClose_PrivateConnection_DisconnectsConnection() throws IOException {
+    void testClose_PrivateConnection_DisconnectsConnection() throws IOException {
         ConnectionFactory factory = mock(ConnectionFactory.class);
         int expectedTimeout = 5;
         when(factory.getConnectionTimeout()).thenReturn(expectedTimeout);
@@ -261,7 +262,7 @@ public class AMQPTransportTest {
 
 
     @Test
-    public void testClose_SharedConnection_DoesntDisconnectConnectionButClosesOpenChannel() throws IOException, TimeoutException {
+    void testClose_SharedConnection_DoesntDisconnectConnectionButClosesOpenChannel() throws IOException, TimeoutException {
         AMQPConnection connection = mock(AMQPConnection.class);
         when(connection.isConnected()).thenReturn(true);
 
@@ -275,7 +276,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testConnect_PrivateConnection_ConnectsAndCreatesChannel() throws IOException, TimeoutException {
+    void testConnect_PrivateConnection_ConnectsAndCreatesChannel() throws IOException, TimeoutException {
 
         amqpTransport = new AMQPTransport(false, "host", 1234, null);
         AMQPConnection connection = mock(AMQPConnection.class);
@@ -287,7 +288,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testConnect_PrivateConnectionAndClosedChannel_ConnectsAndCreatesChannel() throws IOException, TimeoutException {
+    void testConnect_PrivateConnectionAndClosedChannel_ConnectsAndCreatesChannel() throws IOException, TimeoutException {
         amqpTransport = new AMQPTransport(false, "host", 1234, null);
         AMQPConnection connection = mock(AMQPConnection.class);
         amqpTransport.setConnection(connection);
@@ -300,7 +301,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testConnect_SharedConnectionAndOpenChannel_DoesNothing() throws IOException, TimeoutException {
+    void testConnect_SharedConnectionAndOpenChannel_DoesNothing() throws IOException, TimeoutException {
         AMQPConnection connection = mock(AMQPConnection.class);
         when(connection.isConnected()).thenReturn(true);
 
@@ -314,7 +315,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testConnect_SharedConnection_JustCreatesChannel() throws IOException, TimeoutException {
+    void testConnect_SharedConnection_JustCreatesChannel() throws IOException, TimeoutException {
         AMQPConnection connection = mock(AMQPConnection.class);
 
         amqpTransport = new AMQPTransport(connection);
@@ -326,7 +327,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testClose_SharedConnectionAndClosedChannel_DoesNothing() throws IOException, TimeoutException {
+    void testClose_SharedConnectionAndClosedChannel_DoesNothing() throws IOException, TimeoutException {
         AMQPConnection connection = mock(AMQPConnection.class);
         when(connection.isConnected()).thenReturn(true);
 
@@ -340,7 +341,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testStop_PrivateConnection_ClosesChannelStopsConnectionListening() throws IOException, TimeoutException {
+    void testStop_PrivateConnection_ClosesChannelStopsConnectionListening() throws IOException, TimeoutException {
         AMQPConnection connection = mock(AMQPConnection.class);
         when(connection.isConnected()).thenReturn(true);
 
@@ -353,7 +354,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testStop_PrivateConnectionClosedChannel_ClosesChannelStopsConnectionListening() throws IOException, TimeoutException {
+    void testStop_PrivateConnectionClosedChannel_ClosesChannelStopsConnectionListening() throws IOException, TimeoutException {
         AMQPConnection connection = mock(AMQPConnection.class);
         when(connection.isConnected()).thenReturn(true);
 
@@ -366,7 +367,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testStop_SharedConnection_JustClosesOpenChannel() throws IOException, TimeoutException {
+    void testStop_SharedConnection_JustClosesOpenChannel() throws IOException, TimeoutException {
         AMQPConnection connection = mock(AMQPConnection.class);
         when(connection.isConnected()).thenReturn(true);
 
@@ -380,7 +381,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testStop_SharedConnectionAndClosedChannel_DoesNothing() throws IOException, TimeoutException {
+    void testStop_SharedConnectionAndClosedChannel_DoesNothing() throws IOException, TimeoutException {
         AMQPConnection connection = mock(AMQPConnection.class);
         when(connection.isConnected()).thenReturn(true);
 
@@ -394,7 +395,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testIsStopped_PrivateConnection_WaitsForConnectionToStopListening() throws InterruptedException {
+    void testIsStopped_PrivateConnection_WaitsForConnectionToStopListening() throws InterruptedException {
         Duration wait = Duration.ofMillis(666);
         AMQPConnection connection = mock(AMQPConnection.class);
         when(connection.isConnected()).thenReturn(true);
@@ -408,7 +409,7 @@ public class AMQPTransportTest {
     }
 
     @Test
-    public void testIsStopped_SharedConnection_JustChecksIfChannelIsOpen() throws InterruptedException {
+    void testIsStopped_SharedConnection_JustChecksIfChannelIsOpen() throws InterruptedException {
         AMQPConnection connection = mock(AMQPConnection.class);
         when(connection.isConnected()).thenReturn(true);
 
@@ -425,7 +426,8 @@ public class AMQPTransportTest {
         assertTrue(amqpTransport.isStopped(666));
     }
 
-    public static class DynamicQueueCleanupShutdownListenerTest {
+    @Nested
+    class DynamicQueueCleanupShutdownListenerTest {
         private static final String MOCK_DYNAMIC_QUEUE = "MOCK DYNAMIC QUEUE";
         private static final String MOCK_DYNAMIC_POISON_QUEUE = ".poison.MOCK DYNAMIC QUEUE";
 
@@ -437,7 +439,7 @@ public class AMQPTransportTest {
         AMQPTransport.DynamicQueueCleanupShutdownListener shutdownListener;
 
         @BeforeEach
-        public void setup() throws IOException {
+        void setup() throws IOException {
             AMQP.Queue.DeclareOk ok = mock(AMQP.Queue.DeclareOk.class);
             when(ok.getQueue()).thenReturn("MOCK DYNAMIC QUEUE");
 
@@ -504,7 +506,7 @@ public class AMQPTransportTest {
         }
 
         @Test
-        public void testShutdownCompleted_DynamicQueueCreatedWithoutPoisonQueue_AsynchronouslyDeletesDynamicQueue() throws IOException, TimeoutException {
+        void testShutdownCompleted_DynamicQueueCreatedWithoutPoisonQueue_AsynchronouslyDeletesDynamicQueue() throws IOException, TimeoutException {
             listen(false);
             shutdownListener.shutdownCompleted(null);
             shutdownListener.queueCleanupJob.join();
@@ -512,7 +514,7 @@ public class AMQPTransportTest {
         }
 
         @Test
-        public void testShutdownCompleted_DynamicQueueCreatedWithPoisonQueue_AsynchronouslyDeletesBothQueues() throws IOException, TimeoutException {
+        void testShutdownCompleted_DynamicQueueCreatedWithPoisonQueue_AsynchronouslyDeletesBothQueues() throws IOException, TimeoutException {
             listen(true);
             shutdownListener.shutdownCompleted(null);
             shutdownListener.queueCleanupJob.join();
@@ -520,7 +522,7 @@ public class AMQPTransportTest {
         }
 
         @Test
-        public void testShutdownCompleted_ErrorOnDynamicQueueDeclare_DeletesNoQueues() throws IOException {
+        void testShutdownCompleted_ErrorOnDynamicQueueDeclare_DeletesNoQueues() throws IOException {
             when(mainChannel.queueDeclare()).thenThrow(new RuntimeException());
             listen(true, RuntimeException.class);
             shutdownListener.shutdownCompleted(null);
@@ -529,7 +531,7 @@ public class AMQPTransportTest {
         }
 
         @Test
-        public void testShutdownCompleted_ErrorOnDynamicQueueBind_DeletesDynamicQueue() throws IOException, TimeoutException {
+        void testShutdownCompleted_ErrorOnDynamicQueueBind_DeletesDynamicQueue() throws IOException, TimeoutException {
             when(mainChannel.queueBind(eq(MOCK_DYNAMIC_QUEUE), anyString(), anyString())).thenThrow(new RuntimeException());
             listen(true, RuntimeException.class);
             shutdownListener.shutdownCompleted(null);
@@ -538,7 +540,7 @@ public class AMQPTransportTest {
         }
 
         @Test
-        public void testShutdownCompleted_ErrorOnPoisonQueueDeclare_DeletesDynamicQueue() throws IOException, TimeoutException {
+        void testShutdownCompleted_ErrorOnPoisonQueueDeclare_DeletesDynamicQueue() throws IOException, TimeoutException {
 
             when(mainChannel.queueDeclare(eq(MOCK_DYNAMIC_POISON_QUEUE), anyBoolean(), anyBoolean(), anyBoolean(), anyMap())).thenThrow(new RuntimeException());
             listen(true, RuntimeException.class);
@@ -548,7 +550,7 @@ public class AMQPTransportTest {
         }
 
         @Test
-        public void testShutdownCompleted_ErrorOnPoisonQueueBind_DeletesBothQueues() throws IOException, TimeoutException {
+        void testShutdownCompleted_ErrorOnPoisonQueueBind_DeletesBothQueues() throws IOException, TimeoutException {
             when(mainChannel.queueBind(eq(MOCK_DYNAMIC_POISON_QUEUE), anyString(), anyString())).thenThrow(new RuntimeException());
             listen(true, RuntimeException.class);
             shutdownListener.shutdownCompleted(null);
@@ -557,7 +559,7 @@ public class AMQPTransportTest {
         }
 
         @Test
-        public void testShutdownCompleted_ErrorOnDynamicQueueDelete_StillAttemptsToDeletePoisonQueue() throws IOException, TimeoutException {
+        void testShutdownCompleted_ErrorOnDynamicQueueDelete_StillAttemptsToDeletePoisonQueue() throws IOException, TimeoutException {
             when(cleanupChannel.queueDelete(anyString())).thenThrow(new RuntimeException());
             listen(true);
             shutdownListener.shutdownCompleted(null);
@@ -566,7 +568,7 @@ public class AMQPTransportTest {
         }
 
         @Test
-        public void testShutdownCompleted_ErrorOnPoisonQueueDelete_StillClosesChannels() throws IOException, TimeoutException {
+        void testShutdownCompleted_ErrorOnPoisonQueueDelete_StillClosesChannels() throws IOException, TimeoutException {
             when(poisonCleanupChannel.queueDelete(anyString())).thenThrow(new RuntimeException());
             listen(true);
             shutdownListener.shutdownCompleted(null);
