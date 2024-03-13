@@ -8,13 +8,6 @@ public class AMQPPublishProperties implements TransportPublishProperties {
     private final long timeout;
     private final boolean confirmEnabled;
 
-    public AMQPPublishProperties(String exchange, String routingKey) {
-        this.exchange = exchange;
-        this.routingKey = routingKey;
-        this.timeout = 100;
-        this.confirmEnabled = false;
-    }
-
     private AMQPPublishProperties(final Builder builder) {
         this.exchange = builder.exchange;
         this.routingKey = builder.routingKey;
