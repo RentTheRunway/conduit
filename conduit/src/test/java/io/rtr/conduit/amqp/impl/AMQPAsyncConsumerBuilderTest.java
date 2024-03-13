@@ -15,34 +15,34 @@ class AMQPAsyncConsumerBuilderTest {
 
     @Test
     void testValidationDynamicWithNullRoutingKey() {
-        assertThrows(IllegalArgumentException.class, () -> AMQPAsyncConsumerBuilder.builder()
-            .dynamicQueueCreation(true)
-            .dynamicQueueRoutingKey(null)
-            .build());
+        final AMQPAsyncConsumerBuilder builder = AMQPAsyncConsumerBuilder.builder()
+                .dynamicQueueCreation(true)
+                .dynamicQueueRoutingKey(null);
+        assertThrows(IllegalArgumentException.class, builder::build);
     }
 
     @Test
     void testValidationDynamicWithRoutingKeyAndQueue() {
-        assertThrows(IllegalArgumentException.class, () -> AMQPAsyncConsumerBuilder.builder()
-            .dynamicQueueCreation(true)
-            .queue("myq")
-            .dynamicQueueRoutingKey("myRouter")
-            .build());
+        final AMQPAsyncConsumerBuilder builder = AMQPAsyncConsumerBuilder.builder()
+                .dynamicQueueCreation(true)
+                .queue("myq")
+                .dynamicQueueRoutingKey("myRouter");
+        assertThrows(IllegalArgumentException.class, builder::build);
     }
 
     @Test
     void testValidationExchangeRequired() {
-        assertThrows(IllegalArgumentException.class, () -> AMQPAsyncConsumerBuilder.builder()
-            .dynamicQueueCreation(true)
-            .dynamicQueueRoutingKey("myRouter")
-            .build());
+        final AMQPAsyncConsumerBuilder builder = AMQPAsyncConsumerBuilder.builder()
+                .dynamicQueueCreation(true)
+                .dynamicQueueRoutingKey("myRouter");
+        assertThrows(IllegalArgumentException.class, builder::build);
     }
 
     @Test
     void testValidationQueueRequiredWhenNotDynamic() {
-        assertThrows(IllegalArgumentException.class, () -> AMQPAsyncConsumerBuilder.builder()
-            .exchange("exchange")
-            .build());
+        final AMQPAsyncConsumerBuilder builder = AMQPAsyncConsumerBuilder.builder()
+                .exchange("exchange");
+        assertThrows(IllegalArgumentException.class, builder::build);
     }
 
     @Test
@@ -91,25 +91,25 @@ class AMQPAsyncConsumerBuilderTest {
 
     @Test
     void testValidationAutoCreateAndBindWithNullQueue() {
-        assertThrows(IllegalArgumentException.class, () -> AMQPAsyncConsumerBuilder.builder()
-            .autoCreateAndBind("exchange", DIRECT, null, "routingKey")
-            .build());
+        final AMQPAsyncConsumerBuilder builder = AMQPAsyncConsumerBuilder.builder()
+                .autoCreateAndBind("exchange", DIRECT, null, "routingKey");
+        assertThrows(IllegalArgumentException.class, builder::build);
     }
 
     @Test
     void testValidationAutoCreateAndBindWithDynamic() {
-        assertThrows(IllegalArgumentException.class, () -> AMQPAsyncConsumerBuilder.builder()
-            .dynamicQueueCreation(true)
-            .autoCreateAndBind("exchange", DIRECT, "queue", "routingKey")
-            .build());
+        final AMQPAsyncConsumerBuilder builder = AMQPAsyncConsumerBuilder.builder()
+                .dynamicQueueCreation(true)
+                .autoCreateAndBind("exchange", DIRECT, "queue", "routingKey");
+        assertThrows(IllegalArgumentException.class, builder::build);
     }
 
     @Test
     void testValidationAutoCreateAndBindWithPoisonFanout() {
-        assertThrows(IllegalArgumentException.class, () -> AMQPAsyncConsumerBuilder.builder()
-            .poisonQueueEnabled(true)
-            .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.FANOUT, "queue", "routingKey")
-            .build());
+        final AMQPAsyncConsumerBuilder builder = AMQPAsyncConsumerBuilder.builder()
+                .poisonQueueEnabled(true)
+                .autoCreateAndBind("exchange", AMQPConsumerBuilder.ExchangeType.FANOUT, "queue", "routingKey");
+        assertThrows(IllegalArgumentException.class, builder::build);
     }
 
     @Test
