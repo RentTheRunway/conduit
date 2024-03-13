@@ -127,7 +127,12 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
 
     @Override
     protected AMQPPublishProperties buildPublishProperties() {
-        return new AMQPPublishProperties(exchange, routingKey, publishTimeout, confirmEnabled);
+        return AMQPPublishProperties.builder()
+                .exchange(exchange)
+                .routingKey(routingKey)
+                .timeout(publishTimeout)
+                .confirmEnabled(confirmEnabled)
+                .build();
     }
 
     @Override

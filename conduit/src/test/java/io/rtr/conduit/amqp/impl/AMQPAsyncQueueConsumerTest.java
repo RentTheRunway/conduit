@@ -30,10 +30,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 
-public class AMQPAsyncQueueConsumerTest {
+class AMQPAsyncQueueConsumerTest {
 
     @Test
-    public void testRespondMultipleAcknowledgeAll() throws Exception {
+    void testRespondMultipleAcknowledgeAll() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will acknowledge the 2nd message
@@ -74,7 +74,7 @@ public class AMQPAsyncQueueConsumerTest {
     }
 
     @Test
-    public void testRespondSingleAcknowledge() throws Exception {
+    void testRespondSingleAcknowledge() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will acknowledge the 2nd message
@@ -116,7 +116,7 @@ public class AMQPAsyncQueueConsumerTest {
 
 
     @Test
-    public void testRespondMultipleRejectAndDiscardAll() throws Exception {
+    void testRespondMultipleRejectAndDiscardAll() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will discard the 2nd message
@@ -161,7 +161,7 @@ public class AMQPAsyncQueueConsumerTest {
     }
 
     @Test
-    public void testRespondMultipleRejectAndDiscardAllWithoutPoisonQueue() throws Exception {
+    void testRespondMultipleRejectAndDiscardAllWithoutPoisonQueue() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will discard the 2nd message
@@ -208,7 +208,7 @@ public class AMQPAsyncQueueConsumerTest {
     }
 
     @Test
-    public void testRespondSingleRejectAndDiscard() throws Exception {
+    void testRespondSingleRejectAndDiscard() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will discard only the 2nd message
@@ -262,7 +262,7 @@ public class AMQPAsyncQueueConsumerTest {
 
 
     @Test
-    public void testRespondSingleRejectAndDiscardWithoutPoisonQueue() throws Exception {
+    void testRespondSingleRejectAndDiscardWithoutPoisonQueue() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will discard only the 2nd message
@@ -317,7 +317,7 @@ public class AMQPAsyncQueueConsumerTest {
     }
 
     @Test
-    public void testRespondMultipleRejectAndRequeueAll() throws Exception {
+    void testRespondMultipleRejectAndRequeueAll() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will requeue every 2nd message
@@ -391,7 +391,7 @@ public class AMQPAsyncQueueConsumerTest {
     }
 
     @Test
-    public void testRespondSingleRejectAndRequeue() throws Exception {
+    void testRespondSingleRejectAndRequeue() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will requeue every 2nd message
@@ -465,7 +465,7 @@ public class AMQPAsyncQueueConsumerTest {
     }
 
     @Test
-    public void testHandleDeliveryMixedResponses() throws Exception {
+    void testHandleDeliveryMixedResponses() throws Exception {
         AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
 
             private int count = 0;
@@ -538,7 +538,7 @@ public class AMQPAsyncQueueConsumerTest {
     }
 
     @Test
-    public void testHandleDeliveryMixedRetryValues() throws Exception {
+    void testHandleDeliveryMixedRetryValues() throws Exception {
         AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
 
             private int count = 0;
@@ -611,7 +611,7 @@ public class AMQPAsyncQueueConsumerTest {
     }
 
     @Test
-    public void testShutdownHandlerInvocation() {
+    void testShutdownHandlerInvocation() {
         AMQPAsyncConsumerCallback callback = mock(AMQPAsyncConsumerCallback.class);
         Channel channel = mock(Channel.class);
         AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 1, "", true));

@@ -20,10 +20,9 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Testcontainers
-public class ShutdownHandlerIntegrationTest {
+class ShutdownHandlerIntegrationTest {
 
     private static final Network COMMON_NETWORK = Network.newNetwork();
     public static final String TOXIPROXY_NETWORK_ALIAS = "toxiproxy";
@@ -37,7 +36,7 @@ public class ShutdownHandlerIntegrationTest {
         .withNetworkAliases(TOXIPROXY_NETWORK_ALIAS);
 
     @Test
-    public void testReconnectAfterBrokerShutdown() throws IOException {
+    void testReconnectAfterBrokerShutdown() throws IOException {
         ToxiproxyContainer.ContainerProxy proxyInterface = TOXI_PROXY.getProxy(RABBIT_MQ_CONTAINER, 5672);
 
         RecordingAmqpCallbackHandler callbackHandler = new RecordingAmqpCallbackHandler();

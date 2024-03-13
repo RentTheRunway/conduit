@@ -25,9 +25,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class AMQPQueueConsumerTest {
+class AMQPQueueConsumerTest {
     @Test
-    public void testHandleDeliveryAcknowledge() {
+    void testHandleDeliveryAcknowledge() {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         AMQPConsumerCallback callback = new AMQPConsumerCallback() {
@@ -59,7 +59,7 @@ public class AMQPQueueConsumerTest {
     }
 
     @Test
-    public void testHandleDeliveryRejectAndDiscard() throws Exception {
+    void testHandleDeliveryRejectAndDiscard() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
         final String actionReason = "Email was not sent since the user's email address was hard bounced by the Sailthru server";
 
@@ -98,7 +98,7 @@ public class AMQPQueueConsumerTest {
     }
 
     @Test
-    public void testHandleDeliveryRejectAndDiscardWithoutPoisonQueue() throws Exception {
+    void testHandleDeliveryRejectAndDiscardWithoutPoisonQueue() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         AMQPConsumerCallback callback = new AMQPConsumerCallback() {
@@ -137,7 +137,7 @@ public class AMQPQueueConsumerTest {
     }
 
     @Test
-    public void testHandleDeliveryRejectAndRequeue() throws Exception {
+    void testHandleDeliveryRejectAndRequeue() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         AMQPConsumerCallback callback = new AMQPConsumerCallback() {

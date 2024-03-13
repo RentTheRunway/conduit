@@ -21,12 +21,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 
 @Testcontainers
-public class AMQPIntegrationTest {
+class AMQPIntegrationTest {
     @Container
     private static final RabbitMQContainer RABBITMQ_CONTAINER = RabbitMQContainerFactory.createBrokerWithSingleExchangeAndQueue();
 
     @Test
-    public void testSslAmqpTransport() {
+    void testSslAmqpTransport() {
         AMQPMessageBundle message = new AMQPMessageBundle("a message");
         Publisher publisher = IntegrationTestHelpers.buildPublisher(RABBITMQ_CONTAINER);
         Consumer consumer = IntegrationTestHelpers.buildConsumer(RABBITMQ_CONTAINER, new LoggingAmqpCallbackHandler());
@@ -41,7 +41,7 @@ public class AMQPIntegrationTest {
     }
 
     @Test
-    public void testAmqpTransportWithSharedConnection() throws IOException {
+    void testAmqpTransportWithSharedConnection() throws IOException {
         AMQPMessageBundle message = new AMQPMessageBundle("a message");
         AMQPConnection connection = IntegrationTestHelpers.buildConnection(RABBITMQ_CONTAINER);
 
@@ -57,7 +57,7 @@ public class AMQPIntegrationTest {
     }
 
     @Test
-    public void testManualReconnectAfterManualClose() {
+    void testManualReconnectAfterManualClose() {
         AMQPConsumerCallback callback = mock(AMQPConsumerCallback.class);
         AMQPMessageBundle message = new AMQPMessageBundle("a message");
 
@@ -89,7 +89,7 @@ public class AMQPIntegrationTest {
     }
 
     @Test
-    public void testAmqpTransportWithAutoDeleteQueue() throws IOException {
+    void testAmqpTransportWithAutoDeleteQueue() throws IOException {
         AMQPConsumerCallback callback = mock(AMQPConsumerCallback.class);
         AMQPMessageBundle message = new AMQPMessageBundle("a message");
         AMQPConnection connection = IntegrationTestHelpers.buildConnection(RABBITMQ_CONTAINER);
