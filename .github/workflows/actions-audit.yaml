@@ -9,7 +9,7 @@ run-name: Audit ${{ github.event.repository.name }}
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 21 * * 1/1"
+    - cron: "30 21 * * 0,2,4"
 
 jobs:
   actions-audit:
