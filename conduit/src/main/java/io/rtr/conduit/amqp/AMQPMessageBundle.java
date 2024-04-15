@@ -4,22 +4,24 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Envelope;
 import io.rtr.conduit.amqp.transport.TransportMessageBundle;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class AMQPMessageBundle implements TransportMessageBundle {
+    public static final String CONTENT_TYPE_PLAINTEXT = "text/plain";
+    public static final String CONTENT_TYPE_JSON = "application/json";
     private final String consumerTag;
     private final Envelope envelope;
     private final AMQP.BasicProperties basicProperties;
     private final byte[] body;
 
     private static AMQP.BasicProperties initialProperties() {
-        return initialProperties(null);
+        return initialProperties(null, CONTENT_TYPE_PLAINTEXT);
     }
 
-    private static AMQP.BasicProperties initialProperties(Map<String, Object> additionalHeaders) {
-        Map<String, Object> headers = new HashMap<String, Object>();
+    private static AMQP.BasicProperties initialProperties(final Map<String, Object> additionalHeaders,
+                                                          final String contentType) {
+        final Map<String, Object> headers = new HashMap<>();
 
         if (additionalHeaders != null) {
             headers.putAll(additionalHeaders);
@@ -32,7 +34,7 @@ public class AMQPMessageBundle implements TransportMessageBundle {
                 .deliveryMode(2 /*persistent*/)
                 .priority(0)
                 .headers(headers)
-                .contentType("text/plain")
+                .contentType(contentType)
                 .build();
     }
 
@@ -48,7 +50,7 @@ public class AMQPMessageBundle implements TransportMessageBundle {
     }
 
     public AMQPMessageBundle(String message, Map<String, Object> headers) {
-        this(null, null, initialProperties(headers), message.getBytes());
+        this(null, null, initialProperties(headers, CONTENT_TYPE_JSON), message.getBytes());
     }
 
     private AMQPMessageBundle(final Builder builder) {
@@ -83,6 +85,7 @@ public class AMQPMessageBundle implements TransportMessageBundle {
         private Envelope envelope;
         private AMQP.BasicProperties basicProperties;
         private Map<String, Object> headers = new HashMap<>();
+        private String contentType = CONTENT_TYPE_PLAINTEXT;
         private byte[] body;
 
         public Builder consumerTag(final String consumerTag) {
@@ -107,6 +110,11 @@ public class AMQPMessageBundle implements TransportMessageBundle {
             return this;
         }
 
+        public Builder contentType(final String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
         public Builder header(final String name, final Object value) {
             if (value == null) {
                 this.headers.remove(name);
@@ -127,9 +135,9 @@ public class AMQPMessageBundle implements TransportMessageBundle {
 
         public AMQPMessageBundle build() {
             if (basicProperties == null) {
-                this.basicProperties = initialProperties(headers);
-            } else if (headers != null) {
-                throw new IllegalArgumentException("Both basicProperties and headers are set");
+                this.basicProperties = initialProperties(headers, contentType);
+            } else if (!headers.isEmpty() && contentType != null) {
+                throw new IllegalArgumentException("Cannot combine basicProperties and custom property values");
             }
             return new AMQPMessageBundle(this);
         }

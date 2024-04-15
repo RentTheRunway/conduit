@@ -3,9 +3,11 @@ package io.rtr.conduit.amqp;
 import com.rabbitmq.client.AMQP;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.rtr.conduit.amqp.AMQPMessageBundle.CONTENT_TYPE_JSON;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -44,19 +46,49 @@ class AMQPMessageBundleTest {
                 .header("foo", null)
                 .header("bar", "baz")
                 .header("foo2", 2)
+                .contentType(CONTENT_TYPE_JSON)
                 .body("A message")
                 .build();
 
         assertThat(messageBundle.getBasicProperties())
                 .isNotNull()
-                .extracting(AMQP.BasicProperties::getHeaders)
-                .satisfies(headers -> assertThat(headers)
-                        .containsEntry("bar", "baz")
-                        .containsEntry("foo2", 2)
-                        .doesNotContainKey("foo"));
+                .satisfies(props -> {
+                    assertThat(props.getContentType())
+                            .isEqualTo("application/json");
+                    assertThat(props.getHeaders())
+                            .containsEntry("bar", "baz")
+                            .containsEntry("foo2", 2)
+                            .doesNotContainKey("foo");
+                });
         assertThat(messageBundle.getBody())
                 .satisfies(bytes -> assertThat(new String(bytes))
                         .isEqualTo("A message"));
+    }
+
+    @Test
+    void buildMessageWithBasicProperties_populatesPropertiesAndBody() {
+        final AMQPMessageBundle messageBundle = AMQPMessageBundle.builder()
+                .basicProperties(new AMQP.BasicProperties.Builder()
+                        .contentType("application/json")
+                        .deliveryMode(2)
+                        .priority(0)
+                        .headers(Collections.singletonMap("conduit-retry-count", 0))
+                        .build())
+                .body("{\"message\":\"A message\"")
+                .build();
+
+        assertThat(messageBundle.getBasicProperties())
+                .isNotNull()
+                .satisfies(props -> {
+                    assertThat(props.getContentType())
+                            .isEqualTo("application/json");
+                    assertThat(props.getHeaders())
+                            .hasSize(1)
+                            .containsEntry("conduit-retry-count", 0);
+                });
+        assertThat(messageBundle.getBody())
+                .satisfies(bytes -> assertThat(new String(bytes))
+                        .isEqualTo("{\"message\":\"A message\""));
     }
 
     @Test
@@ -67,6 +99,6 @@ class AMQPMessageBundleTest {
 
         assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Both basicProperties and headers are set");
+                .hasMessage("Cannot combine basicProperties and custom property values");
     }
 }
