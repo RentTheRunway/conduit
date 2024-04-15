@@ -128,7 +128,7 @@ public class AMQPMessageBundle implements TransportMessageBundle {
         public AMQPMessageBundle build() {
             if (basicProperties == null) {
                 this.basicProperties = initialProperties(headers);
-            } else if (headers != null) {
+            } else if (!headers.isEmpty()) {
                 throw new IllegalArgumentException("Both basicProperties and headers are set");
             }
             return new AMQPMessageBundle(this);

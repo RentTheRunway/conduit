@@ -3,6 +3,7 @@ package io.rtr.conduit.amqp;
 import com.rabbitmq.client.AMQP;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,6 +58,32 @@ class AMQPMessageBundleTest {
         assertThat(messageBundle.getBody())
                 .satisfies(bytes -> assertThat(new String(bytes))
                         .isEqualTo("A message"));
+    }
+
+    @Test
+    void buildMessageWithBasicProperties_populatesPropertiesAndBody() {
+        final AMQPMessageBundle messageBundle = AMQPMessageBundle.builder()
+                .basicProperties(new AMQP.BasicProperties.Builder()
+                        .contentType("application/json")
+                        .deliveryMode(2)
+                        .priority(0)
+                        .headers(Collections.singletonMap("conduit-retry-count", 0))
+                        .build())
+                .body("{\"message\":\"A message\"")
+                .build();
+
+        assertThat(messageBundle.getBasicProperties())
+                .isNotNull()
+                .satisfies(props -> {
+                    assertThat(props.getContentType())
+                            .isEqualTo("application/json");
+                    assertThat(props.getHeaders())
+                            .hasSize(1)
+                            .containsEntry("conduit-retry-count", 0);
+                });
+        assertThat(messageBundle.getBody())
+                .satisfies(bytes -> assertThat(new String(bytes))
+                        .isEqualTo("{\"message\":\"A message\""));
     }
 
     @Test
