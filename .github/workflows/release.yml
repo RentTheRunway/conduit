@@ -55,7 +55,7 @@ jobs:
           gpg -k
 
       - name: Set up Maven servers and GPG passphrase
-        uses: whelk-io/maven-settings-xml-action@v21
+        uses: whelk-io/maven-settings-xml-action@v22
         with:
           profiles: '[
           {
