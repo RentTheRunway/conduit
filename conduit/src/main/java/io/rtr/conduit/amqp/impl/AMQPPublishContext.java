@@ -1,6 +1,5 @@
 package io.rtr.conduit.amqp.impl;
 
-
 import io.rtr.conduit.amqp.transport.Transport;
 import io.rtr.conduit.amqp.transport.TransportConnectionProperties;
 import io.rtr.conduit.amqp.transport.TransportPublishContext;
@@ -12,10 +11,9 @@ public class AMQPPublishContext implements TransportPublishContext {
     private AMQPPublishProperties publishProperties;
 
     AMQPPublishContext(
-            AMQPTransport transport
-          , AMQPConnectionProperties connectionProperties
-          , AMQPPublishProperties publishProperties
-    ) {
+            AMQPTransport transport,
+            AMQPConnectionProperties connectionProperties,
+            AMQPPublishProperties publishProperties) {
         this.transport = transport;
         this.connectionProperties = connectionProperties;
         this.publishProperties = publishProperties;

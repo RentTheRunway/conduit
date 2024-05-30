@@ -5,7 +5,8 @@ import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
 import io.rtr.conduit.amqp.transport.TransportListenProperties;
 
 public class AMQPAsyncTransport extends AMQPTransport {
-    public AMQPAsyncTransport(boolean ssl, String host, int port, MetricsCollector metricsCollector) {
+    public AMQPAsyncTransport(
+            boolean ssl, String host, int port, MetricsCollector metricsCollector) {
         super(ssl, host, port, metricsCollector);
     }
 
@@ -14,23 +15,26 @@ public class AMQPAsyncTransport extends AMQPTransport {
     }
 
     @Override
-    protected AMQPQueueConsumer getConsumer(Object callback, AMQPCommonListenProperties commonListenProperties, String poisonPrefix){
+    protected AMQPQueueConsumer getConsumer(
+            Object callback,
+            AMQPCommonListenProperties commonListenProperties,
+            String poisonPrefix) {
         return new AMQPAsyncQueueConsumer(
                 getChannel(),
                 (AMQPAsyncConsumerCallback) callback,
                 commonListenProperties.getThreshold(),
                 poisonPrefix,
-                commonListenProperties.isPoisonQueueEnabled()
-        );
+                commonListenProperties.isPoisonQueueEnabled());
     }
 
     @Override
-    protected AMQPCommonListenProperties getCommonListenProperties(TransportListenProperties properties) {
+    protected AMQPCommonListenProperties getCommonListenProperties(
+            TransportListenProperties properties) {
         return (AMQPCommonListenProperties) properties;
     }
 
     @Override
     protected Object getConsumerCallback(TransportListenProperties properties) {
-        return ((AMQPAsyncListenProperties)properties).getCallback();
+        return ((AMQPAsyncListenProperties) properties).getCallback();
     }
 }

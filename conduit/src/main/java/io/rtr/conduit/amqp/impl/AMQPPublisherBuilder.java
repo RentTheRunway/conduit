@@ -1,13 +1,14 @@
 package io.rtr.conduit.amqp.impl;
 
 import com.rabbitmq.client.MetricsCollector;
-import com.rabbitmq.client.impl.MicrometerMetricsCollector;
 import io.rtr.conduit.amqp.publisher.PublisherBuilder;
 
-public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
-                                                         , AMQPConnectionProperties
-                                                         , AMQPPublishProperties
-                                                         , AMQPPublishContext> {
+public class AMQPPublisherBuilder
+        extends PublisherBuilder<
+                AMQPTransport,
+                AMQPConnectionProperties,
+                AMQPPublishProperties,
+                AMQPPublishContext> {
     protected String username;
     protected String password;
     protected String exchange;
@@ -18,14 +19,13 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
     protected int port = 5672;
     private AMQPConnection sharedConnection;
     protected int publishTimeout = 100;
-    protected int connectionTimeout = 10000; //! In milliseconds
-    protected int heartbeatInterval = 60; //! In seconds
+    protected int connectionTimeout = 10000; // ! In milliseconds
+    protected int heartbeatInterval = 60; // ! In seconds
     protected boolean automaticRecoveryEnabled = true;
     protected boolean confirmEnabled = false;
     protected MetricsCollector metricsCollector;
 
-    protected AMQPPublisherBuilder() {
-    }
+    protected AMQPPublisherBuilder() {}
 
     public static AMQPPublisherBuilder builder() {
         return new AMQPPublisherBuilder();
@@ -121,8 +121,13 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
 
     @Override
     protected AMQPConnectionProperties buildConnectionProperties() {
-        return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout,
-                heartbeatInterval, automaticRecoveryEnabled);
+        return new AMQPConnectionProperties(
+                username,
+                password,
+                virtualHost,
+                connectionTimeout,
+                heartbeatInterval,
+                automaticRecoveryEnabled);
     }
 
     @Override
@@ -136,9 +141,10 @@ public class AMQPPublisherBuilder extends PublisherBuilder<AMQPTransport
     }
 
     @Override
-    protected AMQPPublishContext buildPublishContext(AMQPTransport transport
-                                                   , AMQPConnectionProperties connectionProperties
-                                                   , AMQPPublishProperties publishProperties) {
+    protected AMQPPublishContext buildPublishContext(
+            AMQPTransport transport,
+            AMQPConnectionProperties connectionProperties,
+            AMQPPublishProperties publishProperties) {
         return new AMQPPublishContext(transport, connectionProperties, publishProperties);
     }
 

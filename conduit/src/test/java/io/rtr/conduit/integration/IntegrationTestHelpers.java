@@ -20,9 +20,7 @@ public final class IntegrationTestHelpers {
     public static final String QUEUE = "queue";
     public static final String ROUTING_KEY = "bar";
 
-    private IntegrationTestHelpers() {
-
-    }
+    private IntegrationTestHelpers() {}
 
     public static void connectResources(Publisher publisher, Consumer consumer) {
         try {
@@ -46,13 +44,16 @@ public final class IntegrationTestHelpers {
     }
 
     public static AMQPConnection buildConnection(RabbitMQContainer rabbitMQContainer) {
-        AMQPConnection conn = new AMQPConnection(false, rabbitMQContainer.getHost(), rabbitMQContainer.getAmqpPort(), null);
-        AMQPConnectionProperties props = AMQPConnectionProperties.builder()
-            .username(rabbitMQContainer.getAdminUsername())
-            .password(rabbitMQContainer.getAdminPassword())
-            .automaticRecoveryEnabled(true)
-            .virtualHost("local")
-            .build();
+        AMQPConnection conn =
+                new AMQPConnection(
+                        false, rabbitMQContainer.getHost(), rabbitMQContainer.getAmqpPort(), null);
+        AMQPConnectionProperties props =
+                AMQPConnectionProperties.builder()
+                        .username(rabbitMQContainer.getAdminUsername())
+                        .password(rabbitMQContainer.getAdminPassword())
+                        .automaticRecoveryEnabled(true)
+                        .virtualHost("local")
+                        .build();
         try {
             conn.connect(props);
         } catch (IOException | TimeoutException e) {
@@ -61,90 +62,100 @@ public final class IntegrationTestHelpers {
         return conn;
     }
 
-    public static Consumer buildConsumer(RabbitMQContainer rabbitMQContainer,
-                                         AMQPConsumerCallback callback) {
-        return buildConsumer(rabbitMQContainer.getHost(),
-            rabbitMQContainer.getAmqpPort(),
-            rabbitMQContainer.getAdminUsername(),
-            rabbitMQContainer.getAdminPassword(),
-            callback
-        );
+    public static Consumer buildConsumer(
+            RabbitMQContainer rabbitMQContainer, AMQPConsumerCallback callback) {
+        return buildConsumer(
+                rabbitMQContainer.getHost(),
+                rabbitMQContainer.getAmqpPort(),
+                rabbitMQContainer.getAdminUsername(),
+                rabbitMQContainer.getAdminPassword(),
+                callback);
     }
 
-    public static Consumer buildConsumer(String host,
-                                         int port,
-                                         String username,
-                                         String password,
-                                         AMQPConsumerCallback callback) {
+    public static Consumer buildConsumer(
+            String host,
+            int port,
+            String username,
+            String password,
+            AMQPConsumerCallback callback) {
         return AMQPConsumerBuilder.synchronous()
-            .ssl(false)
-            .host(host)
-            .port(port)
-            .virtualHost("local")
-            .username(username)
-            .password(password)
-            .exchange(EXCHANGE)
-            .autoCreateAndBind(EXCHANGE, AMQPConsumerBuilder.ExchangeType.DIRECT, QUEUE, ROUTING_KEY)
-            .heartbeatInterval(1)
-            .automaticRecoveryEnabled(true)
-            .callback(callback)
-            .build();
+                .ssl(false)
+                .host(host)
+                .port(port)
+                .virtualHost("local")
+                .username(username)
+                .password(password)
+                .exchange(EXCHANGE)
+                .autoCreateAndBind(
+                        EXCHANGE, AMQPConsumerBuilder.ExchangeType.DIRECT, QUEUE, ROUTING_KEY)
+                .heartbeatInterval(1)
+                .automaticRecoveryEnabled(true)
+                .callback(callback)
+                .build();
     }
 
-    public static Consumer buildConsumerWithSharedConnection(AMQPConnection connection, AMQPConsumerCallback callback) {
+    public static Consumer buildConsumerWithSharedConnection(
+            AMQPConnection connection, AMQPConsumerCallback callback) {
         return AMQPConsumerBuilder.synchronous()
-            .exchange(EXCHANGE)
-            .autoCreateAndBind(EXCHANGE, AMQPConsumerBuilder.ExchangeType.DIRECT, QUEUE, ROUTING_KEY)
-            .automaticRecoveryEnabled(true)
-            .callback(callback)
-            .sharedConnection(connection)
-            .build();
+                .exchange(EXCHANGE)
+                .autoCreateAndBind(
+                        EXCHANGE, AMQPConsumerBuilder.ExchangeType.DIRECT, QUEUE, ROUTING_KEY)
+                .automaticRecoveryEnabled(true)
+                .callback(callback)
+                .sharedConnection(connection)
+                .build();
     }
 
-    public static Consumer buildConsumerWithAutoDeleteQueue(RabbitMQContainer rabbitMQContainer,
-                                                            AMQPConsumerCallback callback) {
+    public static Consumer buildConsumerWithAutoDeleteQueue(
+            RabbitMQContainer rabbitMQContainer, AMQPConsumerCallback callback) {
         return AMQPConsumerBuilder.synchronous()
-            .ssl(false)
-            .host(rabbitMQContainer.getHost())
-            .port(rabbitMQContainer.getAmqpPort())
-            .virtualHost("local")
-            .username("guest")
-            .password("guest")
-            .autoCreateAndBind(EXCHANGE, AMQPConsumerBuilder.ExchangeType.DIRECT, "auto-delete-queue", true, ROUTING_KEY)
-            .automaticRecoveryEnabled(true)
-            .callback(callback)
-            .build();
+                .ssl(false)
+                .host(rabbitMQContainer.getHost())
+                .port(rabbitMQContainer.getAmqpPort())
+                .virtualHost("local")
+                .username("guest")
+                .password("guest")
+                .autoCreateAndBind(
+                        EXCHANGE,
+                        AMQPConsumerBuilder.ExchangeType.DIRECT,
+                        "auto-delete-queue",
+                        true,
+                        ROUTING_KEY)
+                .automaticRecoveryEnabled(true)
+                .callback(callback)
+                .build();
     }
 
     public static Publisher buildPublisher(RabbitMQContainer rabbitMQContainer) {
-        return buildPublisher(rabbitMQContainer.getHost(),
-            rabbitMQContainer.getAmqpPort(),
-            rabbitMQContainer.getAdminUsername(),
-            rabbitMQContainer.getAdminUsername()
-        );
+        return buildPublisher(
+                rabbitMQContainer.getHost(),
+                rabbitMQContainer.getAmqpPort(),
+                rabbitMQContainer.getAdminUsername(),
+                rabbitMQContainer.getAdminUsername());
     }
 
-    public static Publisher buildPublisher(String host, int port, String username, String password) {
+    public static Publisher buildPublisher(
+            String host, int port, String username, String password) {
         return AMQPPublisherBuilder.builder()
-            .ssl(false)
-            .host(host)
-            .port(port)
-            .virtualHost("local")
-            .username(username)
-            .password(password)
-            .exchange(EXCHANGE)
-            .routingKey(ROUTING_KEY)
-            .heartbeatInterval(1)
-            .automaticRecoveryEnabled(true)
-            .build();
+                .ssl(false)
+                .host(host)
+                .port(port)
+                .virtualHost("local")
+                .username(username)
+                .password(password)
+                .exchange(EXCHANGE)
+                .routingKey(ROUTING_KEY)
+                .heartbeatInterval(1)
+                .automaticRecoveryEnabled(true)
+                .build();
     }
 
     public static Publisher buildPublisherWithSharedConnection(AMQPConnection connection) {
         return AMQPPublisherBuilder.builder()
-            .exchange(EXCHANGE)
-            .routingKey(ROUTING_KEY)
-            .automaticRecoveryEnabled(true)
-            .sharedConnection(connection)
-            .build();
+                .exchange(EXCHANGE)
+                .routingKey(ROUTING_KEY)
+                .automaticRecoveryEnabled(true)
+                .sharedConnection(connection)
+                .build();
     }
 }

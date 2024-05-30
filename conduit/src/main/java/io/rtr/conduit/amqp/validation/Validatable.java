@@ -6,7 +6,8 @@ public abstract class Validatable {
 
     protected void assertNotNull(Object value, String argument) {
         if (value == null) {
-            throw new IllegalArgumentException(String.format("Argument %s cannot be null", argument));
+            throw new IllegalArgumentException(
+                    String.format("Argument %s cannot be null", argument));
         }
     }
 }

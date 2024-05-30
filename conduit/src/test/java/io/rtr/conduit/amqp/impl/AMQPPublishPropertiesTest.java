@@ -8,8 +8,7 @@ class AMQPPublishPropertiesTest {
 
     @Test
     void builderPopulatesAllFields() {
-        assertThat(populatedProperties())
-                .hasNoNullFieldsOrProperties();
+        assertThat(populatedProperties()).hasNoNullFieldsOrProperties();
     }
 
     @Test

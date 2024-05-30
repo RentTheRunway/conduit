@@ -30,7 +30,13 @@ public class AMQPConnection {
         this(new ConnectionFactory(), TransportExecutor::new, ssl, host, port, metricsCollector);
     }
 
-    public AMQPConnection(ConnectionFactory factory, Supplier<TransportExecutor> executorFactory, boolean ssl, String host, int port, MetricsCollector metricsCollector) {
+    public AMQPConnection(
+            ConnectionFactory factory,
+            Supplier<TransportExecutor> executorFactory,
+            boolean ssl,
+            String host,
+            int port,
+            MetricsCollector metricsCollector) {
         this.connectionFactory = factory;
         this.executorFactory = executorFactory;
         if (ssl) {
@@ -49,7 +55,8 @@ public class AMQPConnection {
         return this.connection != null && this.connection.isOpen();
     }
 
-    public synchronized void connect(AMQPConnectionProperties properties) throws IOException, TimeoutException {
+    public synchronized void connect(AMQPConnectionProperties properties)
+            throws IOException, TimeoutException {
         if (isConnected()) {
             return;
         }
@@ -59,20 +66,22 @@ public class AMQPConnection {
     }
 
     public synchronized void disconnect() throws IOException {
-        //! We are going to assume that closing an already closed
+        // ! We are going to assume that closing an already closed
         //  connection is considered success.
         if (isConnected()) {
             try {
                 connection.close(connectionFactory.getConnectionTimeout());
                 connection = null;
-            } catch (AlreadyClosedException ignored) {}
+            } catch (AlreadyClosedException ignored) {
+            }
         }
         stopListening();
     }
 
     public Channel createChannel() throws IOException {
         if (!isConnected()) {
-            throw new ConduitConnectionStateException("Attempted to create channel whilst disconnected.");
+            throw new ConduitConnectionStateException(
+                    "Attempted to create channel whilst disconnected.");
         }
         Channel channel = connection.createChannel();
         channel.basicQos(1);
@@ -95,23 +104,27 @@ public class AMQPConnection {
 
     public synchronized void addRecoveryListener(RecoveryListener recoveryListener) {
         if (!isConnected()) {
-            throw new ConduitConnectionStateException("Attempted to add recovery listener whilst disconnected.");
+            throw new ConduitConnectionStateException(
+                    "Attempted to add recovery listener whilst disconnected.");
         }
         if (this.connection instanceof AutorecoveringConnection) {
             ((AutorecoveringConnection) this.connection).addRecoveryListener(recoveryListener);
         } else {
-            LOGGER.warn("Cannot add recovery listener to connection as it's not an auto recovering connection");
+            LOGGER.warn(
+                    "Cannot add recovery listener to connection as it's not an auto recovering connection");
         }
     }
 
     public synchronized void removeRecoveryListener(RecoveryListener recoveryListener) {
         if (!isConnected()) {
-            throw new ConduitConnectionStateException("Attempted to remove recovery listener whilst disconnected.");
+            throw new ConduitConnectionStateException(
+                    "Attempted to remove recovery listener whilst disconnected.");
         }
         if (this.connection instanceof AutorecoveringConnection) {
             ((AutorecoveringConnection) this.connection).removeRecoveryListener(recoveryListener);
         } else {
-            LOGGER.warn("Cannot remove recovery listener from connection as it's not an auto recovering connection");
+            LOGGER.warn(
+                    "Cannot remove recovery listener from connection as it's not an auto recovering connection");
         }
     }
 
@@ -132,10 +145,9 @@ public class AMQPConnection {
             connectionFactory.setTopologyRecoveryRetryHandler(
                     TopologyRecoveryRetryLogic.RETRY_ON_QUEUE_NOT_FOUND_RETRY_HANDLER
                             .retryAttempts(properties.getTopologyRecoveryMaxAttempts())
-                            .backoffPolicy(n -> Thread.sleep(properties.getTopologyRecoveryInterval()))
-                            .build()
-            );
+                            .backoffPolicy(
+                                    n -> Thread.sleep(properties.getTopologyRecoveryInterval()))
+                            .build());
         }
     }
-
 }

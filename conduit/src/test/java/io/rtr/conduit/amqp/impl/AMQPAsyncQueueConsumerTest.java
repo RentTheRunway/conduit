@@ -29,7 +29,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-
 class AMQPAsyncQueueConsumerTest {
 
     @Test
@@ -37,29 +36,29 @@ class AMQPAsyncQueueConsumerTest {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will acknowledge the 2nd message
-        AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
+        AMQPAsyncConsumerCallback callback =
+                new AMQPAsyncConsumerCallback() {
 
-            private int count = 0;
+                    private int count = 0;
 
-            @Override
-            public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
-                messages.add(messageBundle);
-                if (++count > 1) {
-                    response.respondMultiple(messageBundle, ActionResponse.acknowledge());
-                }
-            }
+                    @Override
+                    public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
+                        messages.add(messageBundle);
+                        if (++count > 1) {
+                            response.respondMultiple(messageBundle, ActionResponse.acknowledge());
+                        }
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
@@ -78,29 +77,29 @@ class AMQPAsyncQueueConsumerTest {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will acknowledge the 2nd message
-        AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
+        AMQPAsyncConsumerCallback callback =
+                new AMQPAsyncConsumerCallback() {
 
-            private int count = 0;
+                    private int count = 0;
 
-            @Override
-            public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
-                messages.add(messageBundle);
-                if (++count > 1) {
-                    response.respondSingle(messageBundle, ActionResponse.acknowledge());
-                }
-            }
+                    @Override
+                    public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
+                        messages.add(messageBundle);
+                        if (++count > 1) {
+                            response.respondSingle(messageBundle, ActionResponse.acknowledge());
+                        }
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
@@ -114,36 +113,35 @@ class AMQPAsyncQueueConsumerTest {
         verify(channel, times(1)).basicAck(anyLong(), eq(false));
     }
 
-
     @Test
     void testRespondMultipleRejectAndDiscardAll() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will discard the 2nd message
-        AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
+        AMQPAsyncConsumerCallback callback =
+                new AMQPAsyncConsumerCallback() {
 
-            private int count = 0;
+                    private int count = 0;
 
-            @Override
-            public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
-                messages.add(messageBundle);
+                    @Override
+                    public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
+                        messages.add(messageBundle);
 
-                if (++count > 1) {
-                    response.respondMultiple(messageBundle, ActionResponse.discard());
-                }
-            }
+                        if (++count > 1) {
+                            response.respondMultiple(messageBundle, ActionResponse.discard());
+                        }
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -153,7 +151,12 @@ class AMQPAsyncQueueConsumerTest {
         consumer.handleDelivery(consumerTag, envelope1, properties, "hello".getBytes());
         consumer.handleDelivery(consumerTag, envelope2, properties, "world".getBytes());
         verify(channel, times(1)).basicNack(eq(1L), eq(true), eq(false));
-        verify(channel, times(2)).basicPublish(eq("exchange"), eq("key.poison"), any(AMQP.BasicProperties.class), any(byte[].class));
+        verify(channel, times(2))
+                .basicPublish(
+                        eq("exchange"),
+                        eq("key.poison"),
+                        any(AMQP.BasicProperties.class),
+                        any(byte[].class));
 
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
@@ -165,32 +168,32 @@ class AMQPAsyncQueueConsumerTest {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will discard the 2nd message
-        AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
+        AMQPAsyncConsumerCallback callback =
+                new AMQPAsyncConsumerCallback() {
 
-            private int count = 0;
+                    private int count = 0;
 
-            @Override
-            public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
-                messages.add(messageBundle);
+                    @Override
+                    public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
+                        messages.add(messageBundle);
 
-                if (++count > 1) {
-                    response.respondMultiple(messageBundle, ActionResponse.discard());
-                }
-            }
+                        if (++count > 1) {
+                            response.respondMultiple(messageBundle, ActionResponse.discard());
+                        }
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        //disable poison queue
+        // disable poison queue
         boolean poisonQueueEnabled = false;
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", poisonQueueEnabled));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", poisonQueueEnabled));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -200,7 +203,12 @@ class AMQPAsyncQueueConsumerTest {
         consumer.handleDelivery(consumerTag, envelope1, properties, "hello".getBytes());
         consumer.handleDelivery(consumerTag, envelope2, properties, "world".getBytes());
         verify(channel, times(1)).basicNack(eq(1L), eq(true), eq(false));
-        verify(channel, never()).basicPublish(anyString(), anyString(), any(AMQP.BasicProperties.class), any(byte[].class));
+        verify(channel, never())
+                .basicPublish(
+                        anyString(),
+                        anyString(),
+                        any(AMQP.BasicProperties.class),
+                        any(byte[].class));
 
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
@@ -212,30 +220,30 @@ class AMQPAsyncQueueConsumerTest {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will discard only the 2nd message
-        AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
+        AMQPAsyncConsumerCallback callback =
+                new AMQPAsyncConsumerCallback() {
 
-            private int count = 0;
+                    private int count = 0;
 
-            @Override
-            public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
-                messages.add(messageBundle);
+                    @Override
+                    public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
+                        messages.add(messageBundle);
 
-                if (++count > 1) {
-                    response.respondSingle(messageBundle, ActionResponse.discard());
-                }
-            }
+                        if (++count > 1) {
+                            response.respondSingle(messageBundle, ActionResponse.discard());
+                        }
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", true));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -245,53 +253,63 @@ class AMQPAsyncQueueConsumerTest {
         consumer.handleDelivery(consumerTag, envelope1, properties, "hello".getBytes());
         consumer.handleDelivery(consumerTag, envelope2, properties, "world".getBytes());
         verify(channel, times(1)).basicReject(eq(1L), eq(false));
-        verify(channel, times(1)).basicPublish(eq("exchange"), eq("key.poison"), any(AMQP.BasicProperties.class), any(byte[].class));
+        verify(channel, times(1))
+                .basicPublish(
+                        eq("exchange"),
+                        eq("key.poison"),
+                        any(AMQP.BasicProperties.class),
+                        any(byte[].class));
 
         // respond to left-over message
         reset(channel);
-        consumer.respondSingle(new AMQPMessageBundle(consumerTag, envelope1, properties, "hello".getBytes()), ActionResponse.discard());
+        consumer.respondSingle(
+                new AMQPMessageBundle(consumerTag, envelope1, properties, "hello".getBytes()),
+                ActionResponse.discard());
 
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
-        verify(channel, times(1)).basicPublish(eq("exchange"), eq("key.poison"), any(AMQP.BasicProperties.class), any(byte[].class));
-
+        verify(channel, times(1))
+                .basicPublish(
+                        eq("exchange"),
+                        eq("key.poison"),
+                        any(AMQP.BasicProperties.class),
+                        any(byte[].class));
 
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
         assertEquals("world", new String(messages.get(1).getBody()));
     }
 
-
     @Test
     void testRespondSingleRejectAndDiscardWithoutPoisonQueue() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will discard only the 2nd message
-        AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
+        AMQPAsyncConsumerCallback callback =
+                new AMQPAsyncConsumerCallback() {
 
-            private int count = 0;
+                    private int count = 0;
 
-            @Override
-            public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
-                messages.add(messageBundle);
+                    @Override
+                    public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
+                        messages.add(messageBundle);
 
-                if (++count > 1) {
-                    response.respondSingle(messageBundle, ActionResponse.discard());
-                }
-            }
+                        if (++count > 1) {
+                            response.respondSingle(messageBundle, ActionResponse.discard());
+                        }
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        //disable poison queue
+        // disable poison queue
         boolean poisonQueueEnabled = false;
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", poisonQueueEnabled));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 10, "", poisonQueueEnabled));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -301,15 +319,26 @@ class AMQPAsyncQueueConsumerTest {
         consumer.handleDelivery(consumerTag, envelope1, properties, "hello".getBytes());
         consumer.handleDelivery(consumerTag, envelope2, properties, "world".getBytes());
         verify(channel, times(1)).basicReject(eq(1L), eq(false));
-        verify(channel, never()).basicPublish(anyString(), anyString(), any(AMQP.BasicProperties.class), any(byte[].class));
+        verify(channel, never())
+                .basicPublish(
+                        anyString(),
+                        anyString(),
+                        any(AMQP.BasicProperties.class),
+                        any(byte[].class));
 
         // respond to left-over message
         reset(channel);
-        consumer.respondSingle(new AMQPMessageBundle(consumerTag, envelope1, properties, "hello".getBytes()), ActionResponse.discard());
+        consumer.respondSingle(
+                new AMQPMessageBundle(consumerTag, envelope1, properties, "hello".getBytes()),
+                ActionResponse.discard());
 
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
-        verify(channel, never()).basicPublish(anyString(), anyString(), any(AMQP.BasicProperties.class), any(byte[].class));
-
+        verify(channel, never())
+                .basicPublish(
+                        anyString(),
+                        anyString(),
+                        any(AMQP.BasicProperties.class),
+                        any(byte[].class));
 
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
@@ -321,44 +350,47 @@ class AMQPAsyncQueueConsumerTest {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will requeue every 2nd message
-        AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
+        AMQPAsyncConsumerCallback callback =
+                new AMQPAsyncConsumerCallback() {
 
-            private int count = 0;
+                    private int count = 0;
 
-            @Override
-            public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
-                messages.add(messageBundle);
+                    @Override
+                    public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
+                        messages.add(messageBundle);
 
-                if (++count > 1) {
-                    response.respondMultiple(messageBundle, ActionResponse.retry());
-                    count = 0;
-                }
-            }
+                        if (++count > 1) {
+                            response.respondMultiple(messageBundle, ActionResponse.retry());
+                            count = 0;
+                        }
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 2, "", true));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 2, "", true));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
         Envelope envelope2 = new Envelope(1, false, "exchange", "key");
-        AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().headers(new HashMap<>()).build();
+        AMQP.BasicProperties properties =
+                new AMQP.BasicProperties().builder().headers(new HashMap<>()).build();
 
-        ArgumentCaptor<AMQP.BasicProperties> captor = ArgumentCaptor.forClass(AMQP.BasicProperties.class);
+        ArgumentCaptor<AMQP.BasicProperties> captor =
+                ArgumentCaptor.forClass(AMQP.BasicProperties.class);
 
         // first time, we will retry
         consumer.handleDelivery(consumerTag, envelope1, properties, "hello".getBytes());
         consumer.handleDelivery(consumerTag, envelope2, properties, "world".getBytes());
         verify(channel, times(1)).basicNack(eq(1L), eq(true), eq(false));
-        verify(channel, times(2)).basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
+        verify(channel, times(2))
+                .basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
 
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
@@ -370,7 +402,8 @@ class AMQPAsyncQueueConsumerTest {
         consumer.handleDelivery(consumerTag, envelope1, captor.getValue(), "hello".getBytes());
         consumer.handleDelivery(consumerTag, envelope2, captor.getValue(), "world".getBytes());
         verify(channel, times(1)).basicNack(eq(1L), eq(true), eq(false));
-        verify(channel, times(2)).basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
+        verify(channel, times(2))
+                .basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
 
         assertEquals(4, messages.size());
         assertEquals("hello", new String(messages.get(2).getBody()));
@@ -382,7 +415,9 @@ class AMQPAsyncQueueConsumerTest {
         consumer.handleDelivery(consumerTag, envelope1, captor.getValue(), "hello".getBytes());
         consumer.handleDelivery(consumerTag, envelope2, captor.getValue(), "world".getBytes());
         verify(channel, times(1)).basicNack(eq(1L), eq(true), eq(false));
-        verify(channel, times(2)).basicPublish(eq("exchange"), eq("key.poison"), captor.capture(), any(byte[].class));
+        verify(channel, times(2))
+                .basicPublish(
+                        eq("exchange"), eq("key.poison"), captor.capture(), any(byte[].class));
 
         assertEquals(6, messages.size());
         assertEquals("hello", new String(messages.get(4).getBody()));
@@ -395,44 +430,47 @@ class AMQPAsyncQueueConsumerTest {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
         // this callback will requeue every 2nd message
-        AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
+        AMQPAsyncConsumerCallback callback =
+                new AMQPAsyncConsumerCallback() {
 
-            private int count = 0;
+                    private int count = 0;
 
-            @Override
-            public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
-                messages.add(messageBundle);
+                    @Override
+                    public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
+                        messages.add(messageBundle);
 
-                if (++count > 1) {
-                    response.respondSingle(messageBundle, ActionResponse.retry());
-                    count = 0;
-                }
-            }
+                        if (++count > 1) {
+                            response.respondSingle(messageBundle, ActionResponse.retry());
+                            count = 0;
+                        }
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 2, "", true));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 2, "", true));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
         Envelope envelope2 = new Envelope(1, false, "exchange", "key");
-        AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().headers(new HashMap<>()).build();
+        AMQP.BasicProperties properties =
+                new AMQP.BasicProperties().builder().headers(new HashMap<>()).build();
 
-        ArgumentCaptor<AMQP.BasicProperties> captor = ArgumentCaptor.forClass(AMQP.BasicProperties.class);
+        ArgumentCaptor<AMQP.BasicProperties> captor =
+                ArgumentCaptor.forClass(AMQP.BasicProperties.class);
 
         // first time, we will retry
         consumer.handleDelivery(consumerTag, envelope1, properties, "hello".getBytes());
         consumer.handleDelivery(consumerTag, envelope2, properties, "world".getBytes());
         verify(channel, times(1)).basicReject(eq(1L), eq(false));
-        verify(channel, times(1)).basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
+        verify(channel, times(1))
+                .basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
 
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
@@ -444,7 +482,8 @@ class AMQPAsyncQueueConsumerTest {
         consumer.handleDelivery(consumerTag, envelope1, captor.getValue(), "hello".getBytes());
         consumer.handleDelivery(consumerTag, envelope2, captor.getValue(), "world".getBytes());
         verify(channel, times(1)).basicReject(eq(1L), eq(false));
-        verify(channel, times(1)).basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
+        verify(channel, times(1))
+                .basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
 
         assertEquals(4, messages.size());
         assertEquals("hello", new String(messages.get(2).getBody()));
@@ -456,7 +495,9 @@ class AMQPAsyncQueueConsumerTest {
         consumer.handleDelivery(consumerTag, envelope1, captor.getValue(), "hello".getBytes());
         consumer.handleDelivery(consumerTag, envelope2, captor.getValue(), "world".getBytes());
         verify(channel, times(1)).basicReject(eq(1L), eq(false));
-        verify(channel, times(1)).basicPublish(eq("exchange"), eq("key.poison"), captor.capture(), any(byte[].class));
+        verify(channel, times(1))
+                .basicPublish(
+                        eq("exchange"), eq("key.poison"), captor.capture(), any(byte[].class));
 
         assertEquals(6, messages.size());
         assertEquals("hello", new String(messages.get(4).getBody()));
@@ -466,47 +507,47 @@ class AMQPAsyncQueueConsumerTest {
 
     @Test
     void testHandleDeliveryMixedResponses() throws Exception {
-        AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
+        AMQPAsyncConsumerCallback callback =
+                new AMQPAsyncConsumerCallback() {
 
-            private int count = 0;
+                    private int count = 0;
 
-            @Override
-            public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
-                switch (count++) {
-                    case 0:
-                        response.respondMultiple(messageBundle, ActionResponse.acknowledge());
-                        break;
+                    @Override
+                    public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
+                        switch (count++) {
+                            case 0:
+                                response.respondMultiple(
+                                        messageBundle, ActionResponse.acknowledge());
+                                break;
 
-                    case 1:
-                        response.respondMultiple(messageBundle, ActionResponse.discard());
-                        break;
+                            case 1:
+                                response.respondMultiple(messageBundle, ActionResponse.discard());
+                                break;
 
-                    case 2:
-                        response.respondMultiple(messageBundle, ActionResponse.retry());
-                        break;
+                            case 2:
+                                response.respondMultiple(messageBundle, ActionResponse.retry());
+                                break;
 
-                    case 3:
-                        // skip, because we'll discard 3 and 4 in step 4
-                        break;
+                            case 3:
+                                // skip, because we'll discard 3 and 4 in step 4
+                                break;
 
-                    case 4:
-                        response.respondMultiple(messageBundle, ActionResponse.discard());
-                        break;
+                            case 4:
+                                response.respondMultiple(messageBundle, ActionResponse.discard());
+                                break;
+                        }
+                    }
 
-                }
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
-
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 0, "", true));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 0, "", true));
 
         String consumerTag = "foo";
         Envelope envelope1 = new Envelope(0, false, "exchange", "key");
@@ -514,7 +555,8 @@ class AMQPAsyncQueueConsumerTest {
         Envelope envelope3 = new Envelope(2, false, "exchange", "key");
         Envelope envelope4 = new Envelope(3, false, "exchange", "key");
         Envelope envelope5 = new Envelope(4, false, "exchange", "key");
-        AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().headers(new HashMap<>()).build();
+        AMQP.BasicProperties properties =
+                new AMQP.BasicProperties().builder().headers(new HashMap<>()).build();
 
         byte[] ack = "ack".getBytes();
         byte[] discard = "discard".getBytes();
@@ -534,58 +576,75 @@ class AMQPAsyncQueueConsumerTest {
         // 1 message rejected and sent to poison
         // 1 message over retry count of 0 and sent to poison
         // 2 rejected and sent to poison
-        verify(channel, times(4)).basicPublish(eq("exchange"), eq("key.poison"), any(AMQP.BasicProperties.class), any(byte[].class));
+        verify(channel, times(4))
+                .basicPublish(
+                        eq("exchange"),
+                        eq("key.poison"),
+                        any(AMQP.BasicProperties.class),
+                        any(byte[].class));
     }
 
     @Test
     void testHandleDeliveryMixedRetryValues() throws Exception {
-        AMQPAsyncConsumerCallback callback = new AMQPAsyncConsumerCallback() {
+        AMQPAsyncConsumerCallback callback =
+                new AMQPAsyncConsumerCallback() {
 
-            private int count = 0;
+                    private int count = 0;
 
-            // after 6 messages, reject and requeue
-            @Override
-            public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
-                if (++count > 5) {
-                    response.respondMultiple(messageBundle, ActionResponse.retry());
-                }
-            }
+                    // after 6 messages, reject and requeue
+                    @Override
+                    public void handle(AMQPMessageBundle messageBundle, AsyncResponse response) {
+                        if (++count > 5) {
+                            response.respondMultiple(messageBundle, ActionResponse.retry());
+                        }
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 1, "", true));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 1, "", true));
         final Map<Long, String> routingKeys = new HashMap<>();
         final List<Long> deliveryTags = new ArrayList<>();
 
-        doAnswer(invocationOnMock -> {
-            Long deliveryTag = Long.parseLong(new String((byte[]) invocationOnMock.getArguments()[3]));
-            String routingKey = invocationOnMock.getArguments()[1].toString();
-            routingKeys.put(deliveryTag, routingKey);
-            deliveryTags.add(deliveryTag);
-            return null;
-        }).when(channel).basicPublish(anyString(), anyString(), any(AMQP.BasicProperties.class), any(byte[].class));
+        doAnswer(
+                        invocationOnMock -> {
+                            Long deliveryTag =
+                                    Long.parseLong(
+                                            new String(
+                                                    (byte[]) invocationOnMock.getArguments()[3]));
+                            String routingKey = invocationOnMock.getArguments()[1].toString();
+                            routingKeys.put(deliveryTag, routingKey);
+                            deliveryTags.add(deliveryTag);
+                            return null;
+                        })
+                .when(channel)
+                .basicPublish(
+                        anyString(),
+                        anyString(),
+                        any(AMQP.BasicProperties.class),
+                        any(byte[].class));
 
         for (int i = 0; i < 6; i++) {
             Envelope envelope = new Envelope(i, false, "exchange", "key");
             HashMap<String, Object> headers = new HashMap<>();
 
-            //conduit-retry-count values:
+            // conduit-retry-count values:
             // - 0 1 2 0 1
             if (i > 0) {
                 headers.put("conduit-retry-count", (i - 1) % 3);
             }
 
-            AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().headers(headers).build();
+            AMQP.BasicProperties properties =
+                    new AMQP.BasicProperties().builder().headers(headers).build();
 
-            consumer.handleDelivery("foo", envelope, properties, Integer.valueOf(i).toString().getBytes());
+            consumer.handleDelivery(
+                    "foo", envelope, properties, Integer.valueOf(i).toString().getBytes());
         }
 
         // 3 of our messages should have been sent to poison queue, while 3 should have been retried
@@ -614,7 +673,8 @@ class AMQPAsyncQueueConsumerTest {
     void testShutdownHandlerInvocation() {
         AMQPAsyncConsumerCallback callback = mock(AMQPAsyncConsumerCallback.class);
         Channel channel = mock(Channel.class);
-        AMQPAsyncQueueConsumer consumer = spy(new AMQPAsyncQueueConsumer(channel, callback, 1, "", true));
+        AMQPAsyncQueueConsumer consumer =
+                spy(new AMQPAsyncQueueConsumer(channel, callback, 1, "", true));
         consumer.handleShutdownSignal("foo", mock(ShutdownSignalException.class));
         verify(callback, times(1)).notifyOfShutdown(eq("foo"), any(ShutdownSignalException.class));
     }

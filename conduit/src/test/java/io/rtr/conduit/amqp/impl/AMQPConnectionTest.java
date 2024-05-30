@@ -24,28 +24,26 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class AMQPConnectionTest {
-    private final static int CONNECTION_TIMEOUT = 1337;
-    private final static int PORT = 42;
+    private static final int CONNECTION_TIMEOUT = 1337;
+    private static final int PORT = 42;
 
     Connection mockConnection;
     ConnectionFactory mockFactory;
     TransportExecutor mockExecutor;
     MetricsCollector mockMetrics;
-    RecoveryListener recoveryListener = new RecoveryListener() {
-        @Override
-        public void handleRecovery(Recoverable recoverable) {
+    RecoveryListener recoveryListener =
+            new RecoveryListener() {
+                @Override
+                public void handleRecovery(Recoverable recoverable) {}
 
-        }
-
-        @Override
-        public void handleRecoveryStarted(Recoverable recoverable) {
-
-        }
-    };
+                @Override
+                public void handleRecoveryStarted(Recoverable recoverable) {}
+            };
 
     private AMQPConnection defaultTestConnection() {
 
-        return new AMQPConnection(mockFactory, ()->mockExecutor, false, "RABBIT HOST", PORT, null);
+        return new AMQPConnection(
+                mockFactory, () -> mockExecutor, false, "RABBIT HOST", PORT, null);
     }
 
     private AMQPConnectionProperties defaultTestConnectionProps() {
@@ -58,8 +56,7 @@ class AMQPConnectionTest {
                 true,
                 5000L,
                 null,
-                null
-        );
+                null);
     }
 
     @BeforeEach
@@ -71,41 +68,41 @@ class AMQPConnectionTest {
         mockConnection = mock(AutorecoveringConnection.class);
         when(mockConnection.createChannel()).thenReturn(mock(Channel.class));
         when(mockConnection.isOpen()).thenReturn(true);
-        doAnswer((i)->when(mockConnection.isOpen())
-                .thenReturn(false))
-                .when(mockConnection).close(anyInt());
+        doAnswer((i) -> when(mockConnection.isOpen()).thenReturn(false))
+                .when(mockConnection)
+                .close(anyInt());
         when(mockFactory.newConnection(mockExecutor)).thenReturn(mockConnection);
         when(mockFactory.getConnectionTimeout()).thenReturn(CONNECTION_TIMEOUT);
     }
 
     @Test
     void testConstructor_NoSll_SetsHostPortAndMetrics() {
-        new AMQPConnection(mockFactory, ()->mockExecutor, false, "RABBIT HOST", PORT, mockMetrics);
+        new AMQPConnection(
+                mockFactory, () -> mockExecutor, false, "RABBIT HOST", PORT, mockMetrics);
         verify(mockFactory).setHost("RABBIT HOST");
         verify(mockFactory).setPort(PORT);
         verify(mockFactory).setMetricsCollector(mockMetrics);
         verify(mockFactory, never()).setSocketFactory(any());
-
     }
 
     @Test
     void testConstructor_Sll_SetsSocketFactory() {
-        new AMQPConnection(mockFactory, ()->mockExecutor, true, "RABBIT HOST", PORT, mockMetrics);
+        new AMQPConnection(mockFactory, () -> mockExecutor, true, "RABBIT HOST", PORT, mockMetrics);
         verify(mockFactory).setHost("RABBIT HOST");
         verify(mockFactory).setPort(PORT);
         verify(mockFactory).setMetricsCollector(mockMetrics);
         verify(mockFactory).setSocketFactory(any());
-
     }
 
     @Test
     void testConstructor_MetricsNull_SetsNoMetrics() {
-        new AMQPConnection(mockFactory, ()->mockExecutor, false, "RABBIT HOST", PORT, null);
+        new AMQPConnection(mockFactory, () -> mockExecutor, false, "RABBIT HOST", PORT, null);
         verify(mockFactory, never()).setMetricsCollector(any());
     }
 
     @Test
-    void testConnect_NotConnected_TransfersPropsToFactoryAndConnects() throws IOException, TimeoutException {
+    void testConnect_NotConnected_TransfersPropsToFactoryAndConnects()
+            throws IOException, TimeoutException {
         defaultTestConnection().connect(defaultTestConnectionProps());
 
         verify(mockFactory).setUsername("BOB");
@@ -173,7 +170,8 @@ class AMQPConnectionTest {
     }
 
     @Test
-    void testStopListening_MultipleCalls_OnlyShutsDownExecutorOnce() throws IOException, TimeoutException {
+    void testStopListening_MultipleCalls_OnlyShutsDownExecutorOnce()
+            throws IOException, TimeoutException {
         AMQPConnection conn = defaultTestConnection();
         conn.connect(defaultTestConnectionProps());
         conn.stopListening();
@@ -204,17 +202,21 @@ class AMQPConnectionTest {
     @Test
     void testAddRecoverListener_NotConnected_DoesNothing() {
         AMQPConnection conn = defaultTestConnection();
-        assertThrows(IllegalStateException.class, () -> {
-            conn.addRecoveryListener(recoveryListener);
-        });
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    conn.addRecoveryListener(recoveryListener);
+                });
     }
 
     @Test
     void testRemoveRecoverListener_NotConnected_DoesNothing() {
         AMQPConnection conn = defaultTestConnection();
-        assertThrows(IllegalStateException.class, () -> {
-            conn.removeRecoveryListener(recoveryListener);
-        });
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    conn.removeRecoveryListener(recoveryListener);
+                });
     }
 
     @Test
@@ -245,7 +247,8 @@ class AMQPConnectionTest {
     }
 
     @Test
-    void testWaitToStopListening_Connected_CallsAwaitTerminationOnExecutor() throws IOException, TimeoutException, InterruptedException {
+    void testWaitToStopListening_Connected_CallsAwaitTerminationOnExecutor()
+            throws IOException, TimeoutException, InterruptedException {
         Duration wait = Duration.ofMillis(1338);
         AMQPConnection conn = defaultTestConnection();
         conn.connect(defaultTestConnectionProps());

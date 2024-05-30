@@ -23,13 +23,16 @@ import static org.mockito.Mockito.timeout;
 @Testcontainers
 class AMQPIntegrationTest {
     @Container
-    private static final RabbitMQContainer RABBITMQ_CONTAINER = RabbitMQContainerFactory.createBrokerWithSingleExchangeAndQueue();
+    private static final RabbitMQContainer RABBITMQ_CONTAINER =
+            RabbitMQContainerFactory.createBrokerWithSingleExchangeAndQueue();
 
     @Test
     void testSslAmqpTransport() {
         AMQPMessageBundle message = new AMQPMessageBundle("a message");
         Publisher publisher = IntegrationTestHelpers.buildPublisher(RABBITMQ_CONTAINER);
-        Consumer consumer = IntegrationTestHelpers.buildConsumer(RABBITMQ_CONTAINER, new LoggingAmqpCallbackHandler());
+        Consumer consumer =
+                IntegrationTestHelpers.buildConsumer(
+                        RABBITMQ_CONTAINER, new LoggingAmqpCallbackHandler());
         IntegrationTestHelpers.connectResources(publisher, consumer);
         IntegrationTestHelpers.publishMessage(publisher, message);
 
@@ -45,8 +48,11 @@ class AMQPIntegrationTest {
         AMQPMessageBundle message = new AMQPMessageBundle("a message");
         AMQPConnection connection = IntegrationTestHelpers.buildConnection(RABBITMQ_CONTAINER);
 
-        try (Consumer consumer = IntegrationTestHelpers.buildConsumerWithSharedConnection(connection, new LoggingAmqpCallbackHandler())) {
-            Publisher publisher = IntegrationTestHelpers.buildPublisherWithSharedConnection(connection);
+        try (Consumer consumer =
+                IntegrationTestHelpers.buildConsumerWithSharedConnection(
+                        connection, new LoggingAmqpCallbackHandler())) {
+            Publisher publisher =
+                    IntegrationTestHelpers.buildPublisherWithSharedConnection(connection);
             IntegrationTestHelpers.connectResources(publisher, consumer);
             IntegrationTestHelpers.publishMessage(publisher, message);
         } catch (IOException e) {
@@ -94,7 +100,9 @@ class AMQPIntegrationTest {
         AMQPMessageBundle message = new AMQPMessageBundle("a message");
         AMQPConnection connection = IntegrationTestHelpers.buildConnection(RABBITMQ_CONTAINER);
 
-        try (Consumer consumer = IntegrationTestHelpers.buildConsumerWithAutoDeleteQueue(RABBITMQ_CONTAINER, callback)) {
+        try (Consumer consumer =
+                IntegrationTestHelpers.buildConsumerWithAutoDeleteQueue(
+                        RABBITMQ_CONTAINER, callback)) {
             Publisher publisher = IntegrationTestHelpers.buildPublisher(RABBITMQ_CONTAINER);
             IntegrationTestHelpers.connectResources(publisher, consumer);
             IntegrationTestHelpers.publishMessage(publisher, message);

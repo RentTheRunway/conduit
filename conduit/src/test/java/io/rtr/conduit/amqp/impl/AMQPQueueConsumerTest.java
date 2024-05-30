@@ -30,21 +30,20 @@ class AMQPQueueConsumerTest {
     void testHandleDeliveryAcknowledge() {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
-        AMQPConsumerCallback callback = new AMQPConsumerCallback() {
-            @Override
-            public ActionResponse handle(AMQPMessageBundle messageBundle) {
-                messages.add(messageBundle);
-                return ActionResponse.acknowledge();
-            }
+        AMQPConsumerCallback callback =
+                new AMQPConsumerCallback() {
+                    @Override
+                    public ActionResponse handle(AMQPMessageBundle messageBundle) {
+                        messages.add(messageBundle);
+                        return ActionResponse.acknowledge();
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
         AMQPQueueConsumer consumer = spy(new AMQPQueueConsumer(channel, callback, 2, "", true));
@@ -61,66 +60,71 @@ class AMQPQueueConsumerTest {
     @Test
     void testHandleDeliveryRejectAndDiscard() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
-        final String actionReason = "Email was not sent since the user's email address was hard bounced by the Sailthru server";
+        final String actionReason =
+                "Email was not sent since the user's email address was hard bounced by the Sailthru server";
 
-        AMQPConsumerCallback callback = new AMQPConsumerCallback() {
-            @Override
-            public ActionResponse handle(AMQPMessageBundle messageBundle) {
-                messages.add(messageBundle);
-                return ActionResponse.discard(actionReason);
-            }
+        AMQPConsumerCallback callback =
+                new AMQPConsumerCallback() {
+                    @Override
+                    public ActionResponse handle(AMQPMessageBundle messageBundle) {
+                        messages.add(messageBundle);
+                        return ActionResponse.discard(actionReason);
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
         AMQPQueueConsumer consumer = spy(new AMQPQueueConsumer(channel, callback, 2, "", true));
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
-        AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().headers(new HashMap<>())
-            .build();
-        ArgumentCaptor<AMQP.BasicProperties> captor = ArgumentCaptor.forClass(AMQP.BasicProperties.class);
+        AMQP.BasicProperties properties =
+                new AMQP.BasicProperties.Builder().headers(new HashMap<>()).build();
+        ArgumentCaptor<AMQP.BasicProperties> captor =
+                ArgumentCaptor.forClass(AMQP.BasicProperties.class);
 
         consumer.handleDelivery(consumerTag, envelope, properties, "hello".getBytes());
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
-        verify(channel, times(1)).basicPublish(eq("exchange"), eq("key.poison"), captor.capture(), any(byte[].class));
+        verify(channel, times(1))
+                .basicPublish(
+                        eq("exchange"), eq("key.poison"), captor.capture(), any(byte[].class));
 
         assertEquals(1, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
-        assertEquals(actionReason, captor.getValue().getHeaders().get(ActionResponse.REASON_KEY).toString());
+        assertEquals(
+                actionReason,
+                captor.getValue().getHeaders().get(ActionResponse.REASON_KEY).toString());
     }
 
     @Test
     void testHandleDeliveryRejectAndDiscardWithoutPoisonQueue() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
-        AMQPConsumerCallback callback = new AMQPConsumerCallback() {
-            @Override
-            public ActionResponse handle(AMQPMessageBundle messageBundle) {
-                messages.add(messageBundle);
-                return ActionResponse.discard();
-            }
+        AMQPConsumerCallback callback =
+                new AMQPConsumerCallback() {
+                    @Override
+                    public ActionResponse handle(AMQPMessageBundle messageBundle) {
+                        messages.add(messageBundle);
+                        return ActionResponse.discard();
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
-        //disable poison queue
+        // disable poison queue
         boolean poisonQueueEnabled = false;
-        AMQPQueueConsumer consumer = spy(new AMQPQueueConsumer(channel, callback, 2, "", poisonQueueEnabled));
+        AMQPQueueConsumer consumer =
+                spy(new AMQPQueueConsumer(channel, callback, 2, "", poisonQueueEnabled));
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
@@ -129,8 +133,13 @@ class AMQPQueueConsumerTest {
         consumer.handleDelivery(consumerTag, envelope, properties, "hello".getBytes());
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
 
-        //Should not publish to poison queue
-        verify(channel, never()).basicPublish(anyString(), anyString(), any(AMQP.BasicProperties.class), any(byte[].class));
+        // Should not publish to poison queue
+        verify(channel, never())
+                .basicPublish(
+                        anyString(),
+                        anyString(),
+                        any(AMQP.BasicProperties.class),
+                        any(byte[].class));
 
         assertEquals(1, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
@@ -140,37 +149,37 @@ class AMQPQueueConsumerTest {
     void testHandleDeliveryRejectAndRequeue() throws Exception {
         final List<AMQPMessageBundle> messages = new ArrayList<>();
 
-        AMQPConsumerCallback callback = new AMQPConsumerCallback() {
-            @Override
-            public ActionResponse handle(AMQPMessageBundle messageBundle) {
-                messages.add(messageBundle);
-                return ActionResponse.retry();
-            }
+        AMQPConsumerCallback callback =
+                new AMQPConsumerCallback() {
+                    @Override
+                    public ActionResponse handle(AMQPMessageBundle messageBundle) {
+                        messages.add(messageBundle);
+                        return ActionResponse.retry();
+                    }
 
-            @Override
-            public void notifyOfActionFailure(Exception e) {
-            }
+                    @Override
+                    public void notifyOfActionFailure(Exception e) {}
 
-            @Override
-            public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
-            }
-        };
+                    @Override
+                    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {}
+                };
 
         Channel channel = mock(Channel.class);
         AMQPQueueConsumer consumer = spy(new AMQPQueueConsumer(channel, callback, 2, "", true));
 
         String consumerTag = "foo";
         Envelope envelope = new Envelope(0, false, "exchange", "key");
-        AMQP.BasicProperties properties = new AMQP.BasicProperties().builder()
-            .headers(new HashMap<>())
-            .build();
+        AMQP.BasicProperties properties =
+                new AMQP.BasicProperties().builder().headers(new HashMap<>()).build();
 
-        ArgumentCaptor<AMQP.BasicProperties> captor = ArgumentCaptor.forClass(AMQP.BasicProperties.class);
+        ArgumentCaptor<AMQP.BasicProperties> captor =
+                ArgumentCaptor.forClass(AMQP.BasicProperties.class);
 
         // first time, we will retry
         consumer.handleDelivery(consumerTag, envelope, properties, "hello".getBytes());
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
-        verify(channel, times(1)).basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
+        verify(channel, times(1))
+                .basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
 
         assertEquals(1, messages.size());
         assertEquals("hello", new String(messages.get(0).getBody()));
@@ -180,7 +189,8 @@ class AMQPQueueConsumerTest {
         reset(channel);
         consumer.handleDelivery(consumerTag, envelope, captor.getValue(), "hello".getBytes());
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
-        verify(channel, times(1)).basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
+        verify(channel, times(1))
+                .basicPublish(eq("exchange"), eq("key"), captor.capture(), any(byte[].class));
 
         assertEquals(2, messages.size());
         assertEquals("hello", new String(messages.get(1).getBody()));
@@ -190,7 +200,9 @@ class AMQPQueueConsumerTest {
         reset(channel);
         consumer.handleDelivery(consumerTag, envelope, captor.getValue(), "hello".getBytes());
         verify(channel, times(1)).basicReject(eq(0L), eq(false));
-        verify(channel, times(1)).basicPublish(eq("exchange"), eq("key.poison"), captor.capture(), any(byte[].class));
+        verify(channel, times(1))
+                .basicPublish(
+                        eq("exchange"), eq("key.poison"), captor.capture(), any(byte[].class));
 
         assertEquals(3, messages.size());
         assertEquals("hello", new String(messages.get(2).getBody()));

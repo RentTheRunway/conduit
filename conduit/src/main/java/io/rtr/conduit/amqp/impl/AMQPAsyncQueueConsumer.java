@@ -20,9 +20,15 @@ import java.util.Map.Entry;
 public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncResponse {
     private static final Logger log = LoggerFactory.getLogger(AMQPAsyncQueueConsumer.class);
     private final AMQPAsyncConsumerCallback callback;
-    private final Map<Long, AMQPMessageBundle> unacknowledgedMessages = new LinkedHashMap<Long, AMQPMessageBundle>();
+    private final Map<Long, AMQPMessageBundle> unacknowledgedMessages =
+            new LinkedHashMap<Long, AMQPMessageBundle>();
 
-    AMQPAsyncQueueConsumer(Channel channel, AMQPAsyncConsumerCallback callback, int threshold, String poisonPrefix, boolean poisonQueueEnabled) {
+    AMQPAsyncQueueConsumer(
+            Channel channel,
+            AMQPAsyncConsumerCallback callback,
+            int threshold,
+            String poisonPrefix,
+            boolean poisonQueueEnabled) {
         super(channel, null, threshold, poisonPrefix, poisonQueueEnabled);
         this.callback = callback;
     }
@@ -34,19 +40,16 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
     }
 
     @Override
-    public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-        AMQPMessageBundle messageBundle = new AMQPMessageBundle(
-                consumerTag
-              , envelope
-              , properties
-              , body
-        );
+    public void handleDelivery(
+            String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
+        AMQPMessageBundle messageBundle =
+                new AMQPMessageBundle(consumerTag, envelope, properties, body);
 
         try {
             unacknowledgedMessages.put(messageBundle.getEnvelope().getDeliveryTag(), messageBundle);
             callback.handle(messageBundle, this);
         } catch (RuntimeException e) {
-            //! Blanket exception handler for notifying, via the log, that the user-supplied
+            // ! Blanket exception handler for notifying, via the log, that the user-supplied
             //  callback let an exception propagate. In such cases, all the listeners are stopped.
             log.error("The user-supplied callback allowed an exception to propagate.");
             log.error("Catastrophic - all listeners have stopped! Exception: ", e);
@@ -54,8 +57,9 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
         }
     }
 
-    protected void respond(AMQPMessageBundle messageBundle, ActionResponse actionResponse, boolean multiple) {
-        //! We can't issue any blocking amqp calls in the context of this method, otherwise
+    protected void respond(
+            AMQPMessageBundle messageBundle, ActionResponse actionResponse, boolean multiple) {
+        // ! We can't issue any blocking amqp calls in the context of this method, otherwise
         //  channel's internal thread(s) will deadlock. Both, basicAck and basicReject are
         //  asynchronous.
         Envelope envelope = messageBundle.getEnvelope();
@@ -71,10 +75,13 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
 
                 case RejectAndDiscard:
                     log.warn("Discarding message, body = " + new String(body));
-                    //! Let the broker know we rejected this message. Then publish this bad boy onto
-                    //  the poison queue. Don't bother confirming for two reasons; we don't care, and
+                    // ! Let the broker know we rejected this message. Then publish this bad boy
+                    // onto
+                    //  the poison queue. Don't bother confirming for two reasons; we don't care,
+                    // and
                     //  we can't issue blocking calls here.
-                    publishToPoisonQueue(envelope, properties, actionResponse.getReason(), body, multiple);
+                    publishToPoisonQueue(
+                            envelope, properties, actionResponse.getReason(), body, multiple);
                     reject(deliveryTag, multiple);
                     break;
 
@@ -83,7 +90,8 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
                     log.warn("\tAdjusting headers for retry.");
 
                     if (!retry(envelope, properties, body, multiple)) {
-                        publishToPoisonQueue(envelope, properties, actionResponse.getReason(), body, multiple);
+                        publishToPoisonQueue(
+                                envelope, properties, actionResponse.getReason(), body, multiple);
                     }
                     reject(deliveryTag, multiple);
                     break;
@@ -99,7 +107,8 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
             return;
         }
 
-        Iterator<Entry<Long, AMQPMessageBundle>> messages = unacknowledgedMessages.entrySet().iterator();
+        Iterator<Entry<Long, AMQPMessageBundle>> messages =
+                unacknowledgedMessages.entrySet().iterator();
 
         while (messages.hasNext()) {
             Entry<Long, AMQPMessageBundle> next = messages.next();
@@ -127,13 +136,16 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
 
     /**
      * Send all unacknowledged messages to poison queue, up-to and including this one
+     *
      * @throws IOException
      */
-    private void publishToPoisonQueue(Envelope envelope
-                                    , AMQP.BasicProperties properties
-                                    , String reason
-                                    , byte[] body
-                                    , boolean multiple) throws IOException {
+    private void publishToPoisonQueue(
+            Envelope envelope,
+            AMQP.BasicProperties properties,
+            String reason,
+            byte[] body,
+            boolean multiple)
+            throws IOException {
         if (!multiple) {
             super.publishToPoisonQueue(envelope, properties, reason, body);
             return;
@@ -149,15 +161,18 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
                 break;
             }
 
-            super.publishToPoisonQueue(next.getEnvelope(), next.getBasicProperties(), reason, next.getBody());
+            super.publishToPoisonQueue(
+                    next.getEnvelope(), next.getBasicProperties(), reason, next.getBody());
         }
     }
 
     /**
      * Retry all previously unacknowledged messages, up-to and including the one given
+     *
      * @throws IOException
      */
-    private boolean retry(Envelope envelope, AMQP.BasicProperties properties, byte[] body, boolean multiple)
+    private boolean retry(
+            Envelope envelope, AMQP.BasicProperties properties, byte[] body, boolean multiple)
             throws IOException {
         boolean retry = true;
 
@@ -179,10 +194,12 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
                 break;
             }
 
-            boolean retried = super.retry(next.getEnvelope(), next.getBasicProperties(), next.getBody());
+            boolean retried =
+                    super.retry(next.getEnvelope(), next.getBasicProperties(), next.getBody());
             retry &= retried;
             if (retried) {
-                // we have successfully sent a retry message, remove from queue so later, after we return,
+                // we have successfully sent a retry message, remove from queue so later, after we
+                // return,
                 // publishToPoisonQueue() won't send this message to the poison queue
                 messages.remove();
             }

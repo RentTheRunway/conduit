@@ -3,9 +3,9 @@ package io.rtr.conduit.amqp.impl;
 import com.rabbitmq.client.MetricsCollector;
 import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
 
-public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTransport
-        , AMQPAsyncListenProperties
-        , AMQPAsyncConsumerBuilder> {
+public class AMQPAsyncConsumerBuilder
+        extends AMQPConsumerBuilder<
+                AMQPAsyncTransport, AMQPAsyncListenProperties, AMQPAsyncConsumerBuilder> {
     private AMQPAsyncConsumerCallback callback;
     private MetricsCollector metricsCollector;
 
@@ -38,7 +38,8 @@ public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTrans
 
     @Override
     protected AMQPAsyncListenProperties buildListenProperties() {
-        return new AMQPAsyncListenProperties(callback,
+        return new AMQPAsyncListenProperties(
+                callback,
                 getExchange(),
                 getQueue(),
                 isAutoDeleteQueue(),
@@ -56,9 +57,10 @@ public class AMQPAsyncConsumerBuilder extends AMQPConsumerBuilder<AMQPAsyncTrans
     }
 
     @Override
-    protected AMQPListenContext buildListenContext(AMQPAsyncTransport transport
-            , AMQPConnectionProperties connectionProperties
-            , AMQPAsyncListenProperties amqpAsyncListenProperties) {
+    protected AMQPListenContext buildListenContext(
+            AMQPAsyncTransport transport,
+            AMQPConnectionProperties connectionProperties,
+            AMQPAsyncListenProperties amqpAsyncListenProperties) {
         return new AMQPListenContext(transport, connectionProperties, amqpAsyncListenProperties);
     }
 }

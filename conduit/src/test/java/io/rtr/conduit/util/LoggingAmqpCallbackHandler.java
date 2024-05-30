@@ -14,12 +14,12 @@ public class LoggingAmqpCallbackHandler implements AMQPConsumerCallback {
 
     @Override
     public ActionResponse handle(AMQPMessageBundle messageBundle) {
-        LOGGER.info("Received message: tag={}, messageProperties={}, envelope={}, body={}",
-            messageBundle.getConsumerTag(),
-            messageBundle.getBasicProperties().toString(),
-            messageBundle.getEnvelope().toString(),
-            new String(messageBundle.getBody(), StandardCharsets.UTF_8)
-        );
+        LOGGER.info(
+                "Received message: tag={}, messageProperties={}, envelope={}, body={}",
+                messageBundle.getConsumerTag(),
+                messageBundle.getBasicProperties().toString(),
+                messageBundle.getEnvelope().toString(),
+                new String(messageBundle.getBody(), StandardCharsets.UTF_8));
         return ActionResponse.acknowledge();
     }
 

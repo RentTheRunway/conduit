@@ -19,8 +19,8 @@ public class AMQPMessageBundle implements TransportMessageBundle {
         return initialProperties(null, CONTENT_TYPE_PLAINTEXT);
     }
 
-    private static AMQP.BasicProperties initialProperties(final Map<String, Object> additionalHeaders,
-                                                          final String contentType) {
+    private static AMQP.BasicProperties initialProperties(
+            final Map<String, Object> additionalHeaders, final String contentType) {
         final Map<String, Object> headers = new HashMap<>();
 
         if (additionalHeaders != null) {
@@ -38,7 +38,11 @@ public class AMQPMessageBundle implements TransportMessageBundle {
                 .build();
     }
 
-    public AMQPMessageBundle(String consumerTag, Envelope envelope, AMQP.BasicProperties basicProperties, byte[] body) {
+    public AMQPMessageBundle(
+            String consumerTag,
+            Envelope envelope,
+            AMQP.BasicProperties basicProperties,
+            byte[] body) {
         this.consumerTag = consumerTag;
         this.envelope = envelope;
         this.basicProperties = basicProperties;
@@ -137,7 +141,8 @@ public class AMQPMessageBundle implements TransportMessageBundle {
             if (basicProperties == null) {
                 this.basicProperties = initialProperties(headers, contentType);
             } else if (!headers.isEmpty() && contentType != null) {
-                throw new IllegalArgumentException("Cannot combine basicProperties and custom property values");
+                throw new IllegalArgumentException(
+                        "Cannot combine basicProperties and custom property values");
             }
             return new AMQPMessageBundle(this);
         }
