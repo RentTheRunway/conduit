@@ -27,12 +27,16 @@ public class TransportExecutor extends ThreadPoolExecutor {
 
     /**
      * Based on Executors.newFixedThreadPool
+     *
      * @param nThreads
      * @param threadFactory
      */
     public TransportExecutor(int nThreads, ThreadFactory threadFactory) {
-        super(nThreads, nThreads,
-                0L, TimeUnit.MILLISECONDS,
+        super(
+                nThreads,
+                nThreads,
+                0L,
+                TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(),
                 threadFactory);
     }

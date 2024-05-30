@@ -1,4 +1,3 @@
 package io.rtr.conduit.amqp.transport;
 
-public interface TransportListenProperties {
-}
+public interface TransportListenProperties {}

@@ -1,8 +1,6 @@
 package io.rtr.conduit.amqp;
 
-/**
- * An action which the transport should take after returning from the handle callback.
- */
+/** An action which the transport should take after returning from the handle callback. */
 public class ActionResponse {
 
     private Action action;
@@ -64,21 +62,15 @@ public class ActionResponse {
 
     @Override
     public String toString() {
-        return "ActionResponse{" +
-                "action=" + action +
-                ", reason='" + reason + '\'' +
-                '}';
+        return "ActionResponse{" + "action=" + action + ", reason='" + reason + '\'' + '}';
     }
 
     public enum Action {
-        Acknowledge,            //! The transport will ack the message explicitly.
-        RejectAndRequeue,       //! The message wasn't meant to be processed.
-                                //  For example, if the message delivered is of
-                                //  a higher version than what we are able to
-                                //  deal with.
-        RejectAndDiscard        //! A malformed message, place it on a poison queue.
+        Acknowledge, // ! The transport will ack the message explicitly.
+        RejectAndRequeue, // ! The message wasn't meant to be processed.
+        //  For example, if the message delivered is of
+        //  a higher version than what we are able to
+        //  deal with.
+        RejectAndDiscard // ! A malformed message, place it on a poison queue.
     }
-
-
-
 }

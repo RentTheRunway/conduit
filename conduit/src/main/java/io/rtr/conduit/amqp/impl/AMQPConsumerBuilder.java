@@ -4,7 +4,10 @@ import io.rtr.conduit.amqp.consumer.ConsumerBuilder;
 import io.rtr.conduit.amqp.transport.Transport;
 import io.rtr.conduit.amqp.transport.TransportListenProperties;
 
-public abstract class AMQPConsumerBuilder<T extends Transport, L extends TransportListenProperties, R extends AMQPConsumerBuilder<?,?,?>>
+public abstract class AMQPConsumerBuilder<
+                T extends Transport,
+                L extends TransportListenProperties,
+                R extends AMQPConsumerBuilder<?, ?, ?>>
         extends ConsumerBuilder<T, AMQPConnectionProperties, L, AMQPListenContext> {
     private String username;
     private String password;
@@ -16,8 +19,10 @@ public abstract class AMQPConsumerBuilder<T extends Transport, L extends Transpo
     private int port = 5672;
     private AMQPConnection sharedConnection;
     private String virtualHost = "/";
-    private int connectionTimeout = 10000; //! In milliseconds.
-    private int heartbeatInterval = 60; //! In seconds.
+    // milliseconds
+    private int connectionTimeout = 10000;
+    // seconds
+    private int heartbeatInterval = 60;
     private boolean automaticRecoveryEnabled = true;
     private int retryThreshold = 10;
     private boolean poisonQueueEnabled = true;
@@ -34,8 +39,7 @@ public abstract class AMQPConsumerBuilder<T extends Transport, L extends Transpo
     private Long topologyRecoveryInterval;
     private Integer topologyRecoveryMaxAttempts = Integer.MAX_VALUE;
 
-    protected AMQPConsumerBuilder() {
-    }
+    protected AMQPConsumerBuilder() {}
 
     public static AMQPAsyncConsumerBuilder asynchronous() {
         return AMQPAsyncConsumerBuilder.builder();
@@ -243,7 +247,9 @@ public abstract class AMQPConsumerBuilder<T extends Transport, L extends Transpo
         return builder();
     }
 
-    protected boolean getExclusive() { return exclusive; }
+    protected boolean getExclusive() {
+        return exclusive;
+    }
 
     public R retryThreshold(final int retryThreshold) {
         this.retryThreshold = retryThreshold;
@@ -292,19 +298,18 @@ public abstract class AMQPConsumerBuilder<T extends Transport, L extends Transpo
 
     /**
      * Auto create the exchange, queue and then bind them together.
-     *<p>
-     * There are a few assumptions to keep this 'light' and compatible with typical usage:
-     *  - Queues are NOT exclusive to this connection
-     *  - No custom arguments
-     *  - No dead letter routing
-     *  - No custom TTL
-     *<p>
-     * By default, queue will be durable (NOT auto-delete)
+     *
+     * <p>There are a few assumptions to keep this 'light' and compatible with typical usage: -
+     * Queues are NOT exclusive to this connection - No custom arguments - No dead letter routing -
+     * No custom TTL
+     *
+     * <p>By default, queue will be durable (NOT auto-delete)
      */
-    public R autoCreateAndBind(final String exchange,
-                               final ExchangeType exchangeType,
-                               final String queue,
-                               final String routingKey) {
+    public R autoCreateAndBind(
+            final String exchange,
+            final ExchangeType exchangeType,
+            final String queue,
+            final String routingKey) {
         this.autoCreateAndBind = true;
         this.exchange = exchange;
         this.queue = queue;
@@ -313,11 +318,12 @@ public abstract class AMQPConsumerBuilder<T extends Transport, L extends Transpo
         return builder();
     }
 
-    public R autoCreateAndBind(final String exchange,
-                               final ExchangeType exchangeType,
-                               final String queue,
-                               final boolean isAutoDeleteQueue,
-                               final String routingKey) {
+    public R autoCreateAndBind(
+            final String exchange,
+            final ExchangeType exchangeType,
+            final String queue,
+            final boolean isAutoDeleteQueue,
+            final String routingKey) {
         this.autoCreateAndBind = true;
         this.exchange = exchange;
         this.queue = queue;
@@ -331,7 +337,8 @@ public abstract class AMQPConsumerBuilder<T extends Transport, L extends Transpo
     protected void validate() {
         assertNotNull(exchange, "exchange");
         if (dynamicQueueCreation && autoCreateAndBind) {
-            throw new IllegalArgumentException("Both dynamicQueueCreation and autoCreateAndBind are enabled.");
+            throw new IllegalArgumentException(
+                    "Both dynamicQueueCreation and autoCreateAndBind are enabled.");
         }
         if (!dynamicQueueCreation) {
             assertNotNull(queue, "queue");
@@ -346,26 +353,35 @@ public abstract class AMQPConsumerBuilder<T extends Transport, L extends Transpo
                 throw new IllegalArgumentException("Fanout exchanges do not support poison queues");
             }
         }
-        if (sharedConnection != null && (username != null || password != null || !virtualHost.equals("/"))) {
+        if (sharedConnection != null
+                && (username != null || password != null || !virtualHost.equals("/"))) {
             throw new IllegalArgumentException(
-                    String.format("Username ('%s'), password ('%s') or virtualHost ('%s') should not be specified for a consumer if using a shared connection, it only needs these if using it's own private connection.",
-                            username, password, virtualHost)
-            );
+                    String.format(
+                            "Username ('%s'), password ('%s') or virtualHost ('%s') should not be specified for a consumer if using a shared connection, it only needs these if using it's own private connection.",
+                            username, password, virtualHost));
         }
     }
 
     @Override
     protected AMQPConnectionProperties buildConnectionProperties() {
-        return new AMQPConnectionProperties(username, password, virtualHost, connectionTimeout,
-                heartbeatInterval, automaticRecoveryEnabled, networkRecoveryInterval,
-                topologyRecoveryInterval, topologyRecoveryMaxAttempts);
+        return new AMQPConnectionProperties(
+                username,
+                password,
+                virtualHost,
+                connectionTimeout,
+                heartbeatInterval,
+                automaticRecoveryEnabled,
+                networkRecoveryInterval,
+                topologyRecoveryInterval,
+                topologyRecoveryMaxAttempts);
     }
 
     public enum ExchangeType {
         DIRECT("direct"),
         FANOUT("fanout"),
         TOPIC("topic"),
-        CONSISTENT_HASH("x-consistent-hash"); // This kind of exchange can only be created if plugin "consistent-hash-exchange" is enabled
+        // This kind of exchange can only be created if plugin "consistent-hash-exchange" is enabled
+        CONSISTENT_HASH("x-consistent-hash");
 
         private final String name;
 

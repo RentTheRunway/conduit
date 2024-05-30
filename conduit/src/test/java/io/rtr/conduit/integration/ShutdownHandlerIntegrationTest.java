@@ -26,41 +26,47 @@ class ShutdownHandlerIntegrationTest {
 
     private static final Network COMMON_NETWORK = Network.newNetwork();
     public static final String TOXIPROXY_NETWORK_ALIAS = "toxiproxy";
+
     @Container
-    private static final RabbitMQContainer RABBIT_MQ_CONTAINER = RabbitMQContainerFactory.createBrokerWithSingleExchangeAndQueue()
-        .withExposedPorts(5672)
-        .withNetwork(COMMON_NETWORK);
+    private static final RabbitMQContainer RABBIT_MQ_CONTAINER =
+            RabbitMQContainerFactory.createBrokerWithSingleExchangeAndQueue()
+                    .withExposedPorts(5672)
+                    .withNetwork(COMMON_NETWORK);
+
     @Container
-    private static final ToxiproxyContainer TOXI_PROXY = new ToxiproxyContainer("shopify/toxiproxy:2.1.4")
-        .withNetwork(COMMON_NETWORK)
-        .withNetworkAliases(TOXIPROXY_NETWORK_ALIAS);
+    private static final ToxiproxyContainer TOXI_PROXY =
+            new ToxiproxyContainer("shopify/toxiproxy:2.1.4")
+                    .withNetwork(COMMON_NETWORK)
+                    .withNetworkAliases(TOXIPROXY_NETWORK_ALIAS);
 
     @Test
     void testReconnectAfterBrokerShutdown() throws IOException {
-        ToxiproxyContainer.ContainerProxy proxyInterface = TOXI_PROXY.getProxy(RABBIT_MQ_CONTAINER, 5672);
+        ToxiproxyContainer.ContainerProxy proxyInterface =
+                TOXI_PROXY.getProxy(RABBIT_MQ_CONTAINER, 5672);
 
         RecordingAmqpCallbackHandler callbackHandler = new RecordingAmqpCallbackHandler();
         Publisher publisher;
         Consumer consumer;
 
         // Simulating a fresh existing container ready for us to interact with
-        publisher = IntegrationTestHelpers.buildPublisher(
-            proxyInterface.getContainerIpAddress(),
-            proxyInterface.getProxyPort(),
-            RABBIT_MQ_CONTAINER.getAdminUsername(),
-            RABBIT_MQ_CONTAINER.getAdminPassword()
-        );
-        consumer = IntegrationTestHelpers.buildConsumer(
-            proxyInterface.getContainerIpAddress(),
-            proxyInterface.getProxyPort(),
-            RABBIT_MQ_CONTAINER.getAdminUsername(),
-            RABBIT_MQ_CONTAINER.getAdminPassword(),
-            callbackHandler
-        );
+        publisher =
+                IntegrationTestHelpers.buildPublisher(
+                        proxyInterface.getContainerIpAddress(),
+                        proxyInterface.getProxyPort(),
+                        RABBIT_MQ_CONTAINER.getAdminUsername(),
+                        RABBIT_MQ_CONTAINER.getAdminPassword());
+        consumer =
+                IntegrationTestHelpers.buildConsumer(
+                        proxyInterface.getContainerIpAddress(),
+                        proxyInterface.getProxyPort(),
+                        RABBIT_MQ_CONTAINER.getAdminUsername(),
+                        RABBIT_MQ_CONTAINER.getAdminPassword(),
+                        callbackHandler);
         IntegrationTestHelpers.connectResources(publisher, consumer);
 
         // Simulating the RabbitMQ broker disappearing (i.e. a crash or network issue)
-        // We should react here and notify status of the connection to the broker, have auto-connection try
+        // We should react here and notify status of the connection to the broker, have
+        // auto-connection try
         proxyInterface.setConnectionCut(true);
         awaitDisconnection(publisher, consumer);
 
@@ -70,15 +76,19 @@ class ShutdownHandlerIntegrationTest {
         IntegrationTestHelpers.publishMessage(publisher, new AMQPMessageBundle("Hello World!"));
 
         // Message publication should still work after reconnecting
-        await()
-            .timeout(1, TimeUnit.SECONDS)
-            .pollInterval(100, TimeUnit.MILLISECONDS)
-            .until(() ->  callbackHandler.getCapturedMessages().size(), is(equalTo(1)));
-        assertEquals("Hello World!", callbackHandler.getCapturedMessages().stream().findAny()
-            .map(AMQPMessageBundle::getBody)
-            .map(bytes -> new String(bytes, StandardCharsets.UTF_8))
-            .orElseThrow(() -> new AssertionFailedError("Expected to have received a message 'Hello World!'"))
-        );
+        await().timeout(1, TimeUnit.SECONDS)
+                .pollInterval(100, TimeUnit.MILLISECONDS)
+                .until(() -> callbackHandler.getCapturedMessages().size(), is(equalTo(1)));
+        assertEquals(
+                "Hello World!",
+                callbackHandler.getCapturedMessages().stream()
+                        .findAny()
+                        .map(AMQPMessageBundle::getBody)
+                        .map(bytes -> new String(bytes, StandardCharsets.UTF_8))
+                        .orElseThrow(
+                                () ->
+                                        new AssertionFailedError(
+                                                "Expected to have received a message 'Hello World!'")));
 
         // Cleanup, close any spurious connections
         consumer.close();
@@ -86,32 +96,28 @@ class ShutdownHandlerIntegrationTest {
     }
 
     private void awaitDisconnection(Publisher publisher, Consumer consumer) {
-        await()
-            .alias("Checking for publisher disconnection")
-            .timeout(10, TimeUnit.SECONDS)
-            .pollInterval(100, TimeUnit.MILLISECONDS)
-            .failFast(() -> publisher == null)
-            .until(publisher::isConnected, value -> !value);
-        await()
-            .alias("Checking for consumer disconnection")
-            .timeout(10, TimeUnit.SECONDS)
-            .pollInterval(100, TimeUnit.MILLISECONDS)
-            .failFast(() -> consumer == null)
-            .until(consumer::isConnected, value -> !value);
+        await().alias("Checking for publisher disconnection")
+                .timeout(10, TimeUnit.SECONDS)
+                .pollInterval(100, TimeUnit.MILLISECONDS)
+                .failFast(() -> publisher == null)
+                .until(publisher::isConnected, value -> !value);
+        await().alias("Checking for consumer disconnection")
+                .timeout(10, TimeUnit.SECONDS)
+                .pollInterval(100, TimeUnit.MILLISECONDS)
+                .failFast(() -> consumer == null)
+                .until(consumer::isConnected, value -> !value);
     }
 
     private void awaitReconnection(Publisher publisher, Consumer consumer) {
-        await()
-            .alias("Checking for publisher re-connection")
-            .timeout(10, TimeUnit.SECONDS)
-            .pollInterval(100, TimeUnit.MILLISECONDS)
-            .failFast(() -> publisher == null)
-            .until(publisher::isConnected);
-        await()
-            .alias("Checking for consumer re-connection")
-            .timeout(10, TimeUnit.SECONDS)
-            .pollInterval(100, TimeUnit.MILLISECONDS)
-            .failFast(() -> consumer == null)
-            .until(consumer::isConnected);
+        await().alias("Checking for publisher re-connection")
+                .timeout(10, TimeUnit.SECONDS)
+                .pollInterval(100, TimeUnit.MILLISECONDS)
+                .failFast(() -> publisher == null)
+                .until(publisher::isConnected);
+        await().alias("Checking for consumer re-connection")
+                .timeout(10, TimeUnit.SECONDS)
+                .pollInterval(100, TimeUnit.MILLISECONDS)
+                .failFast(() -> consumer == null)
+                .until(consumer::isConnected);
     }
 }

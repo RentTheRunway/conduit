@@ -10,12 +10,11 @@ public class AMQPListenContext implements TransportListenContext {
     private AMQPConnectionProperties connectionProperties;
     private TransportListenProperties listenProperties;
 
-    //! Consume context.
+    // ! Consume context.
     AMQPListenContext(
-            AMQPTransport amqpTransport
-          , AMQPConnectionProperties amqpConnectionProperties
-          , AMQPCommonListenProperties amqpListenProperties
-    ) {
+            AMQPTransport amqpTransport,
+            AMQPConnectionProperties amqpConnectionProperties,
+            AMQPCommonListenProperties amqpListenProperties) {
         connectionProperties = amqpConnectionProperties;
         listenProperties = amqpListenProperties;
         transport = amqpTransport;

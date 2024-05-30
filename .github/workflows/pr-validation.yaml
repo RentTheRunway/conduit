@@ -14,39 +14,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Check out repo
+        uses: actions/checkout@v4
 
       - name: Set up JDK 8
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 8
           distribution: temurin
           check-latest: false
 
       - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.5
+        uses: stCarolas/setup-maven@v5
         with:
-          maven-version: 3.9.2
+          maven-version: 3.9.6
 
-      # actions/setup-java does not support multiple servers at this time
-      # https://github.com/actions/setup-java/issues/85
-      - name: Setup Nexus authentication and GPG passphrase
+      - name: Set up Maven servers
         uses: whelk-io/maven-settings-xml-action@v21
         with:
-          servers: |
-            [
-              {
-                "id": "sonatype-nexus-staging",
-                "username": "${{ secrets.OSS_NEXUS_USERNAME }}",
-                "password": "${{ secrets.OSS_NEXUS_PASSWORD }}"
-              },
-              {
-                "id": "sonatype-nexus-snapshots",
-                "username": "${{ secrets.OSS_NEXUS_USERNAME }}",
-                "password": "${{ secrets.OSS_NEXUS_PASSWORD }}"
-              }
-            ]
+          servers: '[
+          {
+            "id": "sonatype-nexus-staging",
+            "username": "${{ secrets.OSS_NEXUS_USERNAME }}",
+            "password": "${{ secrets.OSS_NEXUS_PASSWORD }}"
+          },
+          {
+            "id": "sonatype-nexus-snapshots",
+            "username": "${{ secrets.OSS_NEXUS_USERNAME }}",
+            "password": "${{ secrets.OSS_NEXUS_PASSWORD }}"
+          }]'
 
-      - name: Build And Verify
-        run: mvn -B install
+      - name: Resolve plugins
+        run: mvn dependency:resolve-plugins
+
+      - name: Run dependency analysis
+        run: mvn dependency:analyze
+
+      - name: Build and verify
+        run: mvn verify

@@ -9,25 +9,23 @@ import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 /**
- * The publisher operates in terms of a publish context; an encapsulation of a
- * concrete transport and its properties.
- * Example:
+ * The publisher operates in terms of a publish context; an encapsulation of a concrete transport
+ * and its properties. Example:
  *
- * AMQPPublishContext context = new AMQPPublishContext(
- *         username, password, virtualHost, exchange, routingKey, host, port
- * );
+ * <p>AMQPPublishContext context = new AMQPPublishContext( username, password, virtualHost,
+ * exchange, routingKey, host, port );
  *
- * Publisher publisher = new Publisher(context);
+ * <p>Publisher publisher = new Publisher(context);
  */
 public class Publisher implements AutoCloseable {
     private TransportPublishContext transportContext;
 
-    //! Public interface.
+    // ! Public interface.
     Publisher(TransportPublishContext transportContext) {
         this.transportContext = transportContext;
     }
 
-    //! Connects to the context-specified host with context-specified credentials.
+    // ! Connects to the context-specified host with context-specified credentials.
     public void connect() throws IOException {
         transportContext.getTransport().connect(transportContext.getConnectionProperties());
     }
@@ -43,6 +41,7 @@ public class Publisher implements AutoCloseable {
 
     /**
      * Publish the message using the publish properties defined in the transport context
+     *
      * @param messageBundle Message to send
      */
     public boolean publish(TransportMessageBundle messageBundle)
@@ -51,18 +50,21 @@ public class Publisher implements AutoCloseable {
     }
 
     /**
-     * Publish the message with the publish properties passed as parameter, instead of the ones defined in the transport
-     * context. Useful when those properties change from one message to another (i.e. send messages using different
-     * routing keys)
+     * Publish the message with the publish properties passed as parameter, instead of the ones
+     * defined in the transport context. Useful when those properties change from one message to
+     * another (i.e. send messages using different routing keys)
+     *
      * @param messageBundle Message to send
-     * @param overridePublishProperties Publish properties to use when sending the message. If null, the ones defined
-     *                                  in the transport context will be used.
+     * @param overridePublishProperties Publish properties to use when sending the message. If null,
+     *     the ones defined in the transport context will be used.
      * @return
      * @throws IOException
      * @throws TimeoutException
      * @throws InterruptedException
      */
-    public boolean publish(TransportMessageBundle messageBundle, TransportPublishProperties overridePublishProperties)
+    public boolean publish(
+            TransportMessageBundle messageBundle,
+            TransportPublishProperties overridePublishProperties)
             throws IOException, TimeoutException, InterruptedException {
         if (overridePublishProperties == null) {
             overridePublishProperties = transportContext.getPublishProperties();
@@ -72,6 +74,8 @@ public class Publisher implements AutoCloseable {
 
     public <E> boolean transactionalPublish(Collection<E> messageBundles)
             throws IOException, TimeoutException, InterruptedException {
-        return transportContext.getTransport().transactionalPublish(messageBundles, transportContext.getPublishProperties());
+        return transportContext
+                .getTransport()
+                .transactionalPublish(messageBundles, transportContext.getPublishProperties());
     }
 }

@@ -9,15 +9,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class AMQPConnectionPropertiesTest {
     @Test
     void testValidateBuilder() {
-        AMQPConnectionProperties properties = AMQPConnectionProperties.builder()
-                .username("Anna")
-                .password("Anna's password")
-                .automaticRecoveryEnabled(true)
-                .connectionTimeout(Duration.ofHours(8))
-                .heartbeatInterval(Duration.ofSeconds(2))
-                .virtualHost("Anna's vhost")
-                .networkRecoveryInterval(10000L)
-                .build();
+        AMQPConnectionProperties properties =
+                AMQPConnectionProperties.builder()
+                        .username("Anna")
+                        .password("Anna's password")
+                        .automaticRecoveryEnabled(true)
+                        .connectionTimeout(Duration.ofHours(8))
+                        .heartbeatInterval(Duration.ofSeconds(2))
+                        .virtualHost("Anna's vhost")
+                        .networkRecoveryInterval(10000L)
+                        .build();
 
         assertEquals("Anna", properties.getUsername());
         assertEquals("Anna's password", properties.getPassword());
@@ -29,14 +30,15 @@ class AMQPConnectionPropertiesTest {
 
     @Test
     void testDefaultNetworkRecoveryInterval() {
-        AMQPConnectionProperties properties = AMQPConnectionProperties.builder()
-                .username("Anna")
-                .password("Anna's password")
-                .automaticRecoveryEnabled(true)
-                .connectionTimeout(Duration.ofHours(8))
-                .heartbeatInterval(Duration.ofSeconds(2))
-                .virtualHost("Anna's vhost")
-                .build();
+        AMQPConnectionProperties properties =
+                AMQPConnectionProperties.builder()
+                        .username("Anna")
+                        .password("Anna's password")
+                        .automaticRecoveryEnabled(true)
+                        .connectionTimeout(Duration.ofHours(8))
+                        .heartbeatInterval(Duration.ofSeconds(2))
+                        .virtualHost("Anna's vhost")
+                        .build();
 
         assertEquals("Anna", properties.getUsername());
         assertEquals("Anna's password", properties.getPassword());

@@ -3,9 +3,8 @@ package io.rtr.conduit.amqp.impl;
 import com.rabbitmq.client.MetricsCollector;
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 
-public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
-        , AMQPListenProperties
-        , AMQPSyncConsumerBuilder> {
+public class AMQPSyncConsumerBuilder
+        extends AMQPConsumerBuilder<AMQPTransport, AMQPListenProperties, AMQPSyncConsumerBuilder> {
     private AMQPConsumerCallback callback;
     private MetricsCollector metricsCollector;
 
@@ -38,7 +37,8 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
 
     @Override
     protected AMQPListenProperties buildListenProperties() {
-        return new AMQPListenProperties(callback,
+        return new AMQPListenProperties(
+                callback,
                 getExchange(),
                 getQueue(),
                 isAutoDeleteQueue(),
@@ -52,14 +52,14 @@ public class AMQPSyncConsumerBuilder extends AMQPConsumerBuilder<AMQPTransport
                 getExchangeType(),
                 getRoutingKey(),
                 isAutoCreateAndBind(),
-                getExclusive()
-        );
+                getExclusive());
     }
 
     @Override
-    protected AMQPListenContext buildListenContext(AMQPTransport transport
-            , AMQPConnectionProperties connectionProperties
-            , AMQPListenProperties listenProperties) {
+    protected AMQPListenContext buildListenContext(
+            AMQPTransport transport,
+            AMQPConnectionProperties connectionProperties,
+            AMQPListenProperties listenProperties) {
         return new AMQPListenContext(transport, connectionProperties, listenProperties);
     }
 }

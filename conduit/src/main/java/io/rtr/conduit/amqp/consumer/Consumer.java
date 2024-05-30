@@ -6,13 +6,13 @@ import io.rtr.conduit.amqp.transport.TransportListenContext;
 import java.io.IOException;
 
 /**
- * The consumer operates in terms of a listen context; an encapsulation of a
- * concrete transport and its properties.
+ * The consumer operates in terms of a listen context; an encapsulation of a concrete transport and
+ * its properties.
  */
 public class Consumer implements AutoCloseable {
     private TransportListenContext transportContext;
 
-    //! Public interface.
+    // ! Public interface.
 
     Consumer(TransportListenContext transportContext) {
         this.transportContext = transportContext;
