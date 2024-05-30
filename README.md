@@ -1,49 +1,48 @@
 # Conduit
 
-## What this be?
-
-A simple abstraction over the rabbitmq java client, which hides most of the amqp/rabbitmq specific details.
+A simple abstraction over the RabbitMQ Java client, which hides most of the AMQP-specific details.
 
 ## How do I publish?
 
-    Publisher p = new Publisher(new AMQPPublishContext(
-            username,
-            password,
-            exchange,
-            routing-key,
-            host,
-            port
-    ));
-    p.connect();
-    p.publish(new AMQPMessageBundle("hello-world");
+```java
+final Publisher publisher = new Publisher(new AMQPPublishContext(
+        username,
+        password,
+        exchange,
+        routingKey,
+        host,
+        port));
+publisher.connect();
+publisher.publish(new AMQPMessageBundle("hello-world"));
+```
 
 ## How do I consume?
 
-    Consumer c = new Consumer(AMQPListenContext(
-            username, 
-            password,
-            exchange,
-            queue,
-            host,
-            port, 
-            new AMQPConsumerCallback() {
-                    @Override
-                    void notifyOfActionFailure(Exception e) {}
+```java
+final Consumer consumer = new Consumer(new AMQPListenContext(
+        username,
+        password,
+        exchange,
+        queue,
+        host,
+        port,
+        new AMQPConsumerCallback() {
+                @Override
+                void notifyOfActionFailure(final Exception e) {}
 
-                    @Override
-                    Action handle(AMQPMessageBundle messageBundle) {
+                @Override
+                Action handle(final AMQPMessageBundle messageBundle) {
+                    // message processing goes here
 
-                        //! Message processing here
+                    return Action.Acknowledge;
+                }
+        }));
+```
 
-                        return Action.Acknowledge;
-                    }
-            }
-    ));
+## What versions of Java are supported?
 
-## What versions of Java are supported
-
-As of July 2019, Java 8 is supported.
-Support for Java 6 and Java 7 has ended.
+Java 8 and higher are supported. The build uses Java 21 and targets 8.
 
 ## Release process
-When a PR is merged to master, a release will be made and deployed to Sonatype by Github Actions. This includes pushing new commits via `maven-release-plugin`. The released version will be automatically deployed and usable immediately after the `release` workflow completes.
+
+Manually run the Release workflow in GitHub Actions.
