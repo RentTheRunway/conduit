@@ -30,6 +30,15 @@
         <tag>HEAD</tag>
     </scm>
 
+    <developers>
+        <developer>
+            <name>Matthew Read</name>
+            <email>MatthewRyanRead@users.noreply.github.com</email>
+            <organization>Rent the Runway</organization>
+            <organizationUrl>https://github.com/RentTheRunway</organizationUrl>
+        </developer>
+    </developers>
+
     <repositories>
         <repository>
             <id>ossrh</id>
