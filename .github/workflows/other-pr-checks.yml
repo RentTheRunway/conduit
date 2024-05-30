@@ -1,0 +1,23 @@
+---
+
+name: Other PR Checks
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+
+jobs:
+  other-pr-checks:
+    name: Other PR Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Run YAML linting
+        uses: karancode/yamllint-github-action@v2.1.1
+        with:
+          yamllint_strict: true
+
+      - name: Run woke
+        uses: get-woke/woke-action@v0
+        with:
+          fail-on-error: true
