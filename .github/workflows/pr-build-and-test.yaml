@@ -29,24 +29,10 @@ jobs:
         with:
           maven-version: 3.9.6
 
-      - name: Set up Maven servers
-        uses: whelk-io/maven-settings-xml-action@v21
-        with:
-          servers: '[
-          {
-            "id": "sonatype-nexus-staging",
-            "username": "${{ secrets.OSS_NEXUS_USERNAME }}",
-            "password": "${{ secrets.OSS_NEXUS_PASSWORD }}"
-          },
-          {
-            "id": "sonatype-nexus-snapshots",
-            "username": "${{ secrets.OSS_NEXUS_USERNAME }}",
-            "password": "${{ secrets.OSS_NEXUS_PASSWORD }}"
-          }]'
-
       - name: Resolve plugins
         run: mvn dependency:resolve-plugins
 
+      # dependency:analyze-only is run during the main build, but they sometimes catch different things
       - name: Run dependency analysis
         run: mvn dependency:analyze
 

@@ -15,7 +15,7 @@
 
     <properties>
         <amqp-client.version>5.14.2</amqp-client.version>
-        <logback.version>1.2.11</logback.version>
+        <logback.version>1.2.13</logback.version>
         <slf4j.version>1.7.36</slf4j.version>
     </properties>
 
