@@ -5,7 +5,7 @@
     <parent>
         <artifactId>conduit-parent</artifactId>
         <groupId>io.rtr</groupId>
-        <version>1.46-SNAPSHOT</version>
+        <version>1.46</version>
     </parent>
 
     <name>Conduit</name>
