@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>Conduit</name>
@@ -12,6 +14,7 @@
 
     <modules>
         <module>conduit-bom</module>
+        <module>conduit-dependencies</module>
         <module>conduit</module>
     </modules>
 
@@ -70,11 +73,13 @@
 
         <!-- Maven plugin versions -->
 
+        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
+
         <buildnumber-maven-plugin.version>3.2.0</buildnumber-maven-plugin.version>
 
-        <fmt-maven-plugin.version>2.9.1</fmt-maven-plugin.version>
+        <fmt-maven-plugin.version>2.23</fmt-maven-plugin.version>
 
-        <jacoco.version>0.8.12</jacoco.version>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
 
         <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
 
@@ -82,7 +87,7 @@
 
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
 
-        <maven-dependency-plugin.version>3.6.1</maven-dependency-plugin.version>
+        <maven-dependency-plugin.version>3.7.0</maven-dependency-plugin.version>
 
         <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
 
@@ -96,7 +101,7 @@
 
         <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
 
-        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
 
         <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
 
@@ -117,16 +122,14 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>com.coveo</groupId>
+                    <groupId>com.spotify.fmt</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
                     <version>${fmt-maven-plugin.version}</version>
                     <configuration>
-                        <skipSortingImports>true</skipSortingImports>
                         <style>aosp</style>
                     </configuration>
                     <executions>
                         <execution>
-                            <id>format</id>
                             <phase>validate</phase>
                             <goals>
                                 <goal>check</goal>
@@ -173,8 +176,8 @@
                         <failOnWarning>true</failOnWarning>
                         <ignoreUnusedRuntime>true</ignoreUnusedRuntime>
                         <ignoredUnusedDeclaredDependencies>
-                            <!-- providing junit:junit, which is used -->
-                            <dep>org.junit.vintage:junit-vintage-engine</dep>
+                            <!-- used at test runtime, but that is not a maven scope -->
+                            <dep>org.slf4j:slf4j-simple</dep>
                         </ignoredUnusedDeclaredDependencies>
                     </configuration>
                     <executions>
@@ -201,10 +204,26 @@
                     <version>${maven-enforcer-plugin.version}</version>
                     <configuration>
                         <rules>
+                            <banDuplicatePomDependencyVersions />
                             <banDynamicVersions>
+                                <ignores>
+                                    <dep>${project.groupId}:*</dep>
+                                </ignores>
                                 <verbose>true</verbose>
                             </banDynamicVersions>
-                            <DependencyConvergence />
+                            <dependencyConvergence />
+                            <reactorModuleConvergence />
+                            <requireJavaVersion>
+                                <version>[21,)</version>
+                            </requireJavaVersion>
+                            <requireMavenVersion>
+                                <version>[3.9.6,)</version>
+                            </requireMavenVersion>
+                            <requireReleaseDeps>
+                                <excludes>
+                                    <dep>${project.groupId}:*</dep>
+                                </excludes>
+                            </requireReleaseDeps>
                         </rules>
                     </configuration>
                     <executions>
@@ -334,7 +353,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco.version}</version>
+                    <version>${jacoco-maven-plugin.version}</version>
                     <executions>
                         <execution>
                             <id>default-prepare-agent</id>
@@ -356,7 +375,7 @@
 
         <plugins>
             <plugin>
-                <groupId>com.coveo</groupId>
+                <groupId>com.spotify.fmt</groupId>
                 <artifactId>fmt-maven-plugin</artifactId>
                 <version>${fmt-maven-plugin.version}</version>
             </plugin>
@@ -406,7 +425,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
+                <version>${jacoco-maven-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
