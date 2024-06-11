@@ -17,14 +17,10 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- somewhat pointless at this point, but we might add more modules later -->
             <dependency>
                 <groupId>io.rtr</groupId>
                 <artifactId>conduit</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.rtr</groupId>
-                <artifactId>conduit-dependencies</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

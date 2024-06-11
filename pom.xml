@@ -174,7 +174,7 @@
                         <failOnWarning>true</failOnWarning>
                         <ignoreUnusedRuntime>true</ignoreUnusedRuntime>
                         <ignoredUnusedDeclaredDependencies>
-                            <!-- used at test runtime, but that is not a maven scope -->
+                            <!-- used at test runtime, but that is not a Maven scope -->
                             <dep>org.slf4j:slf4j-simple</dep>
                         </ignoredUnusedDeclaredDependencies>
                     </configuration>
