@@ -4,10 +4,12 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
+
 import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.ActionResponse;
 import io.rtr.conduit.amqp.AsyncResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
