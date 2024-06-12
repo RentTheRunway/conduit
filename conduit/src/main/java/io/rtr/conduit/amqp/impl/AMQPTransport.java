@@ -5,6 +5,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MetricsCollector;
 import com.rabbitmq.client.ShutdownListener;
 import com.rabbitmq.client.ShutdownSignalException;
+
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.AbstractAMQPTransport;
@@ -12,6 +13,7 @@ import io.rtr.conduit.amqp.transport.TransportConnectionProperties;
 import io.rtr.conduit.amqp.transport.TransportListenProperties;
 import io.rtr.conduit.amqp.transport.TransportMessageBundle;
 import io.rtr.conduit.amqp.transport.TransportPublishProperties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

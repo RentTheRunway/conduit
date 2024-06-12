@@ -1,5 +1,7 @@
 package io.rtr.conduit.integration;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.consumer.Consumer;
@@ -8,12 +10,11 @@ import io.rtr.conduit.amqp.impl.AMQPConnectionProperties;
 import io.rtr.conduit.amqp.impl.AMQPConsumerBuilder;
 import io.rtr.conduit.amqp.impl.AMQPPublisherBuilder;
 import io.rtr.conduit.amqp.publisher.Publisher;
+
 import org.testcontainers.containers.RabbitMQContainer;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IntegrationTestHelpers {
     public static final String EXCHANGE = "foo";

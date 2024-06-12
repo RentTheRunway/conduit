@@ -1,21 +1,5 @@
 package io.rtr.conduit.amqp.impl;
 
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Envelope;
-import com.rabbitmq.client.ShutdownSignalException;
-import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
-import io.rtr.conduit.amqp.AMQPMessageBundle;
-import io.rtr.conduit.amqp.ActionResponse;
-import io.rtr.conduit.amqp.AsyncResponse;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyLong;
@@ -28,6 +12,24 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.ShutdownSignalException;
+
+import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
+import io.rtr.conduit.amqp.AMQPMessageBundle;
+import io.rtr.conduit.amqp.ActionResponse;
+import io.rtr.conduit.amqp.AsyncResponse;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 class AMQPAsyncQueueConsumerTest {
 
