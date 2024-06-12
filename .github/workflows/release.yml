@@ -14,16 +14,24 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
-    env:
-      NEXUS_USER: ${{ secrets.OSS_NEXUS_USERNAME }}
-      NEXUS_PASS: ${{ secrets.OSS_NEXUS_PASSWORD }}
-
     steps:
       - name: Fail if not on valid branch
         if: github.ref != 'refs/heads/master'
         run: |
           echo "::error title=Invalid Branch::This workflow can only be run on specific branches"
           exit 1
+
+      - name: Import ansible-vault secret
+        uses: hashicorp/vault-action@v3
+        with:
+          url: ${{ secrets.VAULT_URL }}
+          method: approle
+          roleId: secrets-uploader
+          secretId: ${{ secrets.VAULT_UPLOADER_SECRET_ID }}
+          secrets: |
+            kv/data/mgmt/sonatype/usertoken username | NEXUS_USER ;
+            kv/data/mgmt/sonatype/usertoken password | NEXUS_PASS ;
+            kv/data/mgmt/sonatype/stagingprofile id | STAGING_PROFILE_ID
 
       - name: Check out repo
         uses: actions/checkout@v4
