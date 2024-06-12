@@ -6,7 +6,7 @@
 name: Github Actions Audit
 run-name: Audit ${{ github.event.repository.name }}
 
-on:  # yamllint disable-line rule:truthy
+on:
   workflow_dispatch:
   schedule:
     - cron: "30 21 * * 0,2,4"
