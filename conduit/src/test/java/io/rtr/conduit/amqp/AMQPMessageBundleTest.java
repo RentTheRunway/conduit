@@ -1,18 +1,21 @@
 package io.rtr.conduit.amqp;
 
+import static io.rtr.conduit.amqp.AMQPMessageBundle.CONTENT_TYPE_JSON;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import static java.util.Collections.singletonMap;
+
 import com.rabbitmq.client.AMQP;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import static io.rtr.conduit.amqp.AMQPMessageBundle.CONTENT_TYPE_JSON;
-import static java.util.Collections.singletonMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class AMQPMessageBundleTest {
 
