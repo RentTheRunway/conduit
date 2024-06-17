@@ -8,10 +8,11 @@
     <groupId>io.rtr</groupId>
     <artifactId>conduit-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.47-SNAPSHOT</version>
+    <version>1.48-SNAPSHOT</version>
 
     <modules>
         <module>conduit-bom</module>
+        <module>conduit-dependencies</module>
         <module>conduit</module>
     </modules>
 
@@ -72,9 +73,9 @@
 
         <buildnumber-maven-plugin.version>3.2.0</buildnumber-maven-plugin.version>
 
-        <fmt-maven-plugin.version>2.9.1</fmt-maven-plugin.version>
+        <fmt-maven-plugin.version>2.23</fmt-maven-plugin.version>
 
-        <jacoco.version>0.8.12</jacoco.version>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
 
         <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
 
@@ -82,13 +83,13 @@
 
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
 
-        <maven-dependency-plugin.version>3.6.1</maven-dependency-plugin.version>
+        <maven-dependency-plugin.version>3.7.0</maven-dependency-plugin.version>
 
         <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
 
         <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
 
-        <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
+        <maven-failsafe-plugin.version>3.3.0</maven-failsafe-plugin.version>
 
         <maven-gpg-plugin.version>3.2.4</maven-gpg-plugin.version>
 
@@ -96,13 +97,13 @@
 
         <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
 
-        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
 
         <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
 
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 
-        <maven-shade-plugin.version>3.5.2</maven-shade-plugin.version>
+        <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
 
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
 
@@ -110,23 +111,21 @@
 
         <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
 
-        <spotbugs-maven-plugin.version>4.8.3.1</spotbugs-maven-plugin.version>
+        <spotbugs-maven-plugin.version>4.8.5.0</spotbugs-maven-plugin.version>
     </properties>
 
     <build>
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>com.coveo</groupId>
+                    <groupId>com.spotify.fmt</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
                     <version>${fmt-maven-plugin.version}</version>
                     <configuration>
-                        <skipSortingImports>true</skipSortingImports>
                         <style>aosp</style>
                     </configuration>
                     <executions>
                         <execution>
-                            <id>format</id>
                             <phase>validate</phase>
                             <goals>
                                 <goal>check</goal>
@@ -173,8 +172,8 @@
                         <failOnWarning>true</failOnWarning>
                         <ignoreUnusedRuntime>true</ignoreUnusedRuntime>
                         <ignoredUnusedDeclaredDependencies>
-                            <!-- providing junit:junit, which is used -->
-                            <dep>org.junit.vintage:junit-vintage-engine</dep>
+                            <!-- used at test runtime, but that is not a Maven scope -->
+                            <dep>org.slf4j:slf4j-simple</dep>
                         </ignoredUnusedDeclaredDependencies>
                     </configuration>
                     <executions>
@@ -201,10 +200,26 @@
                     <version>${maven-enforcer-plugin.version}</version>
                     <configuration>
                         <rules>
+                            <banDuplicatePomDependencyVersions />
                             <banDynamicVersions>
+                                <ignores>
+                                    <dep>${project.groupId}:*</dep>
+                                </ignores>
                                 <verbose>true</verbose>
                             </banDynamicVersions>
-                            <DependencyConvergence />
+                            <dependencyConvergence />
+                            <reactorModuleConvergence />
+                            <requireJavaVersion>
+                                <version>[21,)</version>
+                            </requireJavaVersion>
+                            <requireMavenVersion>
+                                <version>[3.9.6,)</version>
+                            </requireMavenVersion>
+                            <requireReleaseDeps>
+                                <excludes>
+                                    <dep>${project.groupId}:*</dep>
+                                </excludes>
+                            </requireReleaseDeps>
                         </rules>
                     </configuration>
                     <executions>
@@ -334,7 +349,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco.version}</version>
+                    <version>${jacoco-maven-plugin.version}</version>
                     <executions>
                         <execution>
                             <id>default-prepare-agent</id>
@@ -356,7 +371,7 @@
 
         <plugins>
             <plugin>
-                <groupId>com.coveo</groupId>
+                <groupId>com.spotify.fmt</groupId>
                 <artifactId>fmt-maven-plugin</artifactId>
                 <version>${fmt-maven-plugin.version}</version>
             </plugin>
@@ -406,7 +421,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
+                <version>${jacoco-maven-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
@@ -446,7 +461,7 @@
                         <configuration>
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <stagingProfileId>5db1fdef03b4db</stagingProfileId>
+                            <stagingProfileId>${env.STAGING_PROFILE_ID}</stagingProfileId>
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
                             <detectBuildFailures>true</detectBuildFailures>
                             <keepStagingRepositoryOnFailure>false</keepStagingRepositoryOnFailure>

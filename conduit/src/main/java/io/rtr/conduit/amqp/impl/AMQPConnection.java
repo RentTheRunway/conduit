@@ -8,16 +8,19 @@ import com.rabbitmq.client.MetricsCollector;
 import com.rabbitmq.client.RecoveryListener;
 import com.rabbitmq.client.impl.recovery.AutorecoveringConnection;
 import com.rabbitmq.client.impl.recovery.TopologyRecoveryRetryLogic;
+
 import io.rtr.conduit.amqp.transport.TransportExecutor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+
+import javax.net.ssl.SSLSocketFactory;
 
 public class AMQPConnection {
     private final ConnectionFactory connectionFactory;

@@ -1,16 +1,5 @@
 package io.rtr.conduit.amqp.impl;
 
-import com.rabbitmq.client.*;
-import com.rabbitmq.client.impl.recovery.AutorecoveringConnection;
-import io.rtr.conduit.amqp.transport.TransportExecutor;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,6 +11,19 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.rabbitmq.client.*;
+import com.rabbitmq.client.impl.recovery.AutorecoveringConnection;
+
+import io.rtr.conduit.amqp.transport.TransportExecutor;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 class AMQPConnectionTest {
     private static final int CONNECTION_TIMEOUT = 1337;

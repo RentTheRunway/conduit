@@ -2,6 +2,7 @@ package io.rtr.conduit.amqp;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Envelope;
+
 import io.rtr.conduit.amqp.transport.TransportMessageBundle;
 
 import java.util.HashMap;

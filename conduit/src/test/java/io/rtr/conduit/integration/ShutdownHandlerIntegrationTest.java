@@ -1,9 +1,15 @@
 package io.rtr.conduit.integration;
 
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.consumer.Consumer;
 import io.rtr.conduit.amqp.publisher.Publisher;
 import io.rtr.conduit.util.RecordingAmqpCallbackHandler;
+
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 import org.testcontainers.containers.Network;
@@ -15,11 +21,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
 class ShutdownHandlerIntegrationTest {
