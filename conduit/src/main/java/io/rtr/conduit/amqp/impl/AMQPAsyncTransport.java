@@ -1,6 +1,7 @@
 package io.rtr.conduit.amqp.impl;
 
 import com.rabbitmq.client.MetricsCollector;
+
 import io.rtr.conduit.amqp.AMQPAsyncConsumerCallback;
 import io.rtr.conduit.amqp.transport.TransportListenProperties;
 

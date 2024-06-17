@@ -1,11 +1,18 @@
 package io.rtr.conduit.integration;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
+
 import io.rtr.conduit.amqp.AMQPConsumerCallback;
 import io.rtr.conduit.amqp.AMQPMessageBundle;
 import io.rtr.conduit.amqp.consumer.Consumer;
 import io.rtr.conduit.amqp.impl.AMQPConnection;
 import io.rtr.conduit.amqp.publisher.Publisher;
 import io.rtr.conduit.util.LoggingAmqpCallbackHandler;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.testcontainers.containers.RabbitMQContainer;
@@ -13,12 +20,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.timeout;
 
 @Testcontainers
 class AMQPIntegrationTest {
