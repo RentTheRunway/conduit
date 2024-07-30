@@ -335,7 +335,6 @@ public abstract class AMQPConsumerBuilder<
 
     @Override
     protected void validate() {
-        assertNotNull(exchange, "exchange");
         if (dynamicQueueCreation && autoCreateAndBind) {
             throw new IllegalArgumentException(
                     "Both dynamicQueueCreation and autoCreateAndBind are enabled.");
@@ -343,10 +342,12 @@ public abstract class AMQPConsumerBuilder<
         if (!dynamicQueueCreation) {
             assertNotNull(queue, "queue");
         } else {
+            assertNotNull(exchange, "exchange");
             assertNotNull(dynamicQueueRoutingKey, "dynamicQueueRoutingKey");
         }
         if (autoCreateAndBind) {
             assertNotNull(queue, "queue");
+            assertNotNull(exchange, "exchange");
             assertNotNull(exchangeType, "exchangeType");
             assertNotNull(routingKey, "routingKey");
             if (exchangeType == ExchangeType.FANOUT && isPoisonQueueEnabled()) {
