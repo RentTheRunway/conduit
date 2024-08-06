@@ -11,7 +11,14 @@ public final class RabbitMQContainerFactory {
     private RabbitMQContainerFactory() {}
 
     public static RabbitMQContainer createBrokerWithSingleExchangeAndQueue() {
-        return new RabbitMQContainer("rabbitmq:3-management")
+        return createBrokerWithSingleExchangeAndQueue("rabbitmq:3-management");
+    }
+
+    /**
+     * @param dockerImageName The name of the RabbitMQ Docker image; e.g., {@code rabbitmq:3-management}.
+     */
+    public static RabbitMQContainer createBrokerWithSingleExchangeAndQueue(final String dockerImageName) {
+        return new RabbitMQContainer(dockerImageName)
                 .withReuse(true)
                 .withLogConsumer(new Slf4jLogConsumer(LOGGER))
                 .withVhost("local")
