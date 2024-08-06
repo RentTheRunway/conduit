@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.utility.DockerImageName;
 
 public final class RabbitMQContainerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQContainerFactory.class);
@@ -11,13 +12,16 @@ public final class RabbitMQContainerFactory {
     private RabbitMQContainerFactory() {}
 
     public static RabbitMQContainer createBrokerWithSingleExchangeAndQueue() {
-        return createBrokerWithSingleExchangeAndQueue("rabbitmq:3-management");
+        return createBrokerWithSingleExchangeAndQueue(
+                DockerImageName.parse("rabbitmq:3-management"));
     }
 
     /**
-     * @param dockerImageName The name of the RabbitMQ Docker image; e.g., {@code rabbitmq:3-management}.
+     * @param dockerImageName The name of the RabbitMQ Docker image; e.g., {@code
+     *     rabbitmq:3-management}.
      */
-    public static RabbitMQContainer createBrokerWithSingleExchangeAndQueue(final String dockerImageName) {
+    public static RabbitMQContainer createBrokerWithSingleExchangeAndQueue(
+            final DockerImageName dockerImageName) {
         return new RabbitMQContainer(dockerImageName)
                 .withReuse(true)
                 .withLogConsumer(new Slf4jLogConsumer(LOGGER))
