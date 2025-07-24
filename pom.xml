@@ -8,7 +8,7 @@
     <groupId>io.rtr</groupId>
     <artifactId>conduit-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.49-SNAPSHOT</version>
+    <version>1.49</version>
 
     <modules>
         <module>conduit-bom</module>
@@ -28,7 +28,7 @@
         <connection>scm:git:git@github.com:RentTheRunway/conduit.git</connection>
         <developerConnection>${project.scm.connection}</developerConnection>
         <url>${project.url}</url>
-        <tag>HEAD</tag>
+        <tag>v1.49</tag>
     </scm>
 
     <developers>
