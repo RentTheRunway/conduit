@@ -75,7 +75,7 @@
 
         <fmt-maven-plugin.version>2.27</fmt-maven-plugin.version>
 
-        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
 
         <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
 
