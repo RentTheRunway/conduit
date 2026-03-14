@@ -16,8 +16,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <assertj.version>3.27.6</assertj.version>
-
+        <assertj.version>3.27.7</assertj.version>
+  
         <awaitility.version>4.3.0</awaitility.version>
 
         <hamcrest.version>2.2</hamcrest.version>
