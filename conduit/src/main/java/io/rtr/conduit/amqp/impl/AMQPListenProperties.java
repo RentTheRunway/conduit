@@ -12,21 +12,21 @@ public class AMQPListenProperties extends AMQPCommonListenProperties
     private AMQPConsumerCallback callback;
 
     AMQPListenProperties(
-            AMQPConsumerCallback callback,
-            String exchange,
-            String queue,
-            boolean isAutoDeleteQueue,
-            int threshold,
-            boolean poisonQueueEnabled,
-            boolean purgeOnConnect,
-            int prefetchCount,
-            String poisonPrefix,
-            String dynamicQueueRoutingKey,
-            boolean dynamicQueueCreation,
-            String exchangeType,
-            String routingKey,
-            boolean autoCreateAndBind,
-            boolean exclusive) {
+            final AMQPConsumerCallback callback,
+            final String exchange,
+            final String queue,
+            final boolean isAutoDeleteQueue,
+            final int threshold,
+            final boolean poisonQueueEnabled,
+            final boolean purgeOnConnect,
+            final int prefetchCount,
+            final String poisonPrefix,
+            final String dynamicQueueRoutingKey,
+            final boolean dynamicQueueCreation,
+            final String exchangeType,
+            final String routingKey,
+            final boolean autoCreateAndBind,
+            final boolean exclusive) {
         super(
                 exchange,
                 queue,

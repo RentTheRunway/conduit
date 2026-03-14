@@ -26,31 +26,34 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
             new LinkedHashMap<Long, AMQPMessageBundle>();
 
     AMQPAsyncQueueConsumer(
-            Channel channel,
-            AMQPAsyncConsumerCallback callback,
-            int threshold,
-            String poisonPrefix,
-            boolean poisonQueueEnabled) {
+            final Channel channel,
+            final AMQPAsyncConsumerCallback callback,
+            final int threshold,
+            final String poisonPrefix,
+            final boolean poisonQueueEnabled) {
         super(channel, null, threshold, poisonPrefix, poisonQueueEnabled);
         this.callback = callback;
     }
 
     @Override
-    public void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
+    public void handleShutdownSignal(final String consumerTag, final ShutdownSignalException sig) {
         log.info("Shutdown handler invoked");
         callback.notifyOfShutdown(consumerTag, sig);
     }
 
     @Override
     public void handleDelivery(
-            String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-        AMQPMessageBundle messageBundle =
+            final String consumerTag,
+            final Envelope envelope,
+            final AMQP.BasicProperties properties,
+            final byte[] body) {
+        final AMQPMessageBundle messageBundle =
                 new AMQPMessageBundle(consumerTag, envelope, properties, body);
 
         try {
             unacknowledgedMessages.put(messageBundle.getEnvelope().getDeliveryTag(), messageBundle);
             callback.handle(messageBundle, this);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             // ! Blanket exception handler for notifying, via the log, that the user-supplied
             //  callback let an exception propagate. In such cases, all the listeners are stopped.
             log.error("The user-supplied callback allowed an exception to propagate.");
@@ -60,19 +63,21 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
     }
 
     protected void respond(
-            AMQPMessageBundle messageBundle, ActionResponse actionResponse, boolean multiple) {
+            final AMQPMessageBundle messageBundle,
+            final ActionResponse actionResponse,
+            final boolean multiple) {
         // ! We can't issue any blocking amqp calls in the context of this method, otherwise
         //  channel's internal thread(s) will deadlock. Both, basicAck and basicReject are
         //  asynchronous.
-        Envelope envelope = messageBundle.getEnvelope();
-        Long deliveryTag = envelope.getDeliveryTag();
-        byte[] body = messageBundle.getBody();
-        AMQP.BasicProperties properties = messageBundle.getBasicProperties();
+        final Envelope envelope = messageBundle.getEnvelope();
+        final Long deliveryTag = envelope.getDeliveryTag();
+        final byte[] body = messageBundle.getBody();
+        final AMQP.BasicProperties properties = messageBundle.getBasicProperties();
 
         try {
             switch (actionResponse.getAction()) {
                 case Acknowledge:
-                    ack(deliveryTag, multiple);
+                    this.ack(deliveryTag, multiple);
                     break;
 
                 case RejectAndDiscard:
@@ -82,38 +87,38 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
                     //  the poison queue. Don't bother confirming for two reasons; we don't care,
                     // and
                     //  we can't issue blocking calls here.
-                    publishToPoisonQueue(
+                    this.publishToPoisonQueue(
                             envelope, properties, actionResponse.getReason(), body, multiple);
-                    reject(deliveryTag, multiple);
+                    this.reject(deliveryTag, multiple);
                     break;
 
                 case RejectAndRequeue:
                     log.warn("Received an unknown message, body = " + new String(body));
                     log.warn("\tAdjusting headers for retry.");
 
-                    if (!retry(envelope, properties, body, multiple)) {
-                        publishToPoisonQueue(
+                    if (!this.retry(envelope, properties, body, multiple)) {
+                        this.publishToPoisonQueue(
                                 envelope, properties, actionResponse.getReason(), body, multiple);
                     }
-                    reject(deliveryTag, multiple);
+                    this.reject(deliveryTag, multiple);
                     break;
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             callback.notifyOfActionFailure(e);
         }
     }
 
-    private void removeUnacknowledgedMessages(Long deliveryTag, boolean multiple) {
+    private void removeUnacknowledgedMessages(final Long deliveryTag, final boolean multiple) {
         if (!multiple) {
             unacknowledgedMessages.remove(deliveryTag);
             return;
         }
 
-        Iterator<Entry<Long, AMQPMessageBundle>> messages =
+        final Iterator<Entry<Long, AMQPMessageBundle>> messages =
                 unacknowledgedMessages.entrySet().iterator();
 
         while (messages.hasNext()) {
-            Entry<Long, AMQPMessageBundle> next = messages.next();
+            final Entry<Long, AMQPMessageBundle> next = messages.next();
 
             if (next.getKey() > deliveryTag) {
                 break;
@@ -122,13 +127,13 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
         }
     }
 
-    private void ack(Long deliveryTag, boolean multiple) throws IOException {
-        removeUnacknowledgedMessages(deliveryTag, multiple);
+    private void ack(final Long deliveryTag, final boolean multiple) throws IOException {
+        this.removeUnacknowledgedMessages(deliveryTag, multiple);
         channel.basicAck(deliveryTag, multiple);
     }
 
-    private void reject(long deliveryTag, boolean multiple) throws IOException {
-        removeUnacknowledgedMessages(deliveryTag, multiple);
+    private void reject(final long deliveryTag, final boolean multiple) throws IOException {
+        this.removeUnacknowledgedMessages(deliveryTag, multiple);
         if (multiple) {
             channel.basicNack(deliveryTag, true, false);
         } else {
@@ -142,22 +147,22 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
      * @throws IOException
      */
     private void publishToPoisonQueue(
-            Envelope envelope,
-            AMQP.BasicProperties properties,
-            String reason,
-            byte[] body,
-            boolean multiple)
+            final Envelope envelope,
+            final AMQP.BasicProperties properties,
+            final String reason,
+            final byte[] body,
+            final boolean multiple)
             throws IOException {
         if (!multiple) {
             super.publishToPoisonQueue(envelope, properties, reason, body);
             return;
         }
 
-        Iterator<AMQPMessageBundle> messages = unacknowledgedMessages.values().iterator();
-        long deliveryTag = envelope.getDeliveryTag();
+        final Iterator<AMQPMessageBundle> messages = unacknowledgedMessages.values().iterator();
+        final long deliveryTag = envelope.getDeliveryTag();
 
         while (messages.hasNext()) {
-            AMQPMessageBundle next = messages.next();
+            final AMQPMessageBundle next = messages.next();
 
             if (next.getEnvelope().getDeliveryTag() > deliveryTag) {
                 break;
@@ -174,7 +179,10 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
      * @throws IOException
      */
     private boolean retry(
-            Envelope envelope, AMQP.BasicProperties properties, byte[] body, boolean multiple)
+            final Envelope envelope,
+            final AMQP.BasicProperties properties,
+            final byte[] body,
+            final boolean multiple)
             throws IOException {
         boolean retry = true;
 
@@ -186,17 +194,17 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
             return retry;
         }
 
-        Iterator<AMQPMessageBundle> messages = unacknowledgedMessages.values().iterator();
-        long deliveryTag = envelope.getDeliveryTag();
+        final Iterator<AMQPMessageBundle> messages = unacknowledgedMessages.values().iterator();
+        final long deliveryTag = envelope.getDeliveryTag();
 
         while (messages.hasNext()) {
-            AMQPMessageBundle next = messages.next();
+            final AMQPMessageBundle next = messages.next();
 
             if (next.getEnvelope().getDeliveryTag() > deliveryTag) {
                 break;
             }
 
-            boolean retried =
+            final boolean retried =
                     super.retry(next.getEnvelope(), next.getBasicProperties(), next.getBody());
             retry &= retried;
             if (retried) {
@@ -211,12 +219,14 @@ public class AMQPAsyncQueueConsumer extends AMQPQueueConsumer implements AsyncRe
     }
 
     @Override
-    public void respondMultiple(AMQPMessageBundle messageBundle, ActionResponse actionResponse) {
-        respond(messageBundle, actionResponse, true);
+    public void respondMultiple(
+            final AMQPMessageBundle messageBundle, final ActionResponse actionResponse) {
+        this.respond(messageBundle, actionResponse, true);
     }
 
     @Override
-    public void respondSingle(AMQPMessageBundle messageBundle, ActionResponse actionResponse) {
-        respond(messageBundle, actionResponse, false);
+    public void respondSingle(
+            final AMQPMessageBundle messageBundle, final ActionResponse actionResponse) {
+        this.respond(messageBundle, actionResponse, false);
     }
 }

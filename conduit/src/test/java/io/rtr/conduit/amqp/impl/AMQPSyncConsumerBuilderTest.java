@@ -53,12 +53,12 @@ class AMQPSyncConsumerBuilderTest {
 
     @Test
     void testDefaultDynamic() {
-        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
+        final AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
                 AMQPSyncConsumerBuilder.builder()
                         .exchange("exchange")
                         .dynamicQueueCreation(true)
                         .dynamicQueueRoutingKey("myRouter");
-        AMQPCommonListenProperties commonListenProperties =
+        final AMQPCommonListenProperties commonListenProperties =
                 amqpSyncConsumerBuilder.buildListenProperties();
 
         assertEquals(
@@ -82,9 +82,9 @@ class AMQPSyncConsumerBuilderTest {
 
     @Test
     void testDefaultExplicit() {
-        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
+        final AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
                 AMQPSyncConsumerBuilder.builder().exchange("exchange").queue("queue");
-        AMQPCommonListenProperties commonListenProperties =
+        final AMQPCommonListenProperties commonListenProperties =
                 amqpSyncConsumerBuilder.buildListenProperties();
 
         assertEquals(
@@ -108,14 +108,14 @@ class AMQPSyncConsumerBuilderTest {
 
     @Test
     void testAutoCreateAndBindDefault() {
-        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
+        final AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
                 AMQPSyncConsumerBuilder.builder()
                         .autoCreateAndBind(
                                 "exchange",
                                 AMQPConsumerBuilder.ExchangeType.CONSISTENT_HASH,
                                 "queue",
                                 "routingKey");
-        AMQPCommonListenProperties commonListenProperties =
+        final AMQPCommonListenProperties commonListenProperties =
                 amqpSyncConsumerBuilder.buildListenProperties();
 
         assertFalse(
@@ -126,7 +126,7 @@ class AMQPSyncConsumerBuilderTest {
 
     @Test
     void testAutoCreateAndBindWithAutoDeleteQueue() {
-        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
+        final AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
                 AMQPSyncConsumerBuilder.builder()
                         .autoCreateAndBind(
                                 "exchange",
@@ -134,7 +134,7 @@ class AMQPSyncConsumerBuilderTest {
                                 "queue",
                                 true,
                                 "routingKey");
-        AMQPCommonListenProperties commonListenProperties =
+        final AMQPCommonListenProperties commonListenProperties =
                 amqpSyncConsumerBuilder.buildListenProperties();
 
         assertTrue(
@@ -145,7 +145,7 @@ class AMQPSyncConsumerBuilderTest {
 
     @Test
     void testSettingCredsAndSharedConnectionThrows() {
-        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
+        final AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
                 AMQPSyncConsumerBuilder.builder()
                         .exchange("exchange")
                         .queue("queue")
@@ -157,7 +157,7 @@ class AMQPSyncConsumerBuilderTest {
 
     @Test
     void testSettingVhostAndSharedConnectionThrows() {
-        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
+        final AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
                 AMQPSyncConsumerBuilder.builder()
                         .exchange("exchange")
                         .queue("queue")
@@ -169,7 +169,7 @@ class AMQPSyncConsumerBuilderTest {
 
     @Test
     void testSettingOnlySharedConnectionDoesNotThrow() {
-        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
+        final AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
                 AMQPSyncConsumerBuilder.builder()
                         .exchange("exchange")
                         .queue("queue")
@@ -180,7 +180,7 @@ class AMQPSyncConsumerBuilderTest {
 
     @Test
     void testSettingOnlyCredsAndVhostDoesNotThrow() {
-        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
+        final AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
                 AMQPSyncConsumerBuilder.builder()
                         .exchange("exchange")
                         .queue("queue")
@@ -193,14 +193,14 @@ class AMQPSyncConsumerBuilderTest {
 
     @Test
     void testDefaultConnectionProperties() {
-        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
+        final AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
                 AMQPSyncConsumerBuilder.builder()
                         .exchange("exchange")
                         .queue("queue")
                         .username("bob")
                         .password("bob");
 
-        AMQPConnectionProperties connectionProperties =
+        final AMQPConnectionProperties connectionProperties =
                 amqpSyncConsumerBuilder.buildConnectionProperties();
         assertEquals(
                 5000,
@@ -210,7 +210,7 @@ class AMQPSyncConsumerBuilderTest {
 
     @Test
     void testOverrideConnectionProperties() {
-        AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
+        final AMQPSyncConsumerBuilder amqpSyncConsumerBuilder =
                 AMQPSyncConsumerBuilder.builder()
                         .exchange("exchange")
                         .queue("queue")
@@ -218,7 +218,7 @@ class AMQPSyncConsumerBuilderTest {
                         .password("bob")
                         .networkRecoveryInterval(10000L);
 
-        AMQPConnectionProperties connectionProperties =
+        final AMQPConnectionProperties connectionProperties =
                 amqpSyncConsumerBuilder.buildConnectionProperties();
         assertEquals(
                 10000,

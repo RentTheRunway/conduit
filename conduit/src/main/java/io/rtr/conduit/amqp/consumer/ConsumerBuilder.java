@@ -22,10 +22,12 @@ public abstract class ConsumerBuilder<
             T transport, C connectionProperties, L listenProperties);
 
     public final Consumer build() {
-        validate();
-        LC context =
-                buildListenContext(
-                        buildTransport(), buildConnectionProperties(), buildListenProperties());
+        this.validate();
+        final LC context =
+                this.buildListenContext(
+                        this.buildTransport(),
+                        this.buildConnectionProperties(),
+                        this.buildListenProperties());
         return new Consumer(context);
     }
 }

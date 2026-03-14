@@ -18,22 +18,23 @@ public class AMQPAsyncConsumerBuilder
         super.prefetchCount(100);
     }
 
-    public AMQPAsyncConsumerBuilder callback(AMQPAsyncConsumerCallback callback) {
+    public AMQPAsyncConsumerBuilder callback(final AMQPAsyncConsumerCallback callback) {
         this.callback = callback;
         return this;
     }
 
-    public AMQPAsyncConsumerBuilder metricsCollector(MetricsCollector metricsCollector) {
+    public AMQPAsyncConsumerBuilder metricsCollector(final MetricsCollector metricsCollector) {
         this.metricsCollector = metricsCollector;
         return this;
     }
 
     @Override
     protected AMQPAsyncTransport buildTransport() {
-        if (getSharedConnection() != null) {
-            return new AMQPAsyncTransport(getSharedConnection());
+        if (this.getSharedConnection() != null) {
+            return new AMQPAsyncTransport(this.getSharedConnection());
         } else {
-            return new AMQPAsyncTransport(isSsl(), getHost(), getPort(), metricsCollector);
+            return new AMQPAsyncTransport(
+                    this.isSsl(), this.getHost(), this.getPort(), metricsCollector);
         }
     }
 
@@ -41,27 +42,27 @@ public class AMQPAsyncConsumerBuilder
     protected AMQPAsyncListenProperties buildListenProperties() {
         return new AMQPAsyncListenProperties(
                 callback,
-                getExchange(),
-                getQueue(),
-                isAutoDeleteQueue(),
-                getRetryThreshold(),
-                getPrefetchCount(),
-                isPoisonQueueEnabled(),
-                shouldPurgeOnConnect(),
-                isDynamicQueueCreation(),
-                getPoisonPrefix(),
-                getDynamicQueueRoutingKey(),
-                isAutoCreateAndBind(),
-                getExchangeType(),
-                getRoutingKey(),
-                getExclusive());
+                this.getExchange(),
+                this.getQueue(),
+                this.isAutoDeleteQueue(),
+                this.getRetryThreshold(),
+                this.getPrefetchCount(),
+                this.isPoisonQueueEnabled(),
+                this.shouldPurgeOnConnect(),
+                this.isDynamicQueueCreation(),
+                this.getPoisonPrefix(),
+                this.getDynamicQueueRoutingKey(),
+                this.isAutoCreateAndBind(),
+                this.getExchangeType(),
+                this.getRoutingKey(),
+                this.getExclusive());
     }
 
     @Override
     protected AMQPListenContext buildListenContext(
-            AMQPAsyncTransport transport,
-            AMQPConnectionProperties connectionProperties,
-            AMQPAsyncListenProperties amqpAsyncListenProperties) {
+            final AMQPAsyncTransport transport,
+            final AMQPConnectionProperties connectionProperties,
+            final AMQPAsyncListenProperties amqpAsyncListenProperties) {
         return new AMQPListenContext(transport, connectionProperties, amqpAsyncListenProperties);
     }
 }

@@ -15,7 +15,7 @@ public class LoggingAmqpCallbackHandler implements AMQPConsumerCallback {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggingAmqpCallbackHandler.class);
 
     @Override
-    public ActionResponse handle(AMQPMessageBundle messageBundle) {
+    public ActionResponse handle(final AMQPMessageBundle messageBundle) {
         LOGGER.info(
                 "Received message: tag={}, messageProperties={}, envelope={}, body={}",
                 messageBundle.getConsumerTag(),
@@ -26,12 +26,12 @@ public class LoggingAmqpCallbackHandler implements AMQPConsumerCallback {
     }
 
     @Override
-    public void notifyOfActionFailure(Exception e) {
+    public void notifyOfActionFailure(final Exception e) {
         LOGGER.error("Failed to handle message", e);
     }
 
     @Override
-    public void notifyOfShutdown(String consumerTag, ShutdownSignalException sig) {
+    public void notifyOfShutdown(final String consumerTag, final ShutdownSignalException sig) {
         LOGGER.warn("Connection shutting down, consumerTag={}", consumerTag, sig);
     }
 }

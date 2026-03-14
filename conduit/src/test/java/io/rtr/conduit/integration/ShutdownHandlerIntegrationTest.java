@@ -42,12 +42,12 @@ class ShutdownHandlerIntegrationTest {
 
     @Test
     void testReconnectAfterBrokerShutdown() throws IOException {
-        ToxiproxyContainer.ContainerProxy proxyInterface =
+        final ToxiproxyContainer.ContainerProxy proxyInterface =
                 TOXI_PROXY.getProxy(RABBIT_MQ_CONTAINER, 5672);
 
-        RecordingAmqpCallbackHandler callbackHandler = new RecordingAmqpCallbackHandler();
-        Publisher publisher;
-        Consumer consumer;
+        final RecordingAmqpCallbackHandler callbackHandler = new RecordingAmqpCallbackHandler();
+        final Publisher publisher;
+        final Consumer consumer;
 
         // Simulating a fresh existing container ready for us to interact with
         publisher =
@@ -69,11 +69,11 @@ class ShutdownHandlerIntegrationTest {
         // We should react here and notify status of the connection to the broker, have
         // auto-connection try
         proxyInterface.setConnectionCut(true);
-        awaitDisconnection(publisher, consumer);
+        this.awaitDisconnection(publisher, consumer);
 
         // Simulating RabbitMQ restarting and coming back online, we should auto-reconnect
         proxyInterface.setConnectionCut(false);
-        awaitReconnection(publisher, consumer);
+        this.awaitReconnection(publisher, consumer);
         IntegrationTestHelpers.publishMessage(publisher, new AMQPMessageBundle("Hello World!"));
 
         // Message publication should still work after reconnecting
@@ -96,7 +96,7 @@ class ShutdownHandlerIntegrationTest {
         publisher.close();
     }
 
-    private void awaitDisconnection(Publisher publisher, Consumer consumer) {
+    private void awaitDisconnection(final Publisher publisher, final Consumer consumer) {
         await().alias("Checking for publisher disconnection")
                 .timeout(10, TimeUnit.SECONDS)
                 .pollInterval(100, TimeUnit.MILLISECONDS)
@@ -109,7 +109,7 @@ class ShutdownHandlerIntegrationTest {
                 .until(consumer::isConnected, value -> !value);
     }
 
-    private void awaitReconnection(Publisher publisher, Consumer consumer) {
+    private void awaitReconnection(final Publisher publisher, final Consumer consumer) {
         await().alias("Checking for publisher re-connection")
                 .timeout(10, TimeUnit.SECONDS)
                 .pollInterval(100, TimeUnit.MILLISECONDS)

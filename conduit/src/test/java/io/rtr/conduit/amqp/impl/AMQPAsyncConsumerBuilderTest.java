@@ -51,10 +51,10 @@ class AMQPAsyncConsumerBuilderTest {
 
     @Test
     void testValidationAutoCreateAndBind() {
-        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
+        final AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
                 AMQPAsyncConsumerBuilder.builder()
                         .autoCreateAndBind("exchange", DIRECT, "queue", "routingKey");
-        AMQPCommonListenProperties commonListenProperties =
+        final AMQPCommonListenProperties commonListenProperties =
                 amqpAsyncConsumerBuilder.buildListenProperties();
 
         // check that the properties got set correctly
@@ -74,11 +74,11 @@ class AMQPAsyncConsumerBuilderTest {
 
     @Test
     void testAutoCreateAndBindWithAutoDeleteQueue() {
-        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
+        final AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
                 AMQPAsyncConsumerBuilder.builder()
                         .autoCreateAndBind(
                                 "exchange", CONSISTENT_HASH, "queue", true, "routingKey");
-        AMQPCommonListenProperties commonListenProperties =
+        final AMQPCommonListenProperties commonListenProperties =
                 amqpAsyncConsumerBuilder.buildListenProperties();
 
         // check that the properties got set correctly
@@ -98,11 +98,11 @@ class AMQPAsyncConsumerBuilderTest {
 
     @Test
     void testValidationAutoCreateAndBindWithNullRoutingKey() {
-        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
+        final AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
                 AMQPAsyncConsumerBuilder.builder()
                         .autoCreateAndBind("exchange", DIRECT, "queue", null);
 
-        AMQPCommonListenProperties commonListenProperties =
+        final AMQPCommonListenProperties commonListenProperties =
                 amqpAsyncConsumerBuilder.buildListenProperties();
         Assertions.assertNotNull(commonListenProperties.getRoutingKey());
         assertEquals("", commonListenProperties.getRoutingKey());
@@ -140,12 +140,12 @@ class AMQPAsyncConsumerBuilderTest {
 
     @Test
     void testDefaultDynamic() {
-        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
+        final AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
                 AMQPAsyncConsumerBuilder.builder()
                         .exchange("exchange")
                         .dynamicQueueCreation(true)
                         .dynamicQueueRoutingKey("myRouter");
-        AMQPCommonListenProperties commonListenProperties =
+        final AMQPCommonListenProperties commonListenProperties =
                 amqpAsyncConsumerBuilder.buildListenProperties();
 
         assertEquals(
@@ -166,9 +166,9 @@ class AMQPAsyncConsumerBuilderTest {
 
     @Test
     void testDefaultExplicit() {
-        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
+        final AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
                 AMQPAsyncConsumerBuilder.builder().exchange("exchange").queue("queue");
-        AMQPCommonListenProperties commonListenProperties =
+        final AMQPCommonListenProperties commonListenProperties =
                 amqpAsyncConsumerBuilder.buildListenProperties();
 
         assertEquals(
@@ -189,7 +189,7 @@ class AMQPAsyncConsumerBuilderTest {
 
     @Test
     void testSettingCredsAndSharedConnectionThrows() {
-        AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
+        final AMQPAsyncConsumerBuilder amqpAsyncConsumerBuilder =
                 AMQPAsyncConsumerBuilder.builder()
                         .exchange("exchange")
                         .queue("queue")

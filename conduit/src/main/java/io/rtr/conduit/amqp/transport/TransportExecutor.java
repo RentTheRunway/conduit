@@ -12,9 +12,9 @@ public class TransportExecutor extends ThreadPoolExecutor {
     private static final int DEFAULT_NUM_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 
     private static ThreadFactory buildCountedDaemonThreadFactory() {
-        AtomicInteger threadCount = new AtomicInteger(0);
+        final AtomicInteger threadCount = new AtomicInteger(0);
         return run -> {
-            Thread thread = new Thread(run);
+            final Thread thread = new Thread(run);
             thread.setDaemon(true);
             thread.setName(String.format("AMQPConnection-%s", threadCount.getAndIncrement()));
             return thread;
@@ -31,7 +31,7 @@ public class TransportExecutor extends ThreadPoolExecutor {
      * @param nThreads
      * @param threadFactory
      */
-    public TransportExecutor(int nThreads, ThreadFactory threadFactory) {
+    public TransportExecutor(final int nThreads, final ThreadFactory threadFactory) {
         super(
                 nThreads,
                 nThreads,

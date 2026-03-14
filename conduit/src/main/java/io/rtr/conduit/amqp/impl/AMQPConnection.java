@@ -29,17 +29,21 @@ public class AMQPConnection {
     private final Supplier<TransportExecutor> executorFactory;
     private static final Logger LOGGER = LoggerFactory.getLogger(AMQPConnection.class);
 
-    public AMQPConnection(boolean ssl, String host, int port, MetricsCollector metricsCollector) {
+    public AMQPConnection(
+            final boolean ssl,
+            final String host,
+            final int port,
+            final MetricsCollector metricsCollector) {
         this(new ConnectionFactory(), TransportExecutor::new, ssl, host, port, metricsCollector);
     }
 
     public AMQPConnection(
-            ConnectionFactory factory,
-            Supplier<TransportExecutor> executorFactory,
-            boolean ssl,
-            String host,
-            int port,
-            MetricsCollector metricsCollector) {
+            final ConnectionFactory factory,
+            final Supplier<TransportExecutor> executorFactory,
+            final boolean ssl,
+            final String host,
+            final int port,
+            final MetricsCollector metricsCollector) {
         this.connectionFactory = factory;
         this.executorFactory = executorFactory;
         if (ssl) {
@@ -58,35 +62,35 @@ public class AMQPConnection {
         return this.connection != null && this.connection.isOpen();
     }
 
-    public synchronized void connect(AMQPConnectionProperties properties)
+    public synchronized void connect(final AMQPConnectionProperties properties)
             throws IOException, TimeoutException {
-        if (isConnected()) {
+        if (this.isConnected()) {
             return;
         }
-        configureConnectionFactory(properties);
-        initializeExecutor();
+        this.configureConnectionFactory(properties);
+        this.initializeExecutor();
         connection = connectionFactory.newConnection(executor);
     }
 
     public synchronized void disconnect() throws IOException {
         // ! We are going to assume that closing an already closed
         //  connection is considered success.
-        if (isConnected()) {
+        if (this.isConnected()) {
             try {
                 connection.close(connectionFactory.getConnectionTimeout());
                 connection = null;
-            } catch (AlreadyClosedException ignored) {
+            } catch (final AlreadyClosedException ignored) {
             }
         }
-        stopListening();
+        this.stopListening();
     }
 
     public Channel createChannel() throws IOException {
-        if (!isConnected()) {
+        if (!this.isConnected()) {
             throw new ConduitConnectionStateException(
                     "Attempted to create channel whilst disconnected.");
         }
-        Channel channel = connection.createChannel();
+        final Channel channel = connection.createChannel();
         channel.basicQos(1);
         return channel;
     }
@@ -98,15 +102,15 @@ public class AMQPConnection {
         }
     }
 
-    public boolean waitToStopListening(Duration waitFor) throws InterruptedException {
+    public boolean waitToStopListening(final Duration waitFor) throws InterruptedException {
         if (executor != null) {
             return executor.awaitTermination(waitFor.toMillis(), TimeUnit.MILLISECONDS);
         }
         return true;
     }
 
-    public synchronized void addRecoveryListener(RecoveryListener recoveryListener) {
-        if (!isConnected()) {
+    public synchronized void addRecoveryListener(final RecoveryListener recoveryListener) {
+        if (!this.isConnected()) {
             throw new ConduitConnectionStateException(
                     "Attempted to add recovery listener whilst disconnected.");
         }
@@ -118,8 +122,8 @@ public class AMQPConnection {
         }
     }
 
-    public synchronized void removeRecoveryListener(RecoveryListener recoveryListener) {
-        if (!isConnected()) {
+    public synchronized void removeRecoveryListener(final RecoveryListener recoveryListener) {
+        if (!this.isConnected()) {
             throw new ConduitConnectionStateException(
                     "Attempted to remove recovery listener whilst disconnected.");
         }
@@ -132,11 +136,11 @@ public class AMQPConnection {
     }
 
     private void initializeExecutor() {
-        stopListening();
+        this.stopListening();
         executor = executorFactory.get();
     }
 
-    private void configureConnectionFactory(AMQPConnectionProperties properties) {
+    private void configureConnectionFactory(final AMQPConnectionProperties properties) {
         connectionFactory.setUsername(properties.getUsername());
         connectionFactory.setPassword(properties.getPassword());
         connectionFactory.setVirtualHost(properties.getVirtualHost());

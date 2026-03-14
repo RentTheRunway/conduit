@@ -21,7 +21,7 @@ public class Publisher implements AutoCloseable {
     private TransportPublishContext transportContext;
 
     // ! Public interface.
-    Publisher(TransportPublishContext transportContext) {
+    Publisher(final TransportPublishContext transportContext) {
         this.transportContext = transportContext;
     }
 
@@ -44,9 +44,9 @@ public class Publisher implements AutoCloseable {
      *
      * @param messageBundle Message to send
      */
-    public boolean publish(TransportMessageBundle messageBundle)
+    public boolean publish(final TransportMessageBundle messageBundle)
             throws IOException, TimeoutException, InterruptedException {
-        return publish(messageBundle, null);
+        return this.publish(messageBundle, null);
     }
 
     /**
@@ -63,7 +63,7 @@ public class Publisher implements AutoCloseable {
      * @throws InterruptedException
      */
     public boolean publish(
-            TransportMessageBundle messageBundle,
+            final TransportMessageBundle messageBundle,
             TransportPublishProperties overridePublishProperties)
             throws IOException, TimeoutException, InterruptedException {
         if (overridePublishProperties == null) {
@@ -72,7 +72,7 @@ public class Publisher implements AutoCloseable {
         return transportContext.getTransport().publish(messageBundle, overridePublishProperties);
     }
 
-    public <E> boolean transactionalPublish(Collection<E> messageBundles)
+    public <E> boolean transactionalPublish(final Collection<E> messageBundles)
             throws IOException, TimeoutException, InterruptedException {
         return transportContext
                 .getTransport()

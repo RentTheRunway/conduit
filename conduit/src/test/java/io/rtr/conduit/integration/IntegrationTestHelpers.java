@@ -23,7 +23,7 @@ public final class IntegrationTestHelpers {
 
     private IntegrationTestHelpers() {}
 
-    public static void connectResources(Publisher publisher, Consumer consumer) {
+    public static void connectResources(final Publisher publisher, final Consumer consumer) {
         try {
             publisher.connect();
             consumer.connect();
@@ -31,24 +31,24 @@ public final class IntegrationTestHelpers {
 
             assertTrue(publisher.isConnected());
             assertTrue(consumer.isConnected());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new AssertionError("Publishing threw an IOException", e);
         }
     }
 
-    public static void publishMessage(Publisher publisher, AMQPMessageBundle message) {
+    public static void publishMessage(final Publisher publisher, final AMQPMessageBundle message) {
         try {
             publisher.publish(message);
-        } catch (IOException | TimeoutException | InterruptedException e) {
+        } catch (final IOException | TimeoutException | InterruptedException e) {
             throw new AssertionError("Publishing threw an exception", e);
         }
     }
 
-    public static AMQPConnection buildConnection(RabbitMQContainer rabbitMQContainer) {
-        AMQPConnection conn =
+    public static AMQPConnection buildConnection(final RabbitMQContainer rabbitMQContainer) {
+        final AMQPConnection conn =
                 new AMQPConnection(
                         false, rabbitMQContainer.getHost(), rabbitMQContainer.getAmqpPort(), null);
-        AMQPConnectionProperties props =
+        final AMQPConnectionProperties props =
                 AMQPConnectionProperties.builder()
                         .username(rabbitMQContainer.getAdminUsername())
                         .password(rabbitMQContainer.getAdminPassword())
@@ -57,14 +57,14 @@ public final class IntegrationTestHelpers {
                         .build();
         try {
             conn.connect(props);
-        } catch (IOException | TimeoutException e) {
+        } catch (final IOException | TimeoutException e) {
             throw new RuntimeException(e);
         }
         return conn;
     }
 
     public static Consumer buildConsumer(
-            RabbitMQContainer rabbitMQContainer, AMQPConsumerCallback callback) {
+            final RabbitMQContainer rabbitMQContainer, final AMQPConsumerCallback callback) {
         return buildConsumer(
                 rabbitMQContainer.getHost(),
                 rabbitMQContainer.getAmqpPort(),
@@ -74,11 +74,11 @@ public final class IntegrationTestHelpers {
     }
 
     public static Consumer buildConsumer(
-            String host,
-            int port,
-            String username,
-            String password,
-            AMQPConsumerCallback callback) {
+            final String host,
+            final int port,
+            final String username,
+            final String password,
+            final AMQPConsumerCallback callback) {
         return AMQPConsumerBuilder.synchronous()
                 .ssl(false)
                 .host(host)
@@ -96,7 +96,7 @@ public final class IntegrationTestHelpers {
     }
 
     public static Consumer buildConsumerWithSharedConnection(
-            AMQPConnection connection, AMQPConsumerCallback callback) {
+            final AMQPConnection connection, final AMQPConsumerCallback callback) {
         return AMQPConsumerBuilder.synchronous()
                 .exchange(EXCHANGE)
                 .autoCreateAndBind(
@@ -108,7 +108,7 @@ public final class IntegrationTestHelpers {
     }
 
     public static Consumer buildConsumerWithAutoDeleteQueue(
-            RabbitMQContainer rabbitMQContainer, AMQPConsumerCallback callback) {
+            final RabbitMQContainer rabbitMQContainer, final AMQPConsumerCallback callback) {
         return AMQPConsumerBuilder.synchronous()
                 .ssl(false)
                 .host(rabbitMQContainer.getHost())
@@ -127,7 +127,7 @@ public final class IntegrationTestHelpers {
                 .build();
     }
 
-    public static Publisher buildPublisher(RabbitMQContainer rabbitMQContainer) {
+    public static Publisher buildPublisher(final RabbitMQContainer rabbitMQContainer) {
         return buildPublisher(
                 rabbitMQContainer.getHost(),
                 rabbitMQContainer.getAmqpPort(),
@@ -136,7 +136,7 @@ public final class IntegrationTestHelpers {
     }
 
     public static Publisher buildPublisher(
-            String host, int port, String username, String password) {
+            final String host, final int port, final String username, final String password) {
         return AMQPPublisherBuilder.builder()
                 .ssl(false)
                 .host(host)
@@ -151,7 +151,7 @@ public final class IntegrationTestHelpers {
                 .build();
     }
 
-    public static Publisher buildPublisherWithSharedConnection(AMQPConnection connection) {
+    public static Publisher buildPublisherWithSharedConnection(final AMQPConnection connection) {
         return AMQPPublisherBuilder.builder()
                 .exchange(EXCHANGE)
                 .routingKey(ROUTING_KEY)

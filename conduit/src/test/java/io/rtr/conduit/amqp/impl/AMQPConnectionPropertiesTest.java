@@ -9,7 +9,7 @@ import java.time.Duration;
 class AMQPConnectionPropertiesTest {
     @Test
     void testValidateBuilder() {
-        AMQPConnectionProperties properties =
+        final AMQPConnectionProperties properties =
                 AMQPConnectionProperties.builder()
                         .username("Anna")
                         .password("Anna's password")
@@ -30,7 +30,7 @@ class AMQPConnectionPropertiesTest {
 
     @Test
     void testDefaultNetworkRecoveryInterval() {
-        AMQPConnectionProperties properties =
+        final AMQPConnectionProperties properties =
                 AMQPConnectionProperties.builder()
                         .username("Anna")
                         .password("Anna's password")

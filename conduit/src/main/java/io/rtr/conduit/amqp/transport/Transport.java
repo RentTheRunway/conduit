@@ -10,45 +10,45 @@ public abstract class Transport {
     // ! Establishes a connection to either an intermediary or the other
     //  end point. In the case of AMQP, this method is used to connect
     //  to the broker.
-    public final void connect(TransportConnectionProperties properties) throws IOException {
-        connectImpl(properties);
+    public final void connect(final TransportConnectionProperties properties) throws IOException {
+        this.connectImpl(properties);
     }
 
     public boolean isConnected() {
-        return isConnectedImpl();
+        return this.isConnectedImpl();
     }
 
     // ! Closes the connection.
     public final void close() throws IOException {
-        closeImpl();
+        this.closeImpl();
     }
 
     // ! Starts the asynchronous delivery mechanism.
-    public final void listen(TransportListenProperties properties) throws IOException {
-        listenImpl(properties);
+    public final void listen(final TransportListenProperties properties) throws IOException {
+        this.listenImpl(properties);
     }
 
     // ! Stops listening for incoming messages.
     public final void stop() throws IOException {
-        stopImpl();
+        this.stopImpl();
     }
 
     // Is the listener thread pool still doing work? (stop is not synchronous)
-    public final boolean isStopped(int maxWaitMilliseconds) throws InterruptedException {
-        return isStoppedImpl(maxWaitMilliseconds);
+    public final boolean isStopped(final int maxWaitMilliseconds) throws InterruptedException {
+        return this.isStoppedImpl(maxWaitMilliseconds);
     }
 
     // ! Publish a message to the other endpoint.
     public final boolean publish(
-            TransportMessageBundle messageBundle, TransportPublishProperties properties)
+            final TransportMessageBundle messageBundle, final TransportPublishProperties properties)
             throws IOException, TimeoutException, InterruptedException {
-        return publishImpl(messageBundle, properties);
+        return this.publishImpl(messageBundle, properties);
     }
 
     public final <E> boolean transactionalPublish(
-            Collection<E> messageBundles, TransportPublishProperties properties)
+            final Collection<E> messageBundles, final TransportPublishProperties properties)
             throws IOException, TimeoutException, InterruptedException {
-        return transactionalPublishImpl(messageBundles, properties);
+        return this.transactionalPublishImpl(messageBundles, properties);
     }
 
     // ! Implementation
@@ -60,20 +60,20 @@ public abstract class Transport {
 
     protected abstract void closeImpl() throws IOException;
 
-    protected void listenImpl(TransportListenProperties properties) throws IOException {}
+    protected void listenImpl(final TransportListenProperties properties) throws IOException {}
 
     protected void stopImpl() throws IOException {}
 
     protected abstract boolean isStoppedImpl(int waitMillSeconds) throws InterruptedException;
 
     protected boolean publishImpl(
-            TransportMessageBundle messageBundle, TransportPublishProperties properties)
+            final TransportMessageBundle messageBundle, final TransportPublishProperties properties)
             throws IOException, TimeoutException, InterruptedException {
         return false;
     }
 
     protected <E> boolean transactionalPublishImpl(
-            Collection<E> messageBundles, TransportPublishProperties properties)
+            final Collection<E> messageBundles, final TransportPublishProperties properties)
             throws IOException, TimeoutException, InterruptedException {
         return false;
     }
