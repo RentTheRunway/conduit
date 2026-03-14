@@ -62,7 +62,7 @@ public class AMQPPublishProperties implements TransportPublishProperties {
         }
 
         public Builder of(final AMQPPublishProperties base) {
-            return exchange(base.getExchange())
+            return this.exchange(base.getExchange())
                     .routingKey(base.getRoutingKey())
                     .timeout(base.getTimeout())
                     .confirmEnabled(base.isConfirmEnabled());

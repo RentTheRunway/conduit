@@ -23,10 +23,12 @@ public abstract class PublisherBuilder<
             T transport, C connectionProperties, P publishProperties);
 
     public final Publisher build() {
-        validate();
-        PC context =
-                buildPublishContext(
-                        buildTransport(), buildConnectionProperties(), buildPublishProperties());
+        this.validate();
+        final PC context =
+                this.buildPublishContext(
+                        this.buildTransport(),
+                        this.buildConnectionProperties(),
+                        this.buildPublishProperties());
         return new Publisher(context);
     }
 }

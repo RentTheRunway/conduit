@@ -41,7 +41,7 @@ final Consumer consumer = new Consumer(new AMQPListenContext(
 
 ## What versions of Java are supported?
 
-Java 8 and higher are supported. The build uses Java 21 and targets 8.
+Java 8 and higher are supported. The build uses Java 25 and targets 8.
 
 ## Release process
 

@@ -14,33 +14,33 @@ public class Consumer implements AutoCloseable {
 
     // ! Public interface.
 
-    Consumer(TransportListenContext transportContext) {
+    Consumer(final TransportListenContext transportContext) {
         this.transportContext = transportContext;
     }
 
     public void connect() throws IOException {
-        getTransport().connect(transportContext.getConnectionProperties());
+        this.getTransport().connect(transportContext.getConnectionProperties());
     }
 
     public boolean isConnected() {
-        return getTransport().isConnected();
+        return this.getTransport().isConnected();
     }
 
     @Override
     public void close() throws IOException {
-        getTransport().close();
+        this.getTransport().close();
     }
 
     public void listen() throws IOException {
-        getTransport().listen(transportContext.getListenProperties());
+        this.getTransport().listen(transportContext.getListenProperties());
     }
 
     public void stop() throws IOException {
-        getTransport().stop();
+        this.getTransport().stop();
     }
 
-    public boolean isStopped(int maxWaitMilliseconds) throws InterruptedException {
-        return getTransport().isStopped(maxWaitMilliseconds);
+    public boolean isStopped(final int maxWaitMilliseconds) throws InterruptedException {
+        return this.getTransport().isStopped(maxWaitMilliseconds);
     }
 
     private Transport getTransport() {
