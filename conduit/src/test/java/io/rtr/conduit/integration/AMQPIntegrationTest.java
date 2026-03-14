@@ -29,9 +29,9 @@ class AMQPIntegrationTest {
 
     @Test
     void testSslAmqpTransport() {
-        AMQPMessageBundle message = new AMQPMessageBundle("a message");
-        Publisher publisher = IntegrationTestHelpers.buildPublisher(RABBITMQ_CONTAINER);
-        Consumer consumer =
+        final AMQPMessageBundle message = new AMQPMessageBundle("a message");
+        final Publisher publisher = IntegrationTestHelpers.buildPublisher(RABBITMQ_CONTAINER);
+        final Consumer consumer =
                 IntegrationTestHelpers.buildConsumer(
                         RABBITMQ_CONTAINER, new LoggingAmqpCallbackHandler());
         IntegrationTestHelpers.connectResources(publisher, consumer);
@@ -39,24 +39,25 @@ class AMQPIntegrationTest {
 
         try {
             consumer.close();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             fail("Should not throw error when closing consumer", e);
         }
     }
 
     @Test
     void testAmqpTransportWithSharedConnection() throws IOException {
-        AMQPMessageBundle message = new AMQPMessageBundle("a message");
-        AMQPConnection connection = IntegrationTestHelpers.buildConnection(RABBITMQ_CONTAINER);
+        final AMQPMessageBundle message = new AMQPMessageBundle("a message");
+        final AMQPConnection connection =
+                IntegrationTestHelpers.buildConnection(RABBITMQ_CONTAINER);
 
-        try (Consumer consumer =
+        try (final Consumer consumer =
                 IntegrationTestHelpers.buildConsumerWithSharedConnection(
                         connection, new LoggingAmqpCallbackHandler())) {
-            Publisher publisher =
+            final Publisher publisher =
                     IntegrationTestHelpers.buildPublisherWithSharedConnection(connection);
             IntegrationTestHelpers.connectResources(publisher, consumer);
             IntegrationTestHelpers.publishMessage(publisher, message);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             fail("Could not connect consumer to RabbitMQ broker", e);
         } finally {
             connection.disconnect();
@@ -65,17 +66,18 @@ class AMQPIntegrationTest {
 
     @Test
     void testManualReconnectAfterManualClose() {
-        AMQPConsumerCallback callback = mock(AMQPConsumerCallback.class);
-        AMQPMessageBundle message = new AMQPMessageBundle("a message");
+        final AMQPConsumerCallback callback = mock(AMQPConsumerCallback.class);
+        final AMQPMessageBundle message = new AMQPMessageBundle("a message");
 
-        Publisher publisher = IntegrationTestHelpers.buildPublisher(RABBITMQ_CONTAINER);
-        Consumer consumer = IntegrationTestHelpers.buildConsumer(RABBITMQ_CONTAINER, callback);
+        final Publisher publisher = IntegrationTestHelpers.buildPublisher(RABBITMQ_CONTAINER);
+        final Consumer consumer =
+                IntegrationTestHelpers.buildConsumer(RABBITMQ_CONTAINER, callback);
         IntegrationTestHelpers.connectResources(publisher, consumer);
 
         try {
             publisher.close();
             consumer.close();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             fail("Error disconnecting publisher or consumer", e);
         }
 
@@ -90,26 +92,27 @@ class AMQPIntegrationTest {
         try {
             consumer.close();
             publisher.close();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             fail("Should not fail to close consumer/publisher at end of test", e);
         }
     }
 
     @Test
     void testAmqpTransportWithAutoDeleteQueue() throws IOException {
-        AMQPConsumerCallback callback = mock(AMQPConsumerCallback.class);
-        AMQPMessageBundle message = new AMQPMessageBundle("a message");
-        AMQPConnection connection = IntegrationTestHelpers.buildConnection(RABBITMQ_CONTAINER);
+        final AMQPConsumerCallback callback = mock(AMQPConsumerCallback.class);
+        final AMQPMessageBundle message = new AMQPMessageBundle("a message");
+        final AMQPConnection connection =
+                IntegrationTestHelpers.buildConnection(RABBITMQ_CONTAINER);
 
-        try (Consumer consumer =
+        try (final Consumer consumer =
                 IntegrationTestHelpers.buildConsumerWithAutoDeleteQueue(
                         RABBITMQ_CONTAINER, callback)) {
-            Publisher publisher = IntegrationTestHelpers.buildPublisher(RABBITMQ_CONTAINER);
+            final Publisher publisher = IntegrationTestHelpers.buildPublisher(RABBITMQ_CONTAINER);
             IntegrationTestHelpers.connectResources(publisher, consumer);
             IntegrationTestHelpers.publishMessage(publisher, message);
 
             Mockito.verify(callback, timeout(500).times(1)).handle(any());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             fail("Could not connect consumer to RabbitMQ broker", e);
         } finally {
             connection.disconnect();

@@ -6,21 +6,21 @@ public class AMQPAsyncListenProperties extends AMQPCommonListenProperties {
     private AMQPAsyncConsumerCallback callback;
 
     AMQPAsyncListenProperties(
-            AMQPAsyncConsumerCallback callback,
-            String exchange,
-            String queue,
-            boolean isAutoDeleteQueue,
-            int threshold,
-            int prefetchCount,
-            boolean poisonQueueEnabled,
-            boolean purgeOnConnect,
-            boolean dynamicQueueCreation,
-            String poisonPrefix,
-            String dynamicQueueRoutingKey,
-            boolean autoCreateAndBind,
-            String exchangeType,
-            String routingKey,
-            boolean exclusive) {
+            final AMQPAsyncConsumerCallback callback,
+            final String exchange,
+            final String queue,
+            final boolean isAutoDeleteQueue,
+            final int threshold,
+            final int prefetchCount,
+            final boolean poisonQueueEnabled,
+            final boolean purgeOnConnect,
+            final boolean dynamicQueueCreation,
+            final String poisonPrefix,
+            final String dynamicQueueRoutingKey,
+            final boolean autoCreateAndBind,
+            final String exchangeType,
+            final String routingKey,
+            final boolean exclusive) {
         super(
                 exchange,
                 queue,

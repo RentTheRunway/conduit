@@ -32,37 +32,37 @@ public class AMQPPublisherBuilder
         return new AMQPPublisherBuilder();
     }
 
-    public AMQPPublisherBuilder username(String username) {
+    public AMQPPublisherBuilder username(final String username) {
         this.username = username;
         return this;
     }
 
-    public AMQPPublisherBuilder password(String password) {
+    public AMQPPublisherBuilder password(final String password) {
         this.password = password;
         return this;
     }
 
-    public AMQPPublisherBuilder virtualHost(String virtualHost) {
+    public AMQPPublisherBuilder virtualHost(final String virtualHost) {
         this.virtualHost = virtualHost;
         return this;
     }
 
-    public AMQPPublisherBuilder ssl(boolean ssl) {
+    public AMQPPublisherBuilder ssl(final boolean ssl) {
         this.ssl = ssl;
         return this;
     }
 
-    public AMQPPublisherBuilder host(String host) {
+    public AMQPPublisherBuilder host(final String host) {
         this.host = host;
         return this;
     }
 
-    public AMQPPublisherBuilder port(int port) {
+    public AMQPPublisherBuilder port(final int port) {
         this.port = port;
         return this;
     }
 
-    public AMQPPublisherBuilder sharedConnection(AMQPConnection connection) {
+    public AMQPPublisherBuilder sharedConnection(final AMQPConnection connection) {
         sharedConnection = connection;
         return this;
     }
@@ -71,50 +71,50 @@ public class AMQPPublisherBuilder
         return sharedConnection;
     }
 
-    public AMQPPublisherBuilder publishTimeout(int timeout) {
+    public AMQPPublisherBuilder publishTimeout(final int timeout) {
         this.publishTimeout = timeout;
         return this;
     }
 
-    public AMQPPublisherBuilder connectionTimeout(int connectionTimeout) {
+    public AMQPPublisherBuilder connectionTimeout(final int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
         return this;
     }
 
-    public AMQPPublisherBuilder heartbeatInterval(int heartbeatInterval) {
+    public AMQPPublisherBuilder heartbeatInterval(final int heartbeatInterval) {
         this.heartbeatInterval = heartbeatInterval;
         return this;
     }
 
-    public AMQPPublisherBuilder automaticRecoveryEnabled(boolean automaticRecoveryEnabled) {
+    public AMQPPublisherBuilder automaticRecoveryEnabled(final boolean automaticRecoveryEnabled) {
         this.automaticRecoveryEnabled = automaticRecoveryEnabled;
         return this;
     }
 
-    public AMQPPublisherBuilder exchange(String exchange) {
+    public AMQPPublisherBuilder exchange(final String exchange) {
         this.exchange = exchange;
         return this;
     }
 
-    public AMQPPublisherBuilder routingKey(String routingKey) {
+    public AMQPPublisherBuilder routingKey(final String routingKey) {
         this.routingKey = routingKey;
         return this;
     }
 
-    public AMQPPublisherBuilder confirmEnabled(boolean confirmEnabled) {
+    public AMQPPublisherBuilder confirmEnabled(final boolean confirmEnabled) {
         this.confirmEnabled = confirmEnabled;
         return this;
     }
 
-    public AMQPPublisherBuilder metricsCollector(MetricsCollector metricsCollector) {
+    public AMQPPublisherBuilder metricsCollector(final MetricsCollector metricsCollector) {
         this.metricsCollector = metricsCollector;
         return this;
     }
 
     @Override
     protected AMQPTransport buildTransport() {
-        if (getSharedConnection() != null) {
-            return new AMQPTransport(getSharedConnection());
+        if (this.getSharedConnection() != null) {
+            return new AMQPTransport(this.getSharedConnection());
         } else {
             return new AMQPTransport(ssl, host, port, metricsCollector);
         }
@@ -143,15 +143,15 @@ public class AMQPPublisherBuilder
 
     @Override
     protected AMQPPublishContext buildPublishContext(
-            AMQPTransport transport,
-            AMQPConnectionProperties connectionProperties,
-            AMQPPublishProperties publishProperties) {
+            final AMQPTransport transport,
+            final AMQPConnectionProperties connectionProperties,
+            final AMQPPublishProperties publishProperties) {
         return new AMQPPublishContext(transport, connectionProperties, publishProperties);
     }
 
     @Override
     protected void validate() {
-        assertNotNull(exchange, "exchange");
-        assertNotNull(routingKey, "routingKey");
+        this.assertNotNull(exchange, "exchange");
+        this.assertNotNull(routingKey, "routingKey");
     }
 }

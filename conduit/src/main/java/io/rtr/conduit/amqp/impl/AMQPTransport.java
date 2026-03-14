@@ -32,18 +32,18 @@ public class AMQPTransport extends AbstractAMQPTransport {
         CompletableFuture<Void> queueCleanupJob;
 
         @Override
-        public void shutdownCompleted(ShutdownSignalException e) {
+        public void shutdownCompleted(final ShutdownSignalException e) {
             // Shutdown handlers run directly in the AMQP Connection's worker loop.
             // As such, trying to initiate new AMQP commands from within it creates a deadlock.
             queueCleanupJob =
                     CompletableFuture.runAsync(
                             () -> {
                                 if (dynamicQueue != null) {
-                                    deleteQueueOnSeparateChannel(dynamicQueue);
+                                    this.deleteQueueOnSeparateChannel(dynamicQueue);
                                     LOGGER.debug("Deleted dynamic queue '{}'.", dynamicQueue);
                                 }
                                 if (dynamicPoisonQueueInUse) {
-                                    deleteQueueOnSeparateChannel(POISON + "." + dynamicQueue);
+                                    this.deleteQueueOnSeparateChannel(POISON + "." + dynamicQueue);
                                     LOGGER.debug(
                                             "Deleted poison message queue for dynamic queue '{}'.",
                                             dynamicQueue);
@@ -51,10 +51,10 @@ public class AMQPTransport extends AbstractAMQPTransport {
                             });
         }
 
-        private void deleteQueueOnSeparateChannel(String queue) {
-            try (Channel cleanupChannel = conn.createChannel()) {
+        private void deleteQueueOnSeparateChannel(final String queue) {
+            try (final Channel cleanupChannel = conn.createChannel()) {
                 cleanupChannel.queueDelete(queue);
-            } catch (TimeoutException | IOException | RuntimeException ex) {
+            } catch (final TimeoutException | IOException | RuntimeException ex) {
                 LOGGER.error(
                         "Failed to delete conduit managed queue '{}', this could cause a queue to leak on the broker! Proceeding with closing channel.",
                         queue,
@@ -71,15 +71,19 @@ public class AMQPTransport extends AbstractAMQPTransport {
     private String dynamicQueue;
     private boolean dynamicPoisonQueueInUse = false;
 
-    protected AMQPTransport(boolean ssl, String host, int port, MetricsCollector metricsCollector) {
+    protected AMQPTransport(
+            final boolean ssl,
+            final String host,
+            final int port,
+            final MetricsCollector metricsCollector) {
         this(new AMQPConnection(ssl, host, port, metricsCollector), true);
     }
 
-    protected AMQPTransport(AMQPConnection sharedConnection) {
+    protected AMQPTransport(final AMQPConnection sharedConnection) {
         this(sharedConnection, false);
     }
 
-    private AMQPTransport(AMQPConnection connection, boolean hasPrivateConnection) {
+    private AMQPTransport(final AMQPConnection connection, final boolean hasPrivateConnection) {
         conn = connection;
         this.hasPrivateConnection = hasPrivateConnection;
     }
@@ -94,11 +98,11 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
     @Override
-    protected void connectImpl(TransportConnectionProperties properties) throws IOException {
-        if (hasPrivateConnection && !isConnected()) {
+    protected void connectImpl(final TransportConnectionProperties properties) throws IOException {
+        if (hasPrivateConnection && !this.isConnected()) {
             try {
                 conn.connect((AMQPConnectionProperties) properties);
-            } catch (TimeoutException e) {
+            } catch (final TimeoutException e) {
                 throw new IOException("Timed-out waiting for new connection", e);
             }
         }
@@ -116,16 +120,16 @@ public class AMQPTransport extends AbstractAMQPTransport {
             }
         }
         // If the connection is shared, just try and close the channel
-        else stop();
+        else this.stop();
     }
 
     @Override
     protected AMQPQueueConsumer getConsumer(
-            Object callback,
-            AMQPCommonListenProperties commonListenProperties,
-            String poisonPrefix) {
+            final Object callback,
+            final AMQPCommonListenProperties commonListenProperties,
+            final String poisonPrefix) {
         return new AMQPQueueConsumer(
-                getChannel(),
+                this.getChannel(),
                 (AMQPConsumerCallback) callback,
                 commonListenProperties.getThreshold(),
                 poisonPrefix,
@@ -134,32 +138,33 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     @Override
     protected AMQPCommonListenProperties getCommonListenProperties(
-            TransportListenProperties properties) {
+            final TransportListenProperties properties) {
         return (AMQPListenProperties) properties;
     }
 
     @Override
-    protected Object getConsumerCallback(TransportListenProperties properties) {
+    protected Object getConsumerCallback(final TransportListenProperties properties) {
         return ((AMQPListenProperties) properties).getCallback();
     }
 
     @Override
-    protected void listenImpl(TransportListenProperties properties) throws IOException {
+    protected void listenImpl(final TransportListenProperties properties) throws IOException {
         final boolean noAutoAck = false;
-        AMQPCommonListenProperties commonListenProperties = getCommonListenProperties(properties);
+        final AMQPCommonListenProperties commonListenProperties =
+                this.getCommonListenProperties(properties);
         String queue = commonListenProperties.getQueue();
         String poisonPrefix = commonListenProperties.getPoisonPrefix();
-        boolean exclusive = commonListenProperties.getExclusive();
+        final boolean exclusive = commonListenProperties.getExclusive();
 
         if (commonListenProperties.isDynamicQueueCreation()) {
             queue =
-                    createDynamicQueue(
+                    this.createDynamicQueue(
                             commonListenProperties.getExchange(),
                             commonListenProperties.getDynamicQueueRoutingKey(),
                             commonListenProperties.isPoisonQueueEnabled());
             poisonPrefix = "." + queue;
         } else if (commonListenProperties.isAutoCreateAndBind()) {
-            autoCreateAndBind(
+            this.autoCreateAndBind(
                     commonListenProperties.getExchange(),
                     commonListenProperties.getExchangeType(),
                     commonListenProperties.getQueue(),
@@ -172,14 +177,17 @@ public class AMQPTransport extends AbstractAMQPTransport {
             channel.queuePurge(queue);
         }
 
-        AMQPQueueConsumer consumer =
-                getConsumer(getConsumerCallback(properties), commonListenProperties, poisonPrefix);
-        getChannel().basicQos(commonListenProperties.getPrefetchCount());
-        getChannel().basicConsume(queue, noAutoAck, "", false, exclusive, (Map) null, consumer);
+        final AMQPQueueConsumer consumer =
+                this.getConsumer(
+                        this.getConsumerCallback(properties), commonListenProperties, poisonPrefix);
+        this.getChannel().basicQos(commonListenProperties.getPrefetchCount());
+        this.getChannel()
+                .basicConsume(queue, noAutoAck, "", false, exclusive, (Map) null, consumer);
     }
 
     protected String createDynamicQueue(
-            String exchange, String routingKey, boolean isPoisonQueueEnabled) throws IOException {
+            final String exchange, final String routingKey, final boolean isPoisonQueueEnabled)
+            throws IOException {
 
         channel.addShutdownListener(new DynamicQueueCleanupShutdownListener());
 
@@ -199,8 +207,8 @@ public class AMQPTransport extends AbstractAMQPTransport {
                 routingKey);
 
         if (isPoisonQueueEnabled) {
-            String poisonQueue = POISON + "." + dynamicQueue;
-            Map<String, Object> settings = new HashMap<>();
+            final String poisonQueue = POISON + "." + dynamicQueue;
+            final Map<String, Object> settings = new HashMap<>();
             channel.queueDeclare(poisonQueue, false, true, true, settings);
             dynamicPoisonQueueInUse = true;
             channel.queueBind(poisonQueue, exchange, routingKey + "." + dynamicQueue + POISON);
@@ -210,18 +218,18 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
     void autoCreateAndBind(
-            String exchange,
-            String exchangeType,
-            String queue,
-            boolean isAutoDeleteQueue,
-            boolean isPoisonQueueEnabled,
-            String routingKey)
+            final String exchange,
+            final String exchangeType,
+            final String queue,
+            final boolean isAutoDeleteQueue,
+            final boolean isPoisonQueueEnabled,
+            final String routingKey)
             throws IOException {
         channel.exchangeDeclare(exchange, exchangeType, true);
         channel.queueDeclare(queue, !isAutoDeleteQueue, false, isAutoDeleteQueue, null);
         channel.queueBind(queue, exchange, routingKey);
         if (isPoisonQueueEnabled) {
-            String poisonQueue = queue + POISON;
+            final String poisonQueue = queue + POISON;
             channel.queueDeclare(poisonQueue, !isAutoDeleteQueue, false, isAutoDeleteQueue, null);
             channel.queueBind(poisonQueue, exchange, routingKey + POISON);
         }
@@ -235,9 +243,9 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
             try {
                 channel.close();
-            } catch (TimeoutException e) {
+            } catch (final TimeoutException e) {
                 throw new IOException("Timed-out closing connection", e);
-            } catch (AlreadyClosedException ignored) {
+            } catch (final AlreadyClosedException ignored) {
             }
         }
         if (hasPrivateConnection) {
@@ -246,7 +254,7 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
     @Override
-    protected boolean isStoppedImpl(int waitForMillis) throws InterruptedException {
+    protected boolean isStoppedImpl(final int waitForMillis) throws InterruptedException {
         if (hasPrivateConnection) {
             return conn.waitToStopListening(Duration.ofMillis(waitForMillis));
         } else {
@@ -256,10 +264,10 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     @Override
     protected boolean publishImpl(
-            TransportMessageBundle bundle, TransportPublishProperties properties)
+            final TransportMessageBundle bundle, final TransportPublishProperties properties)
             throws IOException, TimeoutException, InterruptedException {
-        AMQPPublishProperties publishProperties = (AMQPPublishProperties) properties;
-        AMQPMessageBundle messageBundle = (AMQPMessageBundle) bundle;
+        final AMQPPublishProperties publishProperties = (AMQPPublishProperties) properties;
+        final AMQPMessageBundle messageBundle = (AMQPMessageBundle) bundle;
 
         if (publishProperties.isConfirmEnabled()) {
             channel.confirmSelect();
@@ -280,15 +288,15 @@ public class AMQPTransport extends AbstractAMQPTransport {
 
     @Override
     protected <E> boolean transactionalPublishImpl(
-            Collection<E> messageBundles, TransportPublishProperties properties)
+            final Collection<E> messageBundles, final TransportPublishProperties properties)
             throws IOException, TimeoutException, InterruptedException {
         channel.txSelect();
 
         boolean rollback = true;
 
         try {
-            for (E messageBundle : messageBundles) {
-                if (!publishImpl((AMQPMessageBundle) messageBundle, properties)) return false;
+            for (final E messageBundle : messageBundles) {
+                if (!this.publishImpl((AMQPMessageBundle) messageBundle, properties)) return false;
             }
             rollback = false;
         } finally {
@@ -301,12 +309,12 @@ public class AMQPTransport extends AbstractAMQPTransport {
     }
 
     // Package private for testing
-    void setChannel(Channel channel) {
+    void setChannel(final Channel channel) {
         this.channel = channel;
     }
 
     // Package private for testing
-    void setConnection(AMQPConnection connection) {
+    void setConnection(final AMQPConnection connection) {
         this.conn = connection;
     }
 }

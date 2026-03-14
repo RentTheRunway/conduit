@@ -1,15 +1,46 @@
 ---
+
 version: 2
 
+registries:
+  maven-artifactory-releases:
+    type: maven-repository
+    url: https://artifactory.rtr.cloud/artifactory/maven-releases
+    username: ${{ secrets.ARTIFACTORY_DEPLOY_USER }}
+    password: ${{ secrets.ARTIFACTORY_DEPLOY_PASSWORD }}
+  maven-artifactory-thirdparty:
+    type: maven-repository
+    url: https://artifactory.rtr.cloud/artifactory/maven-thirdparty
+    username: ${{ secrets.ARTIFACTORY_DEPLOY_USER }}
+    password: ${{ secrets.ARTIFACTORY_DEPLOY_PASSWORD }}
+    # prevent Dependabot from looking at Maven Central or our snapshot repo
+    replaces-base: true
+
 updates:
-  - package-ecosystem: "maven"
-    target-branch: "master"
-    registries: "*"
-    directory: "/"
+  - package-ecosystem: github-actions
+    commit-message:
+      prefix: 'ci(gha): [NOJIRA] '
+    directory: '/'
+    labels:
+      - ci
+      - github_actions
+    open-pull-requests-limit: 10
     schedule:
-      interval: "daily"
-  - package-ecosystem: "github-actions"
-    target-branch: "master"
-    directory: "/"
+      day: sunday
+      interval: weekly
+
+  - package-ecosystem: maven
+    commit-message:
+      prefix: 'chore(java): [NOJIRA] '
+    directory: '/'
+    open-pull-requests-limit: 30
+    labels:
+      - chore
+      - dependencies
+      - java
+    registries:
+      - maven-artifactory-thirdparty
+      - maven-artifactory-releases
     schedule:
-      interval: "daily"
+      day: sunday
+      interval: weekly

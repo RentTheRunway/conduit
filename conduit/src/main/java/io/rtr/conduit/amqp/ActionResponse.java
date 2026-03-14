@@ -7,7 +7,7 @@ public class ActionResponse {
     private String reason;
     public static final String REASON_KEY = "reason";
 
-    private ActionResponse(Action action, String reason) {
+    private ActionResponse(final Action action, final String reason) {
         this.action = action;
         this.reason = reason;
     }
@@ -20,7 +20,7 @@ public class ActionResponse {
         return new ActionResponse(Action.RejectAndRequeue, null);
     }
 
-    public static ActionResponse retry(String reason, Object... args) {
+    public static ActionResponse retry(final String reason, final Object... args) {
         return new ActionResponse(Action.RejectAndRequeue, String.format(reason, args));
     }
 
@@ -28,7 +28,7 @@ public class ActionResponse {
         return new ActionResponse(Action.RejectAndDiscard, null);
     }
 
-    public static ActionResponse discard(String reason, Object... args) {
+    public static ActionResponse discard(final String reason, final Object... args) {
         return new ActionResponse(Action.RejectAndDiscard, String.format(reason, args));
     }
 
@@ -41,11 +41,11 @@ public class ActionResponse {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || this.getClass() != o.getClass()) return false;
 
-        ActionResponse that = (ActionResponse) o;
+        final ActionResponse that = (ActionResponse) o;
 
         if (action != that.action) return false;
         if (reason != null ? !reason.equals(that.reason) : that.reason != null) return false;

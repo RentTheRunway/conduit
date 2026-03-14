@@ -22,8 +22,9 @@ class AMQPMessageBundleTest {
     @Test
     void testMessageBundleHeaders() {
         // create message with default headers
-        AMQPMessageBundle bundle1 = new AMQPMessageBundle("test");
-        Map<String, Object> headers1 = new HashMap<>(bundle1.getBasicProperties().getHeaders());
+        final AMQPMessageBundle bundle1 = new AMQPMessageBundle("test");
+        final Map<String, Object> headers1 =
+                new HashMap<>(bundle1.getBasicProperties().getHeaders());
 
         // our additional headers
         Map<String, Object> headers2 = new HashMap<>();
@@ -34,7 +35,7 @@ class AMQPMessageBundleTest {
         headers1.putAll(headers2);
 
         // ensure that headers include our headers and default headers
-        AMQPMessageBundle bundle2 = new AMQPMessageBundle("test", headers2);
+        final AMQPMessageBundle bundle2 = new AMQPMessageBundle("test", headers2);
         headers2 = new HashMap<>(bundle2.getBasicProperties().getHeaders());
 
         assertFalse(headers2.isEmpty());

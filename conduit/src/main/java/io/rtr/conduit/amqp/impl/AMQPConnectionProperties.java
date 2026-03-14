@@ -19,47 +19,47 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
 
         private Builder() {}
 
-        public Builder username(String username) {
+        public Builder username(final String username) {
             this.username = username;
             return this;
         }
 
-        public Builder password(String password) {
+        public Builder password(final String password) {
             this.password = password;
             return this;
         }
 
-        public Builder virtualHost(String virtualHost) {
+        public Builder virtualHost(final String virtualHost) {
             this.virtualHost = virtualHost;
             return this;
         }
 
-        public Builder connectionTimeout(Duration connectionTimeout) {
+        public Builder connectionTimeout(final Duration connectionTimeout) {
             this.connectionTimeout = connectionTimeout;
             return this;
         }
 
-        public Builder heartbeatInterval(Duration heartbeatInterval) {
+        public Builder heartbeatInterval(final Duration heartbeatInterval) {
             this.heartbeatInterval = heartbeatInterval;
             return this;
         }
 
-        public Builder automaticRecoveryEnabled(boolean automaticRecoveryEnabled) {
+        public Builder automaticRecoveryEnabled(final boolean automaticRecoveryEnabled) {
             this.automaticRecoveryEnabled = automaticRecoveryEnabled;
             return this;
         }
 
-        public Builder networkRecoveryInterval(long networkRecoveryInterval) {
+        public Builder networkRecoveryInterval(final long networkRecoveryInterval) {
             this.networkRecoveryInterval = networkRecoveryInterval;
             return this;
         }
 
-        public Builder topologyRecoveryInterval(Long topologyRecoveryInterval) {
+        public Builder topologyRecoveryInterval(final Long topologyRecoveryInterval) {
             this.topologyRecoveryInterval = topologyRecoveryInterval;
             return this;
         }
 
-        public Builder topologyRecoveryMaxAttempts(Integer topologyRecoveryMaxAttempts) {
+        public Builder topologyRecoveryMaxAttempts(final Integer topologyRecoveryMaxAttempts) {
             this.topologyRecoveryMaxAttempts = topologyRecoveryMaxAttempts;
             return builder();
         }
@@ -92,32 +92,33 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
     private Long topologyRecoveryInterval;
     private Integer topologyRecoveryMaxAttempts = Integer.MAX_VALUE;
 
-    AMQPConnectionProperties(String username, String password) {
+    AMQPConnectionProperties(final String username, final String password) {
         this(username, password, "/");
     }
 
-    AMQPConnectionProperties(String username, String password, String virtualHost) {
+    AMQPConnectionProperties(
+            final String username, final String password, final String virtualHost) {
         this(username, password, virtualHost, 10000, 60, true);
     }
 
     AMQPConnectionProperties(
-            String username,
-            String password,
-            String virtualHost,
-            int connectionTimeout,
-            int heartbeatInterval) {
+            final String username,
+            final String password,
+            final String virtualHost,
+            final int connectionTimeout,
+            final int heartbeatInterval) {
         // Different default automaticRecoveryEnabled for this constructor is weird, but it was
         // preexisting logic retained for compatibility
         this(username, password, virtualHost, connectionTimeout, heartbeatInterval, false);
     }
 
     AMQPConnectionProperties(
-            String username,
-            String password,
-            String virtualHost,
-            int connectionTimeout,
-            int heartbeatInterval,
-            boolean automaticRecoveryEnabled) {
+            final String username,
+            final String password,
+            final String virtualHost,
+            final int connectionTimeout,
+            final int heartbeatInterval,
+            final boolean automaticRecoveryEnabled) {
         this.username = username;
         this.password = password;
         this.virtualHost = virtualHost;
@@ -127,15 +128,15 @@ public class AMQPConnectionProperties implements TransportConnectionProperties {
     }
 
     AMQPConnectionProperties(
-            String username,
-            String password,
-            String virtualHost,
-            int connectionTimeout,
-            int heartbeatInterval,
-            boolean automaticRecoveryEnabled,
-            long networkRecoveryInterval,
-            Long topologyRecoveryInterval,
-            Integer topologyRecoveryMaxAttempts) {
+            final String username,
+            final String password,
+            final String virtualHost,
+            final int connectionTimeout,
+            final int heartbeatInterval,
+            final boolean automaticRecoveryEnabled,
+            final long networkRecoveryInterval,
+            final Long topologyRecoveryInterval,
+            final Integer topologyRecoveryMaxAttempts) {
         this.username = username;
         this.password = password;
         this.virtualHost = virtualHost;

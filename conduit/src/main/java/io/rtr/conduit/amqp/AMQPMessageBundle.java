@@ -5,6 +5,7 @@ import com.rabbitmq.client.Envelope;
 
 import io.rtr.conduit.amqp.transport.TransportMessageBundle;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,22 +41,26 @@ public class AMQPMessageBundle implements TransportMessageBundle {
     }
 
     public AMQPMessageBundle(
-            String consumerTag,
-            Envelope envelope,
-            AMQP.BasicProperties basicProperties,
-            byte[] body) {
+            final String consumerTag,
+            final Envelope envelope,
+            final AMQP.BasicProperties basicProperties,
+            final byte[] body) {
         this.consumerTag = consumerTag;
         this.envelope = envelope;
         this.basicProperties = basicProperties;
         this.body = body;
     }
 
-    public AMQPMessageBundle(String message) {
-        this(null, null, initialProperties(), message.getBytes());
+    public AMQPMessageBundle(final String message) {
+        this(null, null, initialProperties(), message.getBytes(StandardCharsets.UTF_8));
     }
 
-    public AMQPMessageBundle(String message, Map<String, Object> headers) {
-        this(null, null, initialProperties(headers, CONTENT_TYPE_JSON), message.getBytes());
+    public AMQPMessageBundle(final String message, final Map<String, Object> headers) {
+        this(
+                null,
+                null,
+                initialProperties(headers, CONTENT_TYPE_JSON),
+                message.getBytes(StandardCharsets.UTF_8));
     }
 
     private AMQPMessageBundle(final Builder builder) {
@@ -135,7 +140,7 @@ public class AMQPMessageBundle implements TransportMessageBundle {
         }
 
         public Builder body(final String body) {
-            return body(body.getBytes());
+            return this.body(body.getBytes(StandardCharsets.UTF_8));
         }
 
         public AMQPMessageBundle build() {

@@ -11,9 +11,9 @@ public class AMQPPublishContext implements TransportPublishContext {
     private AMQPPublishProperties publishProperties;
 
     AMQPPublishContext(
-            AMQPTransport transport,
-            AMQPConnectionProperties connectionProperties,
-            AMQPPublishProperties publishProperties) {
+            final AMQPTransport transport,
+            final AMQPConnectionProperties connectionProperties,
+            final AMQPPublishProperties publishProperties) {
         this.transport = transport;
         this.connectionProperties = connectionProperties;
         this.publishProperties = publishProperties;

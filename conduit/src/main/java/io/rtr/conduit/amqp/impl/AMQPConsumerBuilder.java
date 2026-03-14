@@ -55,7 +55,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R username(final String username) {
         this.username = username;
-        return builder();
+        return this.builder();
     }
 
     public String getUsername() {
@@ -64,7 +64,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R purgeOnConnect(final boolean purgeOnConnect) {
         this.purgeOnConnect = purgeOnConnect;
-        return builder();
+        return this.builder();
     }
 
     public boolean shouldPurgeOnConnect() {
@@ -73,7 +73,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R dynamicQueueCreation(final boolean dynamicQueueCreation) {
         this.dynamicQueueCreation = dynamicQueueCreation;
-        return builder();
+        return this.builder();
     }
 
     protected boolean isDynamicQueueCreation() {
@@ -82,7 +82,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R poisonPrefix(final String poisonPrefix) {
         this.poisonPrefix = poisonPrefix;
-        return builder();
+        return this.builder();
     }
 
     public String getPoisonPrefix() {
@@ -91,7 +91,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R prefetchCount(final int prefetchCount) {
         this.prefetchCount = prefetchCount;
-        return builder();
+        return this.builder();
     }
 
     protected int getPrefetchCount() {
@@ -100,7 +100,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R password(final String password) {
         this.password = password;
-        return builder();
+        return this.builder();
     }
 
     public String getPassword() {
@@ -109,7 +109,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R virtualHost(final String virtualHost) {
         this.virtualHost = virtualHost;
-        return builder();
+        return this.builder();
     }
 
     public String getVirtualHost() {
@@ -118,7 +118,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R dynamicQueueRoutingKey(final String dynamicQueueRoutingKey) {
         this.dynamicQueueRoutingKey = dynamicQueueRoutingKey;
-        return builder();
+        return this.builder();
     }
 
     protected String getDynamicQueueRoutingKey() {
@@ -127,7 +127,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R connectionTimeout(final int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
-        return builder();
+        return this.builder();
     }
 
     public int getConnectionTimeout() {
@@ -136,7 +136,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R heartbeatInterval(final int heartbeatInterval) {
         this.heartbeatInterval = heartbeatInterval;
-        return builder();
+        return this.builder();
     }
 
     public int getHeartbeatInterval() {
@@ -145,7 +145,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R automaticRecoveryEnabled(final boolean automaticRecoveryEnabled) {
         this.automaticRecoveryEnabled = automaticRecoveryEnabled;
-        return builder();
+        return this.builder();
     }
 
     public boolean isAutomaticRecoveryEnabled() {
@@ -154,7 +154,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R networkRecoveryInterval(final long networkRecoveryInterval) {
         this.networkRecoveryInterval = networkRecoveryInterval;
-        return builder();
+        return this.builder();
     }
 
     public long getNetworkRecoveryInterval() {
@@ -163,7 +163,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R topologyRecoveryInterval(final Long topologyRecoveryInterval) {
         this.topologyRecoveryInterval = topologyRecoveryInterval;
-        return builder();
+        return this.builder();
     }
 
     public Long getTopologyRecoveryInterval() {
@@ -172,7 +172,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R topologyRecoveryMaxAttempts(final Integer topologyRecoveryMaxAttempts) {
         this.topologyRecoveryMaxAttempts = topologyRecoveryMaxAttempts;
-        return builder();
+        return this.builder();
     }
 
     public Integer getTopologyRecoveryMaxAttempts() {
@@ -181,7 +181,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R exchange(final String exchange) {
         this.exchange = exchange;
-        return builder();
+        return this.builder();
     }
 
     protected String getExchange() {
@@ -190,7 +190,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R queue(final String queue) {
         this.queue = queue;
-        return builder();
+        return this.builder();
     }
 
     protected String getQueue() {
@@ -199,7 +199,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R autoDeleteQueue(final boolean autoDeleteQueue) {
         isAutoDeleteQueue = autoDeleteQueue;
-        return builder();
+        return this.builder();
     }
 
     protected boolean isAutoDeleteQueue() {
@@ -208,7 +208,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R ssl(final boolean ssl) {
         this.ssl = ssl;
-        return builder();
+        return this.builder();
     }
 
     protected boolean isSsl() {
@@ -217,7 +217,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R host(final String host) {
         this.host = host;
-        return builder();
+        return this.builder();
     }
 
     protected String getHost() {
@@ -226,7 +226,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R port(final int port) {
         this.port = port;
-        return builder();
+        return this.builder();
     }
 
     protected int getPort() {
@@ -235,7 +235,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R sharedConnection(final AMQPConnection connection) {
         sharedConnection = connection;
-        return builder();
+        return this.builder();
     }
 
     public AMQPConnection getSharedConnection() {
@@ -244,7 +244,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R exclusive(final boolean exclusive) {
         this.exclusive = exclusive;
-        return builder();
+        return this.builder();
     }
 
     protected boolean getExclusive() {
@@ -253,7 +253,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R retryThreshold(final int retryThreshold) {
         this.retryThreshold = retryThreshold;
-        return builder();
+        return this.builder();
     }
 
     protected int getRetryThreshold() {
@@ -262,7 +262,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R poisonQueueEnabled(final boolean enabled) {
         this.poisonQueueEnabled = enabled;
-        return builder();
+        return this.builder();
     }
 
     protected boolean isPoisonQueueEnabled() {
@@ -271,7 +271,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R routingKey(final String routingKey) {
         this.routingKey = routingKey;
-        return builder();
+        return this.builder();
     }
 
     public String getRoutingKey() {
@@ -280,7 +280,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R autoCreateAndBind(final boolean autoCreateAndBind) {
         this.autoCreateAndBind = autoCreateAndBind;
-        return builder();
+        return this.builder();
     }
 
     public boolean isAutoCreateAndBind() {
@@ -289,7 +289,7 @@ public abstract class AMQPConsumerBuilder<
 
     public R exchangeType(final ExchangeType exchangeType) {
         this.exchangeType = exchangeType;
-        return builder();
+        return this.builder();
     }
 
     public String getExchangeType() {
@@ -315,7 +315,7 @@ public abstract class AMQPConsumerBuilder<
         this.queue = queue;
         this.exchangeType = exchangeType;
         this.routingKey = (routingKey == null) ? "" : routingKey;
-        return builder();
+        return this.builder();
     }
 
     public R autoCreateAndBind(
@@ -330,7 +330,7 @@ public abstract class AMQPConsumerBuilder<
         this.isAutoDeleteQueue = isAutoDeleteQueue;
         this.exchangeType = exchangeType;
         this.routingKey = (routingKey == null) ? "" : routingKey;
-        return builder();
+        return this.builder();
     }
 
     @Override
@@ -340,17 +340,17 @@ public abstract class AMQPConsumerBuilder<
                     "Both dynamicQueueCreation and autoCreateAndBind are enabled.");
         }
         if (!dynamicQueueCreation) {
-            assertNotNull(queue, "queue");
+            this.assertNotNull(queue, "queue");
         } else {
-            assertNotNull(exchange, "exchange");
-            assertNotNull(dynamicQueueRoutingKey, "dynamicQueueRoutingKey");
+            this.assertNotNull(exchange, "exchange");
+            this.assertNotNull(dynamicQueueRoutingKey, "dynamicQueueRoutingKey");
         }
         if (autoCreateAndBind) {
-            assertNotNull(queue, "queue");
-            assertNotNull(exchange, "exchange");
-            assertNotNull(exchangeType, "exchangeType");
-            assertNotNull(routingKey, "routingKey");
-            if (exchangeType == ExchangeType.FANOUT && isPoisonQueueEnabled()) {
+            this.assertNotNull(queue, "queue");
+            this.assertNotNull(exchange, "exchange");
+            this.assertNotNull(exchangeType, "exchangeType");
+            this.assertNotNull(routingKey, "routingKey");
+            if (exchangeType == ExchangeType.FANOUT && this.isPoisonQueueEnabled()) {
                 throw new IllegalArgumentException("Fanout exchanges do not support poison queues");
             }
         }

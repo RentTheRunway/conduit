@@ -27,11 +27,11 @@ public class AMQPQueueConsumer extends DefaultConsumer {
     private boolean poisonQueueEnabled;
 
     AMQPQueueConsumer(
-            Channel channel,
-            AMQPConsumerCallback callback,
-            int threshold,
-            String poisonPrefix,
-            boolean poisonQueueEnabled) {
+            final Channel channel,
+            final AMQPConsumerCallback callback,
+            final int threshold,
+            final String poisonPrefix,
+            final boolean poisonQueueEnabled) {
         super(channel);
         this.callback = callback;
         this.threshold = threshold;
@@ -41,21 +41,24 @@ public class AMQPQueueConsumer extends DefaultConsumer {
     }
 
     @Override
-    public void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
+    public void handleShutdownSignal(final String consumerTag, final ShutdownSignalException sig) {
         log.info("Shutdown handler invoked");
         callback.notifyOfShutdown(consumerTag, sig);
     }
 
     @Override
     public void handleDelivery(
-            String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-        ActionResponse actionResponse;
-        AMQPMessageBundle messageBundle =
+            final String consumerTag,
+            final Envelope envelope,
+            final AMQP.BasicProperties properties,
+            final byte[] body) {
+        final ActionResponse actionResponse;
+        final AMQPMessageBundle messageBundle =
                 new AMQPMessageBundle(consumerTag, envelope, properties, body);
 
         try {
             actionResponse = callback.handle(messageBundle);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             // ! Blanket exception handler for notifying, via the log, that the user-supplied
             //  callback let an exception propagate. In such cases, all the listeners are stopped.
             log.error("The user-supplied callback allowed an exception to propagate.");
@@ -63,22 +66,23 @@ public class AMQPQueueConsumer extends DefaultConsumer {
             throw e;
         }
 
-        respond(messageBundle, actionResponse);
+        this.respond(messageBundle, actionResponse);
     }
 
-    private void respond(AMQPMessageBundle messageBundle, ActionResponse actionResponse) {
+    private void respond(
+            final AMQPMessageBundle messageBundle, final ActionResponse actionResponse) {
         // ! We can't issue any blocking amqp calls in the context of this method, otherwise
         //  channel's internal thread(s) will deadlock. Both, basicAck and basicReject are
         //  asynchronous.
-        Envelope envelope = messageBundle.getEnvelope();
-        Long deliveryTag = envelope.getDeliveryTag();
-        byte[] body = messageBundle.getBody();
-        AMQP.BasicProperties properties = messageBundle.getBasicProperties();
+        final Envelope envelope = messageBundle.getEnvelope();
+        final Long deliveryTag = envelope.getDeliveryTag();
+        final byte[] body = messageBundle.getBody();
+        final AMQP.BasicProperties properties = messageBundle.getBasicProperties();
 
         try {
             switch (actionResponse.getAction()) {
                 case Acknowledge:
-                    ack(deliveryTag);
+                    this.ack(deliveryTag);
                     break;
 
                 case RejectAndDiscard:
@@ -88,44 +92,46 @@ public class AMQPQueueConsumer extends DefaultConsumer {
                     //  the poison queue. Don't bother confirming for two reasons; we don't care,
                     // and
                     //  we can't issue blocking calls here.
-                    publishToPoisonQueue(envelope, properties, actionResponse.getReason(), body);
-                    reject(deliveryTag);
+                    this.publishToPoisonQueue(
+                            envelope, properties, actionResponse.getReason(), body);
+                    this.reject(deliveryTag);
                     break;
 
                 case RejectAndRequeue:
                     log.warn("Received an unknown message, body = " + new String(body));
                     log.warn("\tAdjusting headers for retry.");
 
-                    if (!retry(envelope, properties, body)) {
-                        publishToPoisonQueue(
+                    if (!this.retry(envelope, properties, body)) {
+                        this.publishToPoisonQueue(
                                 envelope, properties, actionResponse.getReason(), body);
                     }
-                    reject(deliveryTag);
+                    this.reject(deliveryTag);
                     break;
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             callback.notifyOfActionFailure(e);
         }
     }
 
-    private void ack(Long deliveryTag) throws IOException {
+    private void ack(final Long deliveryTag) throws IOException {
         channel.basicAck(deliveryTag, false);
     }
 
-    private void reject(long deliveryTag) throws IOException {
+    private void reject(final long deliveryTag) throws IOException {
         channel.basicReject(deliveryTag, false);
     }
 
-    protected boolean retry(Envelope envelope, AMQP.BasicProperties properties, byte[] body)
+    protected boolean retry(
+            final Envelope envelope, final AMQP.BasicProperties properties, final byte[] body)
             throws IOException {
         Map<String, Object> headers = properties.getHeaders();
-        Object retryHeader = headers.get(HEADER_RETRY_COUNT);
+        final Object retryHeader = headers.get(HEADER_RETRY_COUNT);
         int retryCount = 0;
 
         if (retryHeader != null) {
             try {
                 retryCount = Integer.parseInt(retryHeader.toString());
-            } catch (NumberFormatException ignored) {
+            } catch (final NumberFormatException ignored) {
                 log.error(
                         "Received an invalid retry-count header, body = "
                                 + new String(body)
@@ -142,7 +148,7 @@ public class AMQPQueueConsumer extends DefaultConsumer {
 
         headers = new HashMap<String, Object>(headers);
         headers.put(HEADER_RETRY_COUNT, retryCount + 1);
-        AMQP.BasicProperties retryProperties =
+        final AMQP.BasicProperties retryProperties =
                 new AMQP.BasicProperties()
                         .builder()
                         .type(properties.getType())
@@ -158,16 +164,20 @@ public class AMQPQueueConsumer extends DefaultConsumer {
     }
 
     protected void publishToPoisonQueue(
-            Envelope envelope, AMQP.BasicProperties properties, String reason, byte[] body)
+            final Envelope envelope,
+            AMQP.BasicProperties properties,
+            final String reason,
+            final byte[] body)
             throws IOException {
         if (!poisonQueueEnabled) {
             return;
         }
 
         if (reason != null && !reason.trim().isEmpty()) {
-            Map<String, Object> headers = new HashMap<String, Object>(properties.getHeaders());
+            final Map<String, Object> headers =
+                    new HashMap<String, Object>(properties.getHeaders());
             headers.put(ActionResponse.REASON_KEY, reason);
-            properties = createCopyWithNewHeaders(properties, headers);
+            properties = this.createCopyWithNewHeaders(properties, headers);
         }
 
         channel.basicPublish(
@@ -178,7 +188,7 @@ public class AMQPQueueConsumer extends DefaultConsumer {
     }
 
     protected AMQP.BasicProperties createCopyWithNewHeaders(
-            AMQP.BasicProperties properties, Map<String, Object> headers) {
+            final AMQP.BasicProperties properties, final Map<String, Object> headers) {
         return new AMQP.BasicProperties()
                 .builder()
                 .contentType(properties.getContentType())
