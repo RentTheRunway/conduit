@@ -1,0 +1,18 @@
+---
+
+# yamllint disable rule:line-length
+
+name: GHAS CI
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  ghas-ci:
+    uses: RentTheRunway/security-workflows/.github/workflows/ghas-ci.yaml@SR-9455
+    secrets: inherit
