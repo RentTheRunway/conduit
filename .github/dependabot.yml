@@ -2,20 +2,6 @@
 
 version: 2
 
-registries:
-  maven-artifactory-releases:
-    type: maven-repository
-    url: https://artifactory.rtr.cloud/artifactory/maven-releases
-    username: ${{ secrets.ARTIFACTORY_DEPLOY_USER }}
-    password: ${{ secrets.ARTIFACTORY_DEPLOY_PASSWORD }}
-  maven-artifactory-thirdparty:
-    type: maven-repository
-    url: https://artifactory.rtr.cloud/artifactory/maven-thirdparty
-    username: ${{ secrets.ARTIFACTORY_DEPLOY_USER }}
-    password: ${{ secrets.ARTIFACTORY_DEPLOY_PASSWORD }}
-    # prevent Dependabot from looking at Maven Central or our snapshot repo
-    replaces-base: true
-
 updates:
   - package-ecosystem: github-actions
     commit-message:
@@ -38,9 +24,6 @@ updates:
       - chore
       - dependencies
       - java
-    registries:
-      - maven-artifactory-thirdparty
-      - maven-artifactory-releases
     schedule:
       day: sunday
       interval: weekly
