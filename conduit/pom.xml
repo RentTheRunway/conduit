@@ -20,7 +20,7 @@
   
         <awaitility.version>4.3.0</awaitility.version>
 
-        <hamcrest.version>2.2</hamcrest.version>
+        <hamcrest.version>3.0</hamcrest.version>
 
         <junit.version>5.13.4</junit.version>
 
